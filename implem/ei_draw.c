@@ -315,3 +315,54 @@ void ei_draw_polyline(ei_surface_t surface,
         }
     }
 }
+
+
+void	ei_draw_polygon		(ei_surface_t		surface,
+				 ei_point_t*		point_array,
+				 size_t			point_array_size,
+				 ei_color_t		color,
+				 const ei_rect_t*	clipper)
+{
+    if(point_array_size!=0)
+    {
+        uint32_t *p_first_pixel = (uint32_t *)hw_surface_get_buffer(surface);
+        uint32_t pixel_color = ei_impl_map_rgba(surface, color);
+        int width = hw_surface_get_size(surface).width;
+        int height = hw_surface_get_size(surface).height;
+        /* We determine how long TC must be */
+        int TC_min=point_array->y;
+        int TC_max=point_array->y;
+        for(size_t i=1; i<point_array_size; i++)
+        {
+            if (point_array[i].y< TC_min)
+            {
+                TC_min=point_array[i].y;
+            }
+            else if(point_array[i].y > TC_max)
+            {
+                TC_max=point_array[i].y;
+            }
+        }
+        segment* TC[TC_max-TC_min+1];
+        segment* curr_seg;
+        segment* prev_seg;
+        for(size_t i=0; i<point_array_size-1; i++)
+        {
+            curr_seg=malloc(sizeof(segment));
+            /* We check which point is higher */
+            if(point_array[i].y<point_array[i+1].y)
+            {
+                curr_seg->y_max=point_array[i+1].y;
+                curr_seg->x_y_min=point_array[i+1].x;
+            }
+            else
+            {
+                curr_seg->y_max=point_array[i].y;
+                curr_seg->x_y_min=point_array[i].x;
+            }
+            curr_seg->dx=point_array[i].x-point_array[i+1].x;
+            curr_seg->dy=point_array[i].y-point_array[i+1].y;
+            curr_seg->e=0;
+        }
+    }
+}

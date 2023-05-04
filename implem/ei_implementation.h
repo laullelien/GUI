@@ -93,4 +93,14 @@ void ei_impl_widget_draw_children      (ei_widget_t		widget,
 					ei_surface_t		pick_surface,
 					ei_rect_t*		clipper);
 
+typedef struct{
+	int y_max;
+	int x_y_min;
+	uint16_t e;
+	uint16_t dx;
+	uint16_t dy;
+	segment* next;
+}segment;
+
 #endif
+

@@ -15,6 +15,8 @@ bool is_inside(ei_point_t point,
     return (point.x >= left_border) && (point.x <= right_border) && (point.y >= upper_border) && (point.y <= lower_border);
 }
 
+
+
 bool is_inside_clipper(ei_point_t point,
                         const ei_rect_t *clipper)
 {
@@ -31,6 +33,7 @@ bool is_inside_clipper(ei_point_t point,
 }
 
 
+
 void ei_draw_pixel(ei_surface_t surface,
                    ei_point_t *point,
                    ei_color_t color,
@@ -45,6 +48,7 @@ void ei_draw_pixel(ei_surface_t surface,
         *(p_first_pixel + (width * point->y + point->x)) = pixel_color;
     }
 }
+
 
 
 void ei_fill(ei_surface_t surface,
@@ -672,3 +676,7 @@ void ei_draw_polyline(ei_surface_t surface,
     }
     
 }
+
+
+
+

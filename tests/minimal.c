@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
 	ei_draw_polyline(main_window, pxl_p, 2, *purple, NULL);
 	ei_draw_polyline(main_window, hexa_h, 9, *yellow, NULL);
 	ei_draw_polyline(main_window, pxl_y, 2, *yellow, NULL);
-	
+
 	// unlock, update screen.
 	hw_surface_unlock(main_window);
 	hw_surface_update_rects(main_window, NULL);
@@ -171,4 +171,3 @@ int main(int argc, char *argv[])
 	// Terminate program with no error code.
 	return 0;
 }
-

@@ -309,60 +309,152 @@ void ei_draw_polyline(ei_surface_t surface,
             ei_draw_pixel(surface, point_array, color);
         }
         for (uint32_t i = 0; i < point_array_size - 1; i++)
-        {           
+        {
             ei_draw_line(surface, point_array, point_array + 1, color);
             point_array++;
         }
     }
 }
 
-
-void	ei_draw_polygon		(ei_surface_t		surface,
-				 ei_point_t*		point_array,
-				 size_t			point_array_size,
-				 ei_color_t		color,
-				 const ei_rect_t*	clipper)
+int *ei_TC_length(ei_point_t *point_array, size_t point_array_size)
 {
-    if(point_array_size!=0)
+    int TC_length[2] = {point_array->y, point_array->y};
+    for (size_t i = 1; i < point_array_size; i++)
+    {
+        if (point_array[i].y < TC_length[0])
+        {
+            TC_length[0] = point_array[i].y;
+        }
+        else if (point_array[i].y > TC_length[1])
+        {
+            TC_length[1] = point_array[i].y;
+        }
+    }
+    return TC_length;
+}
+
+void ei_fill_TC(segment **TC, ei_point_t *point_array, size_t point_array_size, int TC_min)
+{
+    /* We store y_min to know in what line of TC we will ad it */
+    int y_min;
+    segment *p_curr_seg;
+    for (size_t i = 0; i < point_array_size - 1; i++)
+    {
+        p_curr_seg = malloc(sizeof(segment));
+        /* We check which point is higher */
+        if (point_array[i].y < point_array[i + 1].y)
+        {
+            y_min = point_array[i].y;
+            p_curr_seg->y_max = point_array[i + 1].y;
+            p_curr_seg->x_y_min = point_array[i].x;
+            p_curr_seg->dx = point_array[i + 1].x - point_array[i].x;
+            p_curr_seg->dy = point_array[i + 1].y - point_array[i].y;
+            p_curr_seg->e = 0;
+        }
+        else
+        {
+            y_min = point_array[i + 1].y;
+            p_curr_seg->y_max = point_array[i].y;
+            p_curr_seg->x_y_min = point_array[i + 1].x;
+            p_curr_seg->dx = point_array[i].x - point_array[i + 1].x;
+            p_curr_seg->dy = point_array[i].y - point_array[i + 1].y;
+            p_curr_seg->e = 0;
+        }
+        segment *curr_line;
+        /* We ignore horizontal lines */
+        if (p_curr_seg->dx != 0)
+        {
+            /* We fill TC */
+            curr_line = TC[y_min - TC_min];
+            /* If this line is empty */
+            if (curr_line == NULL)
+            {
+                TC[y_min - TC_min] = p_curr_seg;
+            }
+            else
+            {
+                /* We find where to add the current segment */
+                while (curr_line->next != NULL)
+                {
+                    curr_line++;
+                }
+                curr_line->next = p_curr_seg;
+            }
+        }
+    }
+}
+
+void ei_draw_polygon(ei_surface_t surface,
+                     ei_point_t *point_array,
+                     size_t point_array_size,
+                     ei_color_t color,
+                     const ei_rect_t *clipper)
+{
+    if (point_array_size != 0)
     {
         uint32_t *p_first_pixel = (uint32_t *)hw_surface_get_buffer(surface);
         uint32_t pixel_color = ei_impl_map_rgba(surface, color);
         int width = hw_surface_get_size(surface).width;
         int height = hw_surface_get_size(surface).height;
+
         /* We determine how long TC must be */
-        int TC_min=point_array->y;
-        int TC_max=point_array->y;
-        for(size_t i=1; i<point_array_size; i++)
+        int *TC_length = ei_TC_length(point_array, point_array_size);
+
+        /* We initialize TC */
+        segment *TC[TC_length[1] - TC_length[0] + 1];
+        ei_fill_TC(segment * TC, ei_point_t * point_array, size_t point_array_size, int TC_min);
+
+        segment *TCA;
+        /* We update TCA */
+        for (uint16_t scanline = 0; scanline <= TC_max - TC_min; scanline++)
         {
-            if (point_array[i].y< TC_min)
+            if (TCA == NULL)
             {
-                TC_min=point_array[i].y;
+                TCA = TC[scanline];
             }
-            else if(point_array[i].y > TC_max)
+            /* if TCA is still NULL, we stop */
+            if (TCA != NULL)
             {
-                TC_max=point_array[i].y;
+                p_prev_seg = *TCA;
+                p_curr_seg = p_prev_seg->next;
+                /* There is only one segment*/
+                if (p_prev_seg == NULL)
+                {
+                    if (p_curr_seg->y_max == scanline)
+                    {
+                        TCA = TC[scanline];
+                    }
+                    else
+                    {
+                        p_prev_seg->next = TC[scanline];
+                    }
+                }
+                /* We know there are at least 2 segments */
+                else
+                {
+                    while (p_curr_seg->next != 0)
+                    {
+                        if (p_curr_seg->y_max == scanline)
+                        {
+                            /* We remove the segment */
+                            p_prev_seg->next = p_curr_seg->next;
+                            free(p_cur_seg);
+                        }
+                        p_prev_seg = p_prev_seg->next;
+                        p_curr_seg = p_prev_seg->next;
+                    }
+                    /* Now, there is one last segment to check */
+                    if (p_curr_seg->y_max == scanline)
+                    {
+                        p_prev_seg->next = TC[scanline];
+                    }
+                    else
+                    {
+                        p_curr_seg->next = TC[scanline];
+                    }
+                }
             }
         }
-        segment* TC[TC_max-TC_min+1];
-        segment* curr_seg;
-        segment* prev_seg;
-        for(size_t i=0; i<point_array_size-1; i++)
-        {
-            curr_seg=malloc(sizeof(segment));
-            /* We check which point is higher */
-            if(point_array[i].y<point_array[i+1].y)
-            {
-                curr_seg->y_max=point_array[i+1].y;
-                curr_seg->x_y_min=point_array[i+1].x;
-            }
-            else
-            {
-                curr_seg->y_max=point_array[i].y;
-                curr_seg->x_y_min=point_array[i].x;
-            }
-            curr_seg->dx=point_array[i].x-point_array[i+1].x;
-            curr_seg->dy=point_array[i].y-point_array[i+1].y;
-            curr_seg->e=0;
-        }
+        TCA = linked_list_merge_sort(TCA);
     }
 }

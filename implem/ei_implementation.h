@@ -40,7 +40,7 @@ int *ei_TC_length(ei_point_t *point_array,
  * 		than can be written directly in the memory returned by \ref hw_surface_get_buffer.
  * 		The surface parameter provides the channel order.
  *
- * @param	TC				Array of segment*, placed in function of y_min, the lowest y coordinate of the 2 points
+ * @param	TC				Array of segment*, stored in function of y_min, the lowest y coordinate of the 2 points
  * @param	point_array 	The array of points defining the polygon. Its size is provided in the
  * 				next parameter (point_array_size). The array can be empty (i.e. nothing
  * 				is drawn) or else it must have more than 2 points.
@@ -51,8 +51,22 @@ int *ei_TC_length(ei_point_t *point_array,
  *				of the color is ignored in the case of surfaces that don't have an
  *				alpha channel.
  */
+void ei_TC_fill(segment **TC, ei_point_t *point_array, size_t point_array_size, int TC_min);
 
-void ei_fill_TC(segment **TC, ei_point_t *point_array, size_t point_array_size, int TC_min);
+/**
+ * \brief	Adds the new segments of the current scanline into TCA
+ * and removes the segments of TCA which are such that y_max = scanline
+ *
+ * @param	TC				Array of segment*, stored in function of y_min, the lowest y coordinate of the 2 points
+ * @param	TCA 		The segments which are currently usefull to determine where to draw our line.
+ * It corresponds to every line that intersect the scanline apart from horizontal which are useless for the algorithm
+ * @param	scanline 	The number corresponding to the current scanline.
+ * scanline + TC_min corresponds to the actual x index of the line we are dealing with.
+ *
+ * @return 			Nothing
+ *
+ */
+void ei_TCA_remove_merge(segment **TC, segment *TCA, uint16_t scanline);
 
 uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color);
 

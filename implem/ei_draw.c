@@ -333,7 +333,7 @@ int *ei_TC_length(ei_point_t *point_array, size_t point_array_size)
     return TC_length;
 }
 
-void ei_fill_TC(segment **TC, ei_point_t *point_array, size_t point_array_size, int TC_min)
+void ei_TC_fill(segment **TC, ei_point_t *point_array, size_t point_array_size, int TC_min)
 {
     /* We store y_min to know in what line of TC we will ad it */
     int y_min;
@@ -384,6 +384,61 @@ void ei_fill_TC(segment **TC, ei_point_t *point_array, size_t point_array_size, 
     }
 }
 
+void ei_TCA_remove_merge(segment **TC, segment *TCA, uint16_t scanline)
+{
+    if (TCA == NULL)
+    {
+        TCA = TC[scanline];
+    }
+    /* if TCA is still NULL, we stop */
+    if (TCA != NULL)
+    {
+        segment *p_prev_seg = TCA;
+        segment *p_curr_seg = p_prev_seg->next;
+        /* There is only one segment*/
+        if (p_curr_seg == NULL)
+        {
+            if (p_curr_seg->y_max == scanline)
+            {
+                TCA = TC[scanline];
+            }
+            else
+            {
+                p_curr_seg->next = TC[scanline];
+            }
+        }
+        /* We know there are at least 2 segments */
+        else
+        {
+            while (p_curr_seg->next != 0)
+            {
+                if (p_curr_seg->y_max == scanline)
+                {
+                    /* We remove the segment */
+                    p_prev_seg->next = p_curr_seg->next;
+                    free(p_cur_seg);
+                    p_curr_seg = p_prev_seg->next;
+                }
+                else
+                {
+                    p_prev_seg = p_curr_seg;
+                    p_curr_seg = p_curr_seg->next;
+                }
+            }
+            /* Now, there is one last segment to check */
+            if (p_curr_seg->y_max == scanline)
+            {
+                p_prev_seg->next = TC[scanline];
+                free(p_curr_seg);
+            }
+            else
+            {
+                p_curr_seg->next = TC[scanline];
+            }
+        }
+    }
+}
+
 void ei_draw_polygon(ei_surface_t surface,
                      ei_point_t *point_array,
                      size_t point_array_size,
@@ -400,61 +455,18 @@ void ei_draw_polygon(ei_surface_t surface,
         /* We determine how long TC must be */
         int *TC_length = ei_TC_length(point_array, point_array_size);
 
-        /* We initialize TC */
+        /* We initialize and fill TC */
         segment *TC[TC_length[1] - TC_length[0] + 1];
-        ei_fill_TC(segment * TC, ei_point_t * point_array, size_t point_array_size, int TC_min);
+        ei_TC_fill(segment * TC, ei_point_t * point_array, size_t point_array_size, int TC_min);
 
         segment *TCA;
-        /* We update TCA */
+        /* We update TCA and draw for each scanline */
         for (uint16_t scanline = 0; scanline <= TC_max - TC_min; scanline++)
         {
-            if (TCA == NULL)
-            {
-                TCA = TC[scanline];
-            }
-            /* if TCA is still NULL, we stop */
-            if (TCA != NULL)
-            {
-                p_prev_seg = *TCA;
-                p_curr_seg = p_prev_seg->next;
-                /* There is only one segment*/
-                if (p_prev_seg == NULL)
-                {
-                    if (p_curr_seg->y_max == scanline)
-                    {
-                        TCA = TC[scanline];
-                    }
-                    else
-                    {
-                        p_prev_seg->next = TC[scanline];
-                    }
-                }
-                /* We know there are at least 2 segments */
-                else
-                {
-                    while (p_curr_seg->next != 0)
-                    {
-                        if (p_curr_seg->y_max == scanline)
-                        {
-                            /* We remove the segment */
-                            p_prev_seg->next = p_curr_seg->next;
-                            free(p_cur_seg);
-                        }
-                        p_prev_seg = p_prev_seg->next;
-                        p_curr_seg = p_prev_seg->next;
-                    }
-                    /* Now, there is one last segment to check */
-                    if (p_curr_seg->y_max == scanline)
-                    {
-                        p_prev_seg->next = TC[scanline];
-                    }
-                    else
-                    {
-                        p_curr_seg->next = TC[scanline];
-                    }
-                }
-            }
+            ei_TCA_remove_merge(TC, TCA, scanline);
+            TCA = linked_list_merge_sort(TCA);
         }
-        TCA = linked_list_merge_sort(TCA);
+
+        // ei_TC_free
     }
 }

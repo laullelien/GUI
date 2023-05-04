@@ -55,14 +55,6 @@
 // 	return 0;
 // }
 
-#include <stdlib.h>
-
-#include "ei_types.h"
-#include "ei_event.h"
-#include "ei_utils.h"
-#include "hw_interface.h"
-#include "ei_draw.h"
-
 int main(int argc, char *argv[])
 {
 	ei_surface_t main_window = NULL;
@@ -154,19 +146,12 @@ int main(int argc, char *argv[])
 	pxl_y[1].x = 375;
 	pxl_y[1].y = 213;
 
-	ei_point_t line_8[2];
-	line_8[0].x = 300;
-	line_8[0].y = 275;
-	line_8[1].x = 500;
-	line_8[1].y = 200;
-
 	ei_fill(main_window, black, NULL);
 
 	ei_draw_polyline(main_window, hexa_l, 9, *purple, NULL);
 	ei_draw_polyline(main_window, pxl_p, 2, *purple, NULL);
 	ei_draw_polyline(main_window, hexa_h, 9, *yellow, NULL);
 	ei_draw_polyline(main_window, pxl_y, 2, *yellow, NULL);
-	ei_draw_polyline(main_window, line_8, 2, *white, NULL);
 	
 	// unlock, update screen.
 	hw_surface_unlock(main_window);

@@ -693,4 +693,9 @@ void ei_draw_polygon(ei_surface_t surface,
 
         // ei_TC_free
     }
+    for (uint32_t i = 0; i < point_array_size - 1; i++)
+    {
+        ei_draw_line(surface, point_array, point_array + 1, color, clipper);
+        point_array++;
+    }
 }

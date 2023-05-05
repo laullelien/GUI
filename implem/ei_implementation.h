@@ -133,12 +133,12 @@ void ei_impl_widget_draw_children(ei_widget_t widget,
  * @param first Pointer to the first cell of TCA
  *
  */
-segment *linked_list_merge_sort(segment *first);
+segment *ei_TCA_sort(segment *first);
 
-segment *linked_list_sort(segment *first, segment *second);
+segment *ei_merge(segment *first, segment *second);
 
-void print_list(segment *first);
+void ei_liste_print(segment *first);
 
-segment *get_middle(segment *first);
+segment *ei_get_middle(segment *first);
 
 #endif

@@ -688,7 +688,7 @@ void ei_draw_polygon(ei_surface_t surface,
         for (uint16_t scanline = 0; scanline <= TC_length[1] - TC_length[0]; scanline++)
         {
             ei_TCA_remove_merge(TC, TCA, scanline);
-            TCA = linked_list_merge_sort(TCA);
+            TCA = ei_TCA_sort(TCA);
         }
 
         // ei_TC_free

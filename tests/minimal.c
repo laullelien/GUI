@@ -55,14 +55,6 @@
 // 	return 0;
 // }
 
-#include <stdlib.h>
-
-#include "ei_types.h"
-#include "ei_event.h"
-#include "ei_utils.h"
-#include "hw_interface.h"
-#include "ei_draw.h"
-
 int main(int argc, char *argv[])
 {
 	ei_surface_t main_window = NULL;

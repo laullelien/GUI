@@ -16,7 +16,7 @@ uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color)
     }  
     return *((uint32_t *)pixel_color); 
 }
-
+    
 
 segment * get_middle(segment * first)
 {

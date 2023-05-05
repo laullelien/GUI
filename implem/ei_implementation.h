@@ -127,4 +127,18 @@ void ei_impl_widget_draw_children(ei_widget_t widget,
 								  ei_surface_t pick_surface,
 								  ei_rect_t *clipper);
 
+/**
+ * @brief Sort the linked list TCA according to abscisses (by merging)
+ *
+ * @param first Pointer to the first cell of TCA
+ *
+ */
+segment *linked_list_merge_sort(segment *first);
+
+segment *linked_list_sort(segment *first, segment *second);
+
+void print_list(segment *first);
+
+segment *get_middle(segment *first);
+
 #endif

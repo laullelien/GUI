@@ -16,8 +16,8 @@ typedef struct segment
 {
 	int y_max;
 	int x_y_min;
-	uint16_t e;
-	uint16_t dx;
+	int e;
+	int dx;
 	uint16_t dy;
 	struct segment *next;
 } segment;
@@ -67,6 +67,28 @@ void ei_TC_fill(segment **TC, ei_point_t *point_array, size_t point_array_size, 
  *
  */
 void ei_TCA_remove_merge(segment **TC, segment *TCA, uint16_t scanline);
+
+/**
+ * \brief	Draws the current scanline
+ *
+ * @param	TCA 		The segments which are currently usefull to determine where to draw our line.
+ * It corresponds to every line that intersect the scanline apart from horizontal which are useless for the algorithm
+ *
+ * @return 			Nothing
+ *
+ */
+void ei_draw_scanline(segment *TCA, ei_surface_t surface, ei_color_t color, int *TC_length);
+
+/**
+ * \brief	Updates the x_y_min of the pixels in the current scanline
+ *
+ * @param	TCA 		The segments which are currently usefull to determine where to draw our line.
+ * It corresponds to every line that intersect the scanline apart from horizontal which are useless for the algorithm
+ *
+ * @return 			Nothing
+ *
+ */
+void ei_update(segment *TCA);
 
 uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color);
 

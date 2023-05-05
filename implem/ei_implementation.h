@@ -12,6 +12,14 @@
 #include "ei_types.h"
 #include "ei_widget.h"
 
+typedef struct segment{
+	int y_max;
+	int x_y_min;
+	uint16_t e;
+	uint16_t dx;
+	uint16_t dy;
+	struct segment * next;
+} segment;
 
 
 /**
@@ -93,14 +101,24 @@ void ei_impl_widget_draw_children      (ei_widget_t		widget,
 					ei_surface_t		pick_surface,
 					ei_rect_t*		clipper);
 
-typedef struct{
-	int y_max;
-	int x_y_min;
-	uint16_t e;
-	uint16_t dx;
-	uint16_t dy;
-	segment* next;
-}segment;
+
+
+
+
+/**
+ * @brief Sort the linked list TCA according to abscisses (by merging)
+ * 
+ * @param first Pointer to the first cell of TCA
+ * 
+*/
+segment * linked_list_merge_sort(segment * first);
+
+segment* linked_list_sort(segment * first, segment * second);
+
+void print_list(segment * first);
+
+segment * get_middle(segment * first);
+
 
 #endif
 

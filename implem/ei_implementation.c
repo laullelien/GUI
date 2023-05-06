@@ -40,6 +40,7 @@ void ei_TC_fill(segment **TC, ei_point_t *point_array, size_t point_array_size, 
     /* We store y_min to know in what line of TC we will ad it */
     int y_min;
     segment *p_curr_seg;
+    segment *curr_line;
     for (size_t i = 0; i < point_array_size - 1; i++)
     {
         p_curr_seg = malloc(sizeof(segment));
@@ -52,6 +53,7 @@ void ei_TC_fill(segment **TC, ei_point_t *point_array, size_t point_array_size, 
             p_curr_seg->dx = point_array[i + 1].x - point_array[i].x;
             p_curr_seg->dy = point_array[i + 1].y - point_array[i].y;
             p_curr_seg->e = 0;
+            p_curr_seg->next = 0;
         }
         else
         {
@@ -61,10 +63,10 @@ void ei_TC_fill(segment **TC, ei_point_t *point_array, size_t point_array_size, 
             p_curr_seg->dx = point_array[i].x - point_array[i + 1].x;
             p_curr_seg->dy = point_array[i].y - point_array[i + 1].y;
             p_curr_seg->e = 0;
+            p_curr_seg->next = 0;
         }
-        segment *curr_line;
         /* We ignore horizontal lines */
-        if (p_curr_seg->dx != 0)
+        if (p_curr_seg->dy != 0)
         {
             /* We fill TC */
             curr_line = TC[y_min - TC_min];
@@ -78,30 +80,35 @@ void ei_TC_fill(segment **TC, ei_point_t *point_array, size_t point_array_size, 
                 /* We find where to add the current segment */
                 while (curr_line->next != NULL)
                 {
-                    curr_line++;
+                    curr_line = curr_line->next;
                 }
                 curr_line->next = p_curr_seg;
             }
         }
+        else
+        {
+            free(p_curr_seg);
+        }
     }
 }
 
-void ei_TCA_remove_merge(segment **TC, segment *TCA, uint16_t scanline)
+void ei_TCA_remove_merge(segment **TC, segment **p_TCA, uint16_t scanline, int TC_min)
 {
-    if (TCA == NULL)
+    if (*p_TCA == NULL)
     {
-        TCA = TC[scanline];
+        *p_TCA = TC[scanline];
     }
     else
     {
-        segment *p_prev_seg = TCA;
+        segment *p_prev_seg = *p_TCA;
         segment *p_curr_seg = p_prev_seg->next;
         /* There is only one segment*/
         if (p_curr_seg == NULL)
         {
-            if (p_curr_seg->y_max == scanline)
+            if (p_curr_seg->y_max == scanline+TC_min)
             {
-                TCA = TC[scanline];
+                *p_TCA = TC[scanline];
+                free(p_curr_seg);
             }
             else
             {
@@ -113,7 +120,7 @@ void ei_TCA_remove_merge(segment **TC, segment *TCA, uint16_t scanline)
         {
             while (p_curr_seg->next != 0)
             {
-                if (p_curr_seg->y_max == scanline)
+                if (p_curr_seg->y_max == scanline+TC_min)
                 {
                     /* We remove the segment */
                     p_prev_seg->next = p_curr_seg->next;
@@ -126,9 +133,8 @@ void ei_TCA_remove_merge(segment **TC, segment *TCA, uint16_t scanline)
                     p_curr_seg = p_curr_seg->next;
                 }
             }
-            printf("ok\n");
             /* Now, there is one last segment to check */
-            if (p_curr_seg->y_max == scanline)
+            if (p_curr_seg->y_max == scanline+TC_min)
             {
                 p_prev_seg->next = TC[scanline];
                 free(p_curr_seg);
@@ -137,15 +143,22 @@ void ei_TCA_remove_merge(segment **TC, segment *TCA, uint16_t scanline)
             {
                 p_curr_seg->next = TC[scanline];
             }
+            /* This was never tested. */
+            if ((*p_TCA)->y_max == scanline+TC_min)
+            {
+                segment *p_to_free_seg = *p_TCA;
+                (*p_TCA) = (*p_TCA)->next;
+                free(p_to_free_seg);
+            }
         }
     }
 }
 
-void ei_draw_scanline(segment *TCA, ei_surface_t surface, ei_color_t color, int *TC_length)
+void ei_draw_scanline(segment *TCA, ei_surface_t surface, ei_color_t color, int *TC_length, int line_idx)
 {
     uint32_t pixel_color = ei_impl_map_rgba(surface, color);
     int width = hw_surface_get_size(surface).width;
-    int offset = TC_length[0] * width;
+    int offset = width * line_idx;
     uint32_t *p_first_pixel = (uint32_t *)hw_surface_get_buffer(surface) + offset; /* We set p_first_pixel to the first pixel of the scanline */
 
     segment *p_interval_entry = TCA;
@@ -153,7 +166,7 @@ void ei_draw_scanline(segment *TCA, ei_surface_t surface, ei_color_t color, int 
     uint16_t interval_entry_idx;
     uint16_t interval_ending_idx;
     /* The number of segments in TCA must be even since we removed horizontal and ending segments */
-    while (p_interval_entry->next != NULL)
+    while (p_interval_entry != NULL)
     {
         p_interval_ending = p_interval_entry->next;
         /* We round to the next number in entry. So we add 1 to x_y_min if epsilon > 0 i.e. dx.e > 0*/
@@ -168,7 +181,7 @@ void ei_draw_scanline(segment *TCA, ei_surface_t surface, ei_color_t color, int 
             interval_entry_idx = p_interval_entry->x_y_min + (p_interval_entry->e > 0);
             interval_ending_idx = p_interval_ending->x_y_min - (p_interval_ending->e <= 0);
         }
-        for (uint32_t i = interval_entry_idx; interval_entry_idx <= interval_ending_idx; interval_entry_idx++)
+        for (uint32_t i = interval_entry_idx; i <= interval_ending_idx; i++)
         {
             *(p_first_pixel + i) = pixel_color;
         }
@@ -184,22 +197,44 @@ void ei_update(segment *TCA)
         if (p_curr_segment->dx > 0)
         {
             p_curr_segment->e += p_curr_segment->dx;
-            if (p_curr_segment->e << 1 > p_curr_segment->dy)
+            /* if |dx| > dy there may be several loop needed */
+            while (p_curr_segment->e << 1 > p_curr_segment->dy)
             {
                 p_curr_segment->x_y_min++;
                 p_curr_segment->e -= p_curr_segment->dy;
             }
         }
-        else
+        else if (p_curr_segment->dx < 0)
         {
             p_curr_segment->e -= p_curr_segment->dx;
-            if (p_curr_segment->e << 1 > p_curr_segment->dy)
+            /* if |dx| > dy there may be several loop needed */
+            while (p_curr_segment->e << 1 > p_curr_segment->dy)
             {
                 p_curr_segment->x_y_min--;
                 p_curr_segment->e -= p_curr_segment->dy;
             }
         }
         p_curr_segment = p_curr_segment->next;
+    }
+}
+
+void ei_TCA_free(segment *TCA)
+{
+    if(TCA==NULL)
+    {
+        return;
+    }
+    else
+    {
+        segment *p_curr_segment=TCA->next;
+        segment *p_prev_segment=TCA;
+        while(p_curr_segment!=NULL)
+        {
+            free(p_prev_segment);
+            p_prev_segment=p_curr_segment;
+            p_curr_segment=p_curr_segment->next;
+        }
+        free(p_prev_segment);
     }
 }
 

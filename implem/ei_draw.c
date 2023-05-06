@@ -673,36 +673,32 @@ void ei_draw_polygon(ei_surface_t surface,
     {
         /* We determine how long TC must be */
         int *TC_length = ei_TC_length(point_array, point_array_size);
-        printf("%d %d\n", *TC_length, *(TC_length + 1));
-
         /* We initialize and fill TC */
-        segment *TC[TC_length[1] - TC_length[0] + 1];
+        segment *TC[TC_length[1] - TC_length[0]];
         for (int i = 0; i <= TC_length[1] - TC_length[0]; i++)
         {
             TC[i] = 0;
         }
         ei_TC_fill(TC, point_array, point_array_size, TC_length[0]);
-        for (int i = 0; i <= TC_length[1] - TC_length[0]; i++)
-        {
-            if (TC[i] != NULL)
-            {
-                printf("x:%d, y:%d\n", TC[i]->x_y_min, TC[i]->y_max);
-            }
-        }
-        segment *TCA;
+        segment *TCA = 0;
+        segment *p_curr_seg;
         /* We update TCA and draw for each scanline */
-        for (uint16_t scanline = 0; scanline <= TC_length[1] - TC_length[0]; scanline++)
+        for (uint16_t scanline = 0; scanline < TC_length[1] - TC_length[0]; scanline++)
         {
-            ei_TCA_remove_merge(TC, TCA, scanline);
+            ei_TCA_remove_merge(TC, &TCA, scanline, TC_length[0]);
+            p_curr_seg = TCA;
+            while (p_curr_seg != 0)
+            {
+                p_curr_seg = p_curr_seg->next;
+            }
             if (TCA != NULL)
             {
                 TCA = ei_TCA_sort(TCA);
-                ei_draw_scanline(TCA, surface, color, TC_length);
+                ei_draw_scanline(TCA, surface, color, TC_length, scanline + TC_length[0]);
                 ei_update(TCA);
             }
         }
-
-        // ei_TC_free
         free(TC_length);
+        ei_TCA_free(TCA);
     }
 };

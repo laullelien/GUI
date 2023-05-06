@@ -23,72 +23,81 @@ typedef struct segment
 } segment;
 
 /**
- * \brief	Allows to get the indices in order to minimize the size of TC
+ * \brief	Returns the indices of the lowest and highest points in order to minimize the size of TC.
  *
  * @param	point_array 	The array of points defining the polygon. Its size is provided in the
  * 				next parameter (point_array_size). The array can be empty (i.e. nothing
  * 				is drawn) or else it must have more than 2 points.
  * @param	point_array_size The number of points in the point_array. Must be 0 or more than 2.
  *
- * @return 	Returns an array of size 2, with the minimum index first and then the maximum index.
+ * @return 	An array of size 2. The first element is the index TC_min of the lowest point and the second
+ *          element is TC_max, the index of the highest point.
  */
 int *ei_TC_length(ei_point_t *point_array,
 				  size_t point_array_size);
 
 /**
- * \brief	Converts the red, green, blue and alpha components of a color into a 32 bits integer
- * 		than can be written directly in the memory returned by \ref hw_surface_get_buffer.
- * 		The surface parameter provides the channel order.
+ * \brief	Creates TC, an array where each element TC[i] contains a linked list of segments. 
+ * 			The segments in TC[i] have a lowest point with a y coordinate equal to i.
  *
- * @param	TC				Array of segment*, stored in function of y_min, the lowest y coordinate of the 2 points
+ * @param	TC				Array of segment* that we fill
  * @param	point_array 	The array of points defining the polygon. Its size is provided in the
  * 				next parameter (point_array_size). The array can be empty (i.e. nothing
  * 				is drawn) or else it must have more than 2 points.
  * @param	point_array_size The number of points in the point_array. Must be 0 or more than 2.
- * @param   TC_min The y idex of the lowest point
+ * @param   TC_min The y index of the lowest point
  *
- * @return 			The 32 bit integer corresponding to the color. The alpha component
- *				of the color is ignored in the case of surfaces that don't have an
- *				alpha channel.
+ * @return 			Nothing
  */
 void ei_TC_fill(segment **TC, ei_point_t *point_array, size_t point_array_size, int TC_min);
 
 /**
- * \brief	Adds the new segments of the current scanline into TCA
+ * \brief	Adds the new segments of the current scanline i.e the elements of TC[scanline] into TCA
  * and removes the segments of TCA which are such that y_max = scanline
  *
- * @param	TC				Array of segment*, stored in function of y_min, the lowest y coordinate of the 2 points
- * @param	TCA 		The segments which are currently usefull to determine where to draw our line.
- * It corresponds to every line that intersect the scanline apart from horizontal which are useless for the algorithm
- * @param	scanline 	The number corresponding to the current scanline.
- * scanline + TC_min corresponds to the actual x index of the line we are dealing with.
+ * @param	TC				Array of segment*, stored based on y_min, the lowest y coordinate of the 2 points
+ * @param	p_TCA 		A pointer to the segments which are currently being used to determine where to draw our line.
+ * It corresponds to every line that intersect the scanline apart from horizontal lines which are useless for the algorithm
+ * @param	scanline 	The index corresponding to the current scanline.
+ * scanline + TC_min corresponds to the actual x index of the line we are dealing with in the surface.
  *
  * @return 			Nothing
  *
  */
-void ei_TCA_remove_merge(segment **TC, segment *TCA, uint16_t scanline);
+void ei_TCA_remove_merge(segment **TC, segment **p_TCA, uint16_t scanline, int TC_min);
 
 /**
- * \brief	Draws the current scanline
+ * \brief	Draws the current scanline by drawing between each segment couple
  *
- * @param	TCA 		The segments which are currently usefull to determine where to draw our line.
- * It corresponds to every line that intersect the scanline apart from horizontal which are useless for the algorithm
+ * @param	TCA 		The segments which are currently being used to determine where to draw our line.
+ * It corresponds to every line that intersect the scanline apart from horizontal lines which are useless for the algorithm
  *
  * @return 			Nothing
  *
  */
-void ei_draw_scanline(segment *TCA, ei_surface_t surface, ei_color_t color, int *TC_length);
+void ei_draw_scanline(segment *TCA, ei_surface_t surface, ei_color_t color, int *TC_length, int line_idx);
 
 /**
- * \brief	Updates the x_y_min of the pixels in the current scanline
+ * \brief	Frees the segments of TCA
  *
- * @param	TCA 		The segments which are currently usefull to determine where to draw our line.
- * It corresponds to every line that intersect the scanline apart from horizontal which are useless for the algorithm
+ * @param	TCA 		The segments which are currently being used to determine where to draw our line.
+ * It corresponds to every line that intersect the scanline apart from horizontal lines which are useless for the algorithm
  *
  * @return 			Nothing
  *
  */
 void ei_update(segment *TCA);
+
+/**
+ * \brief	Updates the x_y_min of the pixels in the current scanline
+ *
+ * @param	TCA 		The segments which are currently being used to determine where to draw our line.
+ * It corresponds to every line that intersect the scanline apart from horizontal lines which are useless for the algorithm
+ *
+ * @return 			Nothing
+ *
+ */
+void ei_TCA_free(segment *TCA);
 
 uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color);
 

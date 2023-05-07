@@ -216,7 +216,64 @@ int main(int argc, char *argv[])
 	// fish[6].x = 200;
 	// fish[6].y = 50;
 
+	ei_point_t hexa_l[9];
+	hexa_l[0].x = 100;
+	hexa_l[0].y = 100;
+	hexa_l[1].x = 200;
+	hexa_l[1].y = 100;
+	hexa_l[2].x = 250;
+	hexa_l[2].y = 125;
+	hexa_l[3].x = 250;
+	hexa_l[3].y = 175;
+	hexa_l[4].x = 200;
+	hexa_l[4].y = 200;
+	hexa_l[5].x = 100;
+	hexa_l[5].y = 200;
+	hexa_l[6].x = 50;
+	hexa_l[6].y = 175;
+	hexa_l[7].x = 50;
+	hexa_l[7].y = 125;
+	hexa_l[8].x = 100;
+	hexa_l[8].y = 100;
+
+	ei_point_t pxl_p[2];
+	pxl_p[0].x = 150;
+	pxl_p[0].y = 150;
+	pxl_p[1].x = 150;
+	pxl_p[1].y = 150;
+
+	ei_point_t hexa_h[9];
+	hexa_h[0].x = 400;
+	hexa_h[0].y = 100;
+	hexa_h[1].x = 350;
+	hexa_h[1].y = 100;
+	hexa_h[2].x = 300;
+	hexa_h[2].y = 175;
+	hexa_h[3].x = 300;
+	hexa_h[3].y = 250;
+	hexa_h[4].x = 350;
+	hexa_h[4].y = 325;
+	hexa_h[5].x = 400;
+	hexa_h[5].y = 325;
+	hexa_h[6].x = 450;
+	hexa_h[6].y = 250;
+	hexa_h[7].x = 450;
+	hexa_h[7].y = 175;
+	hexa_h[8].x = 400;
+	hexa_h[8].y = 100;
+
+	ei_point_t pxl_y[2];
+	pxl_y[0].x = 375;
+	pxl_y[0].y = 213;
+	pxl_y[1].x = 375;
+	pxl_y[1].y = 213;
+
 	ei_fill(main_window, black, NULL);
+
+	ei_draw_polyline(main_window, hexa_l, 9, *red, NULL);
+	ei_draw_polyline(main_window, pxl_p, 2, *red, NULL);
+	ei_draw_polyline(main_window, hexa_h, 9, *green, NULL);
+	ei_draw_polyline(main_window, pxl_y, 2, *green, NULL);
 
 	// ei_draw_polygon(main_window, red_poly, 5, *red, NULL);
 	// ei_draw_polygon(main_window, green_poly, 9, *green, NULL);

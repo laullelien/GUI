@@ -187,7 +187,7 @@ void ei_draw_scanline(segment *TCA, ei_surface_t surface, ei_color_t color, int 
         {
             interval_ending_idx = p_interval_ending->x_y_min - (p_interval_ending->e <= 0);
         }
-        printf("e: %d, s: %d\n", interval_entry_idx, interval_ending_idx);
+        // printf("e: %d, s: %d\n", interval_entry_idx, interval_ending_idx);
         for (uint32_t i = interval_entry_idx; i <= interval_ending_idx; i++)
         {
             *(p_first_pixel + i) = pixel_color;

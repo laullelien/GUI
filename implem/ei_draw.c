@@ -171,7 +171,7 @@ void ei_draw_line(ei_surface_t surface,
                         y0--;
                         e += dx;
                         offset -= width;
-                        if (e << 1 > dy)
+                        if (e << 1 > -dy)
                         {
                             x0++;
                             e += dy;
@@ -264,7 +264,7 @@ void ei_draw_line(ei_surface_t surface,
                         y0++;
                         e -= dx;
                         offset += width;
-                        if (e << 1 > dx)
+                        if (e << 1 > dy)
                         {
                             x0--;
                             e -= dy;
@@ -308,7 +308,7 @@ void ei_draw_line(ei_surface_t surface,
                         x0--;
                         e -= dy;
                         offset--;
-                        if (e << 1 > dx)
+                        if (e << 1 > -dx)
                         {
                             y0--;
                             e += dx;
@@ -328,7 +328,7 @@ void ei_draw_line(ei_surface_t surface,
                         y0--;
                         e -= dx;
                         offset -= width;
-                        if (e << 1 > dy)
+                        if (e << 1 > -dy)
                         {
                             x0--;
                             e += dy;
@@ -680,18 +680,18 @@ void ei_draw_polygon(ei_surface_t surface,
             TC[i] = 0;
         }
         ei_TC_fill(TC, point_array, point_array_size, TC_length[0]);
-        for (int i = 0; i <= TC_length[1] - TC_length[0]; i++)
-        {
-            if (TC[i] != NULL)
-            {
-                segment *p_curr_seg = TC[i];
-                while (p_curr_seg != NULL)
-                {
-                    printf("line: %d, x_y_min : %d,y_max : %d\n", i, p_curr_seg->x_y_min, p_curr_seg->y_max);
-                    p_curr_seg = p_curr_seg->next;
-                }
-            }
-        }
+        // for (int i = 0; i <= TC_length[1] - TC_length[0]; i++)
+        // {
+        //     if (TC[i] != NULL)
+        //     {
+        //         segment *p_curr_seg = TC[i];
+        //         while (p_curr_seg != NULL)
+        //         {
+        //             printf("line: %d, x_y_min : %d,y_max : %d\n", i, p_curr_seg->x_y_min, p_curr_seg->y_max);
+        //             p_curr_seg = p_curr_seg->next;
+        //         }
+        //     }
+        // }
         segment *TCA = 0;
         segment *p_curr_seg;
         /* We update TCA and draw for each scanline */
@@ -707,20 +707,20 @@ void ei_draw_polygon(ei_surface_t surface,
             {
                 TCA = ei_TCA_sort(TCA);
                 ei_draw_scanline(TCA, surface, color, TC_length, scanline + TC_length[0]);
-                segment *p_curr_seg = TCA;
-                while (p_curr_seg != NULL)
-                {
-                    if(p_curr_seg->dx>0)
-                    {
-                        printf("line: %d, x_y_min : %d,y_max : %d, e : %d, dx : %d, x: %f\n", scanline, p_curr_seg->x_y_min, p_curr_seg->y_max, p_curr_seg->e, p_curr_seg->dx, (float)p_curr_seg->x_y_min+(float)p_curr_seg->e/(float)p_curr_seg->dy);
-                    }
-                    else
-                    {
-                        printf("line: %d, x_y_min : %d,y_max : %d, e : %d, dx : %d, x: %f\n" , scanline, p_curr_seg->x_y_min, p_curr_seg->y_max, p_curr_seg->e, p_curr_seg->dx, (float)p_curr_seg->x_y_min-(float)p_curr_seg->e/(float)p_curr_seg->dy );
+                // segment *p_curr_seg = TCA;
+                // while (p_curr_seg != NULL)
+                // {
+                //     if(p_curr_seg->dx>0)
+                //     {
+                //         printf("line: %d, x_y_min : %d,y_max : %d, e : %d, dx : %d, x: %f\n", scanline, p_curr_seg->x_y_min, p_curr_seg->y_max, p_curr_seg->e, p_curr_seg->dx, (float)p_curr_seg->x_y_min+(float)p_curr_seg->e/(float)p_curr_seg->dy);
+                //     }
+                //     else
+                //     {
+                //         printf("line: %d, x_y_min : %d,y_max : %d, e : %d, dx : %d, x: %f\n" , scanline, p_curr_seg->x_y_min, p_curr_seg->y_max, p_curr_seg->e, p_curr_seg->dx, (float)p_curr_seg->x_y_min-(float)p_curr_seg->e/(float)p_curr_seg->dy );
 
-                    }
-                    p_curr_seg = p_curr_seg->next;
-                }
+                //     }
+                //     p_curr_seg = p_curr_seg->next;
+                // }
                 ei_update(TCA);
             }
         }

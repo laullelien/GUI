@@ -169,18 +169,25 @@ void ei_draw_scanline(segment *TCA, ei_surface_t surface, ei_color_t color, int 
     while (p_interval_entry != NULL)
     {
         p_interval_ending = p_interval_entry->next;
-        /* We round to the next number in entry. So we add 1 to x_y_min if epsilon > 0 i.e. dx.e > 0*/
-        /* We round to the previous number in entry. So we substract 1 from x_y_min if epsilon <= 0 i.e. dx.e <= 0*/
+        /* We round to the next number in entry. So we add 1 to x_y_min if epsilon > 0 */
+        /* We round to the previous number in entry. So we substract 1 from x_y_min if epsilon <= 0 */
         if (p_interval_entry->dx < 0)
         {
             interval_entry_idx = p_interval_entry->x_y_min + (p_interval_entry->e < 0);
+        }
+        else
+        {
+            interval_entry_idx = p_interval_entry->x_y_min + (p_interval_entry->e > 0);  
+        }
+        if (p_interval_ending->dx < 0)
+        {
             interval_ending_idx = p_interval_ending->x_y_min - (p_interval_ending->e >= 0);
         }
         else
         {
-            interval_entry_idx = p_interval_entry->x_y_min + (p_interval_entry->e > 0);
             interval_ending_idx = p_interval_ending->x_y_min - (p_interval_ending->e <= 0);
         }
+        printf("e: %d, s: %d\n", interval_entry_idx, interval_ending_idx);
         for (uint32_t i = interval_entry_idx; i <= interval_ending_idx; i++)
         {
             *(p_first_pixel + i) = pixel_color;

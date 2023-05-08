@@ -12,15 +12,23 @@
 #include "ei_types.h"
 #include "ei_widget.h"
 
-typedef struct segment
+typedef struct ei_segment
 {
 	int y_max;
 	int x_y_min;
 	int e;
 	int dx;
 	uint16_t dy;
-	struct segment *next;
-} segment;
+	struct ei_segment *next;
+} ei_segment;
+
+typedef struct ei_borders
+{
+	int left;
+	int right;
+	int upper;
+	int lower;
+} ei_borders;
 
 /**
  * \brief	Returns the indices of the lowest and highest points in order to minimize the size of TC.
@@ -37,7 +45,7 @@ int *ei_TC_length(ei_point_t *point_array,
 				  size_t point_array_size);
 
 /**
- * \brief	Creates TC, an array where each element TC[i] contains a linked list of segments. 
+ * \brief	Creates TC, an array where each element TC[i] contains a linked list of segments.
  * 			The segments in TC[i] have a lowest point with a y coordinate equal to i.
  *
  * @param	TC				Array of segment* that we fill
@@ -46,10 +54,8 @@ int *ei_TC_length(ei_point_t *point_array,
  * 				is drawn) or else it must have more than 2 points.
  * @param	point_array_size The number of points in the point_array. Must be 0 or more than 2.
  * @param   TC_min The y index of the lowest point
- *
- * @return 			Nothing
  */
-void ei_TC_fill(segment **TC, ei_point_t *point_array, size_t point_array_size, int TC_min);
+void ei_TC_fill(ei_segment **TC, ei_point_t *point_array, size_t point_array_size, int TC_min);
 
 /**
  * \brief	Adds the new segments of the current scanline i.e the elements of TC[scanline] into TCA
@@ -61,21 +67,24 @@ void ei_TC_fill(segment **TC, ei_point_t *point_array, size_t point_array_size, 
  * @param	scanline 	The index corresponding to the current scanline.
  * scanline + TC_min corresponds to the actual x index of the line we are dealing with in the surface.
  *
- * @return 			Nothing
- *
  */
-void ei_TCA_remove_merge(segment **TC, segment **p_TCA, uint16_t scanline, int TC_min);
+void ei_TCA_remove_merge(ei_segment **TC, ei_segment **p_TCA, uint16_t scanline, int TC_min);
 
 /**
  * \brief	Draws the current scanline by drawing between each segment couple
  *
+ * @param	surface 	Where to draw the text. The surface must be *locked* by
+ *				\ref hw_surface_lock.
  * @param	TCA 		The segments which are currently being used to determine where to draw our line.
  * It corresponds to every line that intersect the scanline apart from horizontal lines which are useless for the algorithm
- *
- * @return 			Nothing
+ * @param	clipper		If not NULL, the drawing is restricted within this rectangle.
+ * @param	pixel_color		The color of the polygon, returned by \ref ei_impl_map_rgba 
+ * @param	width		The width of the window that we are drawing on
+ * @param	line_idx		The index of the line that we are drawing on
+ * @param	borders     The indices of the clipper extrmums coordinates i.e. x_min (left), x_max (right), y_min (upper), y_max (lower)
  *
  */
-void ei_draw_scanline(segment *TCA, ei_surface_t surface, ei_color_t color, int *TC_length, int line_idx);
+void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *clipper, uint32_t pixel_color, int width, int line_idx, ei_borders *borders);
 
 /**
  * \brief	Frees the segments of TCA
@@ -83,10 +92,8 @@ void ei_draw_scanline(segment *TCA, ei_surface_t surface, ei_color_t color, int 
  * @param	TCA 		The segments which are currently being used to determine where to draw our line.
  * It corresponds to every line that intersect the scanline apart from horizontal lines which are useless for the algorithm
  *
- * @return 			Nothing
- *
  */
-void ei_update(segment *TCA);
+void ei_update(ei_segment *TCA);
 
 /**
  * \brief	Updates the x_y_min of the pixels in the current scanline
@@ -94,10 +101,8 @@ void ei_update(segment *TCA);
  * @param	TCA 		The segments which are currently being used to determine where to draw our line.
  * It corresponds to every line that intersect the scanline apart from horizontal lines which are useless for the algorithm
  *
- * @return 			Nothing
- *
  */
-void ei_TCA_free(segment *TCA);
+void ei_TCA_free(ei_segment *TCA);
 
 uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color);
 
@@ -164,12 +169,26 @@ void ei_impl_widget_draw_children(ei_widget_t widget,
  * @param first Pointer to the first cell of TCA
  *
  */
-segment *ei_TCA_sort(segment *first);
+ei_segment *ei_TCA_sort(ei_segment *first);
 
-segment *ei_merge(segment *first, segment *second);
+ei_segment *ei_merge(ei_segment *first, ei_segment *second);
 
-void ei_liste_print(segment *first);
+void ei_liste_print(ei_segment *first);
 
-segment *ei_get_middle(segment *first);
+ei_segment *ei_get_middle(ei_segment *first);
+
+/**
+ * @brief   Indicates wether the point to draw is inside the clipper
+ *
+ * @param	point       The point to draw
+ * @param	clipper		If not NULL, the drawing is restricted within this rectangle.
+ * @param	borders     The indices of the clipper extrmums coordinates i.e. x_min (left), x_max (right), y_min (upper), y_max (lower)
+ * 
+ * @return 			A boolean that is true if and only if the point is inside the clipper
+ */
+bool ei_inside_clipper(ei_point_t *point,
+                       const ei_rect_t *clipper,
+                       ei_borders *borders);
+
 
 #endif

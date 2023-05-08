@@ -1,5 +1,9 @@
 {
     "files.associations": {
-        "type_traits": "c"
+        "type_traits": "c",
+        "ei_implementation.h": "c",
+        "stdio.h": "c",
+        "hw_interface.h": "c",
+        "ei_draw.h": "c"
     }
 }

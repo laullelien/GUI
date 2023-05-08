@@ -78,7 +78,7 @@ void ei_TCA_remove_merge(ei_segment **TC, ei_segment **p_TCA, uint16_t scanline,
  * @param	TCA 		The segments which are currently being used to determine where to draw our line.
  * It corresponds to every line that intersect the scanline apart from horizontal lines which are useless for the algorithm
  * @param	clipper		If not NULL, the drawing is restricted within this rectangle.
- * @param	pixel_color		The color of the polygon, returned by \ref ei_impl_map_rgba 
+ * @param	pixel_color		The color of the polygon, returned by \ref ei_impl_map_rgba
  * @param	width		The width of the window that we are drawing on
  * @param	line_idx		The index of the line that we are drawing on
  * @param	borders     The indices of the clipper extrmums coordinates i.e. x_min (left), x_max (right), y_min (upper), y_max (lower)
@@ -178,17 +178,25 @@ void ei_liste_print(ei_segment *first);
 ei_segment *ei_get_middle(ei_segment *first);
 
 /**
+ * @brief   Initialize the borders to the clipper's borders
+ *
+ * @param	clipper		If not NULL, the drawing is restricted within this rectangle.
+ * @param	borders     The indices of the clipper extrmums coordinates i.e. x_min (left), x_max (right), y_min (upper), y_max (lower)
+ */
+void ei_initialize_borders(const ei_rect_t *clipper,
+						   ei_borders *borders);
+
+/**
  * @brief   Indicates wether the point to draw is inside the clipper
  *
  * @param	point       The point to draw
  * @param	clipper		If not NULL, the drawing is restricted within this rectangle.
  * @param	borders     The indices of the clipper extrmums coordinates i.e. x_min (left), x_max (right), y_min (upper), y_max (lower)
- * 
+ *
  * @return 			A boolean that is true if and only if the point is inside the clipper
  */
 bool ei_inside_clipper(ei_point_t *point,
-                       const ei_rect_t *clipper,
-                       ei_borders *borders);
-
+					   const ei_rect_t *clipper,
+					   ei_borders *borders);
 
 #endif

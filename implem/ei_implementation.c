@@ -323,6 +323,15 @@ void ei_list_print(ei_segment *first)
     ei_list_print(first->next);
 }
 
+void ei_initialize_borders(const ei_rect_t *clipper,
+                           ei_borders *borders)
+{
+    borders->left = (clipper->top_left).x;
+    borders->right = (clipper->top_left).x + (clipper->size).width;
+    borders->upper = (clipper->top_left).y;
+    borders->lower = (clipper->top_left).y + (clipper->size).height;
+}
+
 bool ei_inside_clipper(ei_point_t *point,
                        const ei_rect_t *clipper,
                        ei_borders *borders)

@@ -13,10 +13,7 @@ void ei_draw_pixel(ei_surface_t surface,
     ei_borders borders[1];
     if (clipper != 0)
     {
-        borders->left = (clipper->top_left).x;
-        borders->right = (clipper->top_left).x + (clipper->size).width;
-        borders->upper = (clipper->top_left).y;
-        borders->lower = (clipper->top_left).y + (clipper->size).height;
+        ei_initialize_borders(clipper, borders);
     }
 
     int width = hw_surface_get_size(surface).width;
@@ -43,10 +40,7 @@ void ei_fill(ei_surface_t surface,
     ei_borders borders[1];
     if (clipper != 0)
     {
-        borders->left = (clipper->top_left).x;
-        borders->right = (clipper->top_left).x + (clipper->size).width;
-        borders->upper = (clipper->top_left).y;
-        borders->lower = (clipper->top_left).y + (clipper->size).height;
+        ei_initialize_borders(clipper, borders);
     }
 
     // if (clipper == NULL)
@@ -96,10 +90,7 @@ void ei_draw_line(ei_surface_t surface,
     ei_borders borders[1];
     if (clipper != 0)
     {
-        borders->left = (clipper->top_left).x;
-        borders->right = (clipper->top_left).x + (clipper->size).width;
-        borders->upper = (clipper->top_left).y;
-        borders->lower = (clipper->top_left).y + (clipper->size).height;
+        ei_initialize_borders(clipper, borders);
     }
 
     /* We first check if the line is horizontal*/

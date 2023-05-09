@@ -459,3 +459,68 @@ void ei_draw_polygon(ei_surface_t surface,
     }
 }
 
+
+
+int	ei_copy_surface		(ei_surface_t		destination,
+                            const ei_rect_t*	dst_rect,
+                            ei_surface_t		source,
+                            const ei_rect_t*	src_rect,
+                            bool			alpha)
+{
+
+    // hw_surface_lock() ???
+    if (dst_rect = NULL)
+    {
+        *dst_rect = hw_surface_get_rect(destination);
+    }
+    if (src_rect = NULL)
+    {
+        *src_rect = hw_surface_get_rect(source);
+    }
+    // if the dst_rect and src_rest have different size
+    if (dst_rect->size.width != src_rect->size.width || dst_rect->size.height != src_rect->size.height)
+    {
+        return false;
+    }
+    // when alpha is not defined
+    int index_src = hw_surface_get_size(source).width * src_rect->top_left.y + src_rect->top_left.x;
+    int index_dst = hw_surface_get_size(destination).width * dst_rect->top_left.y + src_rect->top_left.x;
+    uint8_t* src_start_addr = hw_surface_get_buffer(source) + index_src;
+    uint8_t* dst_start_addr = hw_surface_get_buffer(destination) + index_dst;
+
+    if (alpha == NULL)
+    {
+        int i = 0;
+        (uint32_t*) src_start_addr;
+        (uint32_t*) dst_start_addr;
+        for (int y=0; y < src_rect->size.height; y++)
+        {
+            for (int x = 0; x < src_rect->size.width; x++)
+            {
+                *(dst_start_addr + i) = *(src_start_addr + i);
+                i ++;
+            }
+            i += hw_surface_get_size(source).width;
+        }
+    } 
+    else
+    {
+        int i = 0;
+        for (int y=0; y < src_rect->size.height; y++)
+        {
+            for (int x = 0; x < src_rect->size.width; x++)
+            {
+                // we get the color of each pixel from the address
+                // then we calculate the new color value
+                // then we assign them to destination
+                *(dst_start_addr + i) = (*(dst_start_addr + i) * (255 - alpha) + *(src_start_addr + i) * alpha) / 255;
+                *(dst_start_addr + i+1) = (*(dst_start_addr + i+1) * (255 - alpha) + *(src_start_addr + i+1) * alpha) / 255;
+                *(dst_start_addr + i+2) = (*(dst_start_addr + i+2) * (255 - alpha) + *(src_start_addr + i+2) * alpha) / 255;
+                *(dst_start_addr + i+3) = (*(dst_start_addr + i+3) * (255 - alpha) + *(src_start_addr + i+3) * alpha) / 255;
+                i += 4;
+            }
+            i += hw_surface_get_size(source).width * 4;
+        }
+    }
+
+}

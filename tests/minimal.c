@@ -294,17 +294,18 @@ int main(int argc, char *argv[])
 
 
 
-    int radius = 50;
+    int radius = 5;
     int length;
     ei_rect_t rectangle;
     rectangle.size.height = 300;
     rectangle.size.width = 500;
     rectangle.top_left.x = 200;
     rectangle.top_left.y = 200;
+    bool is_top = false;
 
-
-    ei_point_t * list = list_of_points_for_a_rounded_frame(rectangle, radius,&length);
-    ei_draw_polygon(main_window, list, length, red, NULL);
+    ei_point_t * list = list_of_points_for_a_rounded_frame(rectangle, radius,&length, is_top);
+    ei_draw_polyline(main_window, list, length, red, NULL);
+    //ei_draw_polygon(main_window, list, length, red, NULL);
 
 
 

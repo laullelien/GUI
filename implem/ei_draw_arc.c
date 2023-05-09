@@ -137,115 +137,219 @@ void list_of_points_for_an_arc( ei_point_t center,
         m = m + (x<<3) + 4;
     }
 
-    *length = nb_octant*nb_point;
+    *length = nb_point;
 
     return;
 }
 
 
+
+
+
+
+
+
+
+
 ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
                                                int radius,
-                                               int height,
-                                               int* array_size)
+                                               int* array_size,
+                                               bool is_top)
 {
-    int nb_points = ((int) (radius * 0.70710678118 + 1)) << 1 ;
+    int height = (int) ( (rectangle.size.height) >> 1);
+    int nb_points = ((int) (radius * 0.70710678118 + 1)) ;
+    int width_half = (int) nb_points;
     ei_point_t* list_points_arc = calloc(nb_points*4 + 9, sizeof(ei_point_t));
 
     int length = 0;
     int total_length = 0;
     ei_point_t point;
+    ei_point_t center;
 
 
-    /* top left */
-    point.x = rectangle.top_left.x + radius;
-    point.y = rectangle.top_left.y;
-    *(list_points_arc+total_length) = point;
-    total_length += 1;
+    if (is_top)
+    {
+        /* top right */
 
-
-    ei_point_t center = {rectangle.top_left.x + radius, rectangle.top_left.y + radius};
-    list_of_points_for_an_arc(center, radius, M_PI/2, M_PI, &length, list_points_arc+total_length);
-    puts("laa");
-    total_length += length;
-
-
-
-    point.x = rectangle.top_left.x;
-    point.y = rectangle.top_left.y + radius;
-    *(list_points_arc+total_length) = point;
-    total_length += 1;
+        point.x = rectangle.top_left.x + rectangle.size.width - radius + width_half;
+        point.y = rectangle.top_left.y + radius - width_half;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
 
 
 
-    /* bottom left */
-    point.x = rectangle.top_left.x;
-    point.y = rectangle.top_left.y + rectangle.size.height - radius;
-    *(list_points_arc+total_length) = point;
-    total_length += 1;
+        center.x = rectangle.top_left.x + rectangle.size.width - radius;
+        center.y = rectangle.top_left.y + radius;
+        list_of_points_for_an_arc(center, radius, M_PI/4, M_PI/2, &length, list_points_arc+total_length);
+        total_length += length;
 
-    center.x = rectangle.top_left.x + radius;
-    center.y = rectangle.top_left.y + rectangle.size.height - radius;
-    list_of_points_for_an_arc(center, radius, M_PI, 3*M_PI/2, &length, list_points_arc+total_length);
-    total_length += length;
 
-    point.x = rectangle.top_left.x + radius;
-    point.y = rectangle.top_left.y + rectangle.size.height;
-    *(list_points_arc+total_length) = point;
-    total_length += 1;
+        point.x = rectangle.top_left.x + rectangle.size.width - radius;
+        point.y = rectangle.top_left.y;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
 
 
 
 
 
-    /* bottom right */
-    point.x = rectangle.top_left.x + rectangle.size.width - radius;
-    point.y = rectangle.top_left.y + rectangle.size.height;
-    *(list_points_arc+total_length) = point;
-    total_length += 1;
-
-    center.x = rectangle.top_left.x + rectangle.size.width - radius;
-    center.y = rectangle.top_left.y + rectangle.size.height - radius;
-    list_of_points_for_an_arc(center, radius,3*M_PI/2, 2*M_PI,&length, list_points_arc+total_length);
-    total_length += length;
-
-    point.x = rectangle.top_left.x + rectangle.size.width;
-    point.y = rectangle.top_left.y + rectangle.size.height - radius;
-    *(list_points_arc+total_length) = point;
-    total_length += 1;
+        /* top left */
+        point.x = rectangle.top_left.x + radius;
+        point.y = rectangle.top_left.y;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
 
 
 
 
+        center.x = rectangle.top_left.x + radius;
+        center.y = rectangle.top_left.y + radius;
+
+        list_of_points_for_an_arc(center, radius, M_PI/2, M_PI, &length, list_points_arc+total_length);
+        total_length += length;
 
 
-
-    /* top right */
-    point.x = rectangle.top_left.x + rectangle.size.width;
-    point.y = rectangle.top_left.y + radius;
-    *(list_points_arc+total_length) = point;
-    total_length += 1;
-
-    center.x = rectangle.top_left.x + rectangle.size.width - radius;
-    center.y = rectangle.top_left.y + radius;
-    list_of_points_for_an_arc(center, radius, 0, M_PI/2, &length, list_points_arc+total_length);
-    total_length += length;
-
-    point.x = rectangle.top_left.x + rectangle.size.width - radius;
-    point.y = rectangle.top_left.y;
-    *(list_points_arc+total_length) = point;
-    total_length += 1;
+        point.x = rectangle.top_left.x;
+        point.y = rectangle.top_left.y + radius;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
 
 
 
 
-    /* add the first point as the final point to complete the circle */
-    point.x = rectangle.top_left.x + radius;
-    point.y = rectangle.top_left.y;
-    *(list_points_arc+total_length) = point;
-    total_length += 1;
-
-    *array_size = total_length;
+        /* We begin the form right here */
 
 
-    return list_points_arc; /* remember to free list points at the end */
+
+
+        /* bottom left */
+        point.x = rectangle.top_left.x;
+        point.y = rectangle.top_left.y + rectangle.size.height - radius;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
+
+
+        center.x = rectangle.top_left.x + radius;
+        center.y = rectangle.top_left.y + rectangle.size.height - radius;
+        list_of_points_for_an_arc(center, radius, M_PI, 5*M_PI/4, &length, list_points_arc+total_length);
+        total_length += length;
+
+
+        point.x = rectangle.top_left.x + radius - width_half;
+        point.y = rectangle.top_left.y + rectangle.size.height - radius + width_half;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
+
+
+        ei_point_t height_1 = {rectangle.top_left.x + height, rectangle.top_left.y + height};
+        *(list_points_arc+total_length) = height_1;
+        total_length += 1;
+
+        ei_point_t height_2 = {rectangle.top_left.x + rectangle.size.width - height, rectangle.top_left.y + height};
+        *(list_points_arc+total_length) = height_2;
+        total_length += 1;
+
+
+        point.x = rectangle.top_left.x + rectangle.size.width - radius + width_half;
+        point.y = rectangle.top_left.y + radius - width_half;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
+
+
+        *array_size = total_length;
+        return list_points_arc; /* remember to free list points at the end */
+    }
+    else
+    {
+        /* top right */
+        point.x = rectangle.top_left.x + rectangle.size.width - radius + width_half;
+        point.y = rectangle.top_left.y + radius - width_half;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
+
+
+
+        ei_point_t height_1;
+        height_1.x = rectangle.top_left.x + rectangle.size.width - height;
+        height_1.y = rectangle.top_left.y + height;
+        *(list_points_arc+total_length) = height_1;
+        total_length += 1;
+
+
+        ei_point_t height_2 = {rectangle.top_left.x + height, rectangle.top_left.y + height};
+        *(list_points_arc+total_length) = height_2;
+        total_length += 1;
+
+
+        point.x = rectangle.top_left.x + radius - width_half;
+        point.y = rectangle.top_left.y + rectangle.size.height - radius + width_half;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
+
+
+
+
+        center.x = rectangle.top_left.x + radius;
+        center.y = rectangle.top_left.y + rectangle.size.height - radius;
+        list_of_points_for_an_arc(center, radius,5*M_PI/4, 2*M_PI/3,&length, list_points_arc+total_length);
+        total_length += length;
+
+        point.x = rectangle.top_left.x + radius;
+        point.y = rectangle.top_left.y + rectangle.size.height ;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
+
+
+        point.x = rectangle.top_left.x + rectangle.size.width - radius;
+        point.y = rectangle.top_left.y + rectangle.size.height ;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
+
+
+
+
+        center.x = rectangle.top_left.x +  rectangle.size.width - radius;
+        center.y = rectangle.top_left.y + rectangle.size.height - radius;
+        list_of_points_for_an_arc(center, radius,2*M_PI/3, 2*M_PI,&length, list_points_arc+total_length);
+        total_length += length;
+
+
+
+        point.x = rectangle.top_left.x + rectangle.size.width;
+        point.y = rectangle.top_left.y + rectangle.size.height - radius;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
+
+
+
+        point.x = rectangle.top_left.x + rectangle.size.width;
+        point.y = rectangle.top_left.y - radius;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
+
+
+        center.x = rectangle.top_left.x +  rectangle.size.width - radius;
+        center.y = rectangle.top_left.y - radius;
+        list_of_points_for_an_arc(center, radius,0, M_PI/4,&length, list_points_arc+total_length);
+        total_length += length;
+
+
+        point.x = rectangle.top_left.x + rectangle.size.width - radius + width_half;
+        point.y = rectangle.top_left.y + radius - width_half;
+        *(list_points_arc+total_length) = point;
+        total_length += 1;
+
+
+
+        for (int i=0;i<total_length;i++)
+        {
+            fprintf(stdout, "x=%i  y=%i\n", list_points_arc[i].x, list_points_arc[i].y);
+        }
+
+
+        *array_size = total_length;
+        return list_points_arc; /* remember to free list points at the end */
+    }
+
+
 }

@@ -42,8 +42,8 @@ void list_of_points_for_an_arc( ei_point_t center,
  */
 ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
                                                int radius,
-                                               int height,
-                                               int* array_size);
+                                               int* array_size,
+                                               bool is_top);
 
 
 #endif //PROJETC_IG_EI_DRAW_ARC_H

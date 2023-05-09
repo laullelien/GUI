@@ -22,10 +22,16 @@ int main(int argc, char *argv[])
 	hw_surface_lock(main_window);
 
 	ei_color_t *white = malloc(sizeof(ei_color_t));
-	white->red = 0;
-	white->green = 0;
-	white->blue = 0;
+	white->red = 255;
+	white->green = 255;
+	white->blue = 255;
 	white->alpha = 0;
+
+	ei_color_t *black = malloc(sizeof(ei_color_t));
+	black->red = 0;
+	black->green = 0;
+	black->blue = 0;
+	black->alpha = 0;
 
 	ei_color_t *purple = malloc(sizeof(ei_color_t));
 	purple->red = 255;
@@ -91,19 +97,12 @@ int main(int argc, char *argv[])
 	pxl_y[1].x = 375;
 	pxl_y[1].y = 213;
 
-	ei_point_t line_8[2];
-	line_8[0].x = 550;
-	line_8[0].y = 275;
-	line_8[1].x = 500;
-	line_8[1].y = 200;
-
-	ei_fill(main_window, white, NULL);
+	ei_fill(main_window, black, NULL);
 
 	ei_draw_polyline(main_window, hexa_l, 9, *purple, NULL);
 	ei_draw_polyline(main_window, pxl_p, 2, *purple, NULL);
 	ei_draw_polyline(main_window, hexa_h, 9, *yellow, NULL);
 	ei_draw_polyline(main_window, pxl_y, 2, *yellow, NULL);
-	ei_draw_polyline(main_window, line_8, 2, *white, NULL);
 
 	// unlock, update screen.
 	hw_surface_unlock(main_window);
@@ -117,6 +116,7 @@ int main(int argc, char *argv[])
 	// Free hardware resources.
 	hw_quit();
 	free(white);
+	free(black);
 	free(purple);
 	free(yellow);
 	// Terminate program with no error code.

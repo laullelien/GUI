@@ -5,6 +5,7 @@
         "stdio.h": "c",
         "hw_interface.h": "c",
         "ei_draw.h": "c",
-        "ei_widget_configure.h": "c"
+        "ei_widget_configure.h": "c",
+        "ei_application.h": "c"
     }
 }

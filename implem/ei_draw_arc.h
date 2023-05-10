@@ -43,7 +43,18 @@ void list_of_points_for_an_arc( ei_point_t center,
 ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
                                                int radius,
                                                int* array_size,
-                                               bool is_top);
+                                               int area);
+
+
+/**
+ * \brief	draw the button by using draw_polygone and list_of_points_for_a_rounded_frame twice
+ *
+ * @param	the surface to draw
+ * @param   the rectangle taht represent the button
+ *
+ * @return 	void
+ */
+void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle);
 
 
 #endif //PROJETC_IG_EI_DRAW_ARC_H

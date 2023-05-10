@@ -78,17 +78,17 @@ int main(int argc, char *argv[])
     // black.blue = 0;
     // black.alpha = 0;
 
-    // ei_color_t white;
-    // white.red = 255;
-    // white.green = 255;
-    // white.blue = 255;
-    // white.alpha = 0;
+    ei_color_t white;
+    white.red = 255;
+    white.green = 255;
+    white.blue = 255;
+    white.alpha = 0;
 
-    ei_color_t red;
-    red.red = 255;
-    red.green = 0;
-    red.blue = 0;
-    red.alpha = 0;
+    // ei_color_t red;
+    // red.red = 255;
+    // red.green = 0;
+    // red.blue = 0;
+    // red.alpha = 0;
 
     // ei_color_t green;
     // green.red = 0;
@@ -289,25 +289,28 @@ int main(int argc, char *argv[])
     // ei_draw_polyline(main_window, blue_poly_d, 7, *white, NULL);
 
 
+    ei_fill(main_window, &white, NULL);
 
 
 
 
-
-    int radius = 5;
-    int length;
+    // int radius = 120;
+    // int length;
     ei_rect_t rectangle;
-    rectangle.size.height = 300;
-    rectangle.size.width = 500;
+    rectangle.size.height = 200;
+    rectangle.size.width = 400;
     rectangle.top_left.x = 200;
     rectangle.top_left.y = 200;
-    bool is_top = false;
+    // bool is_top1 = false;
+    // bool is_top2 = true;
+    // ei_point_t * list = list_of_points_for_a_rounded_frame(rectangle, radius,&length, is_top1);
+    // ei_point_t * list2 = list_of_points_for_a_rounded_frame(rectangle, radius,&length, is_top2);
 
-    ei_point_t * list = list_of_points_for_a_rounded_frame(rectangle, radius,&length, is_top);
-    ei_draw_polyline(main_window, list, length, red, NULL);
-    //ei_draw_polygon(main_window, list, length, red, NULL);
+    // ei_draw_polygon(main_window, list, length, red, NULL);
+    // ei_draw_polygon(main_window, list2, length, blue, NULL);
 
 
+    ei_draw_button(main_window, rectangle);
 
     // unlock, update screen.
     hw_surface_unlock(main_window);

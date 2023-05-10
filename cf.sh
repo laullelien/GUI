@@ -2,7 +2,7 @@
 
 
 cd cmake
-make minimal
+make frame
 
 cd ..
-./cmake/minimal
+./cmake/frame

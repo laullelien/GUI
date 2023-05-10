@@ -47,8 +47,8 @@
 // 	return 0;
 // }
 
-#include <stdlib.h>
 
+#include <stdlib.h>
 #include "ei_types.h"
 #include "ei_event.h"
 #include "ei_utils.h"
@@ -72,37 +72,27 @@ int main(int argc, char *argv[])
     // Lock the surface for drawing,
     hw_surface_lock(main_window);
 
-    // ei_color_t black;
-    // black.green = 0;
-    // black.red = 0;
-    // black.blue = 0;
-    // black.alpha = 0;
+    // create a second window
+    ei_size_t second_window_size = ei_size(600,1000);
+    ei_surface_t second_window = hw_surface_create(main_window, second_window_size, true);
+    hw_surface_lock(second_window);
 
-    ei_color_t white;
-    white.red = 255;
-    white.green = 255;
-    white.blue = 255;
-    white.alpha = 0;
+    // colors
+    // ei_color_t black = {0,0,0,0};
+    // ei_color_t white = {255,255,255,0};
+    // ei_color_t red = {255,0,0,0};
+    ei_color_t green = {0,255,0,80};
+    ei_color_t blue = {0,0,255,200};
 
-    // ei_color_t red;
-    // red.red = 255;
-    // red.green = 0;
-    // red.blue = 0;
-    // red.alpha = 0;
+    // Test to copy surface
+    ei_point_t dst_top_left = {350,350};
+    ei_point_t src_top_left = {0,0};
+    ei_size_t dst_size = {100,100};
+    ei_size_t src_size = {100,100};
+    ei_rect_t dst_rect = {dst_top_left, dst_size};
+    ei_rect_t src_rect = {src_top_left, src_size};
 
-    // ei_color_t green;
-    // green.red = 0;
-    // green.green = 255;
-    // green.blue = 0;
-    // green.alpha = 0;
-
-    // ei_color_t blue;
-    // blue.red = 0;
-    // blue.green = 0;
-    // blue.blue = 255;
-    // blue.alpha = 0;
-
-    // ei_point_t red_poly[5];
+        // ei_point_t red_poly[5];
     // red_poly[0].x = 6;
     // red_poly[0].y = 1;
     // red_poly[1].x = 8;
@@ -287,33 +277,16 @@ int main(int argc, char *argv[])
     // // ei_draw_polyline(main_window, fish, 7, *white, NULL);
     // ei_draw_polygon(main_window, blue_poly_d, 7, *blue, NULL);
     // ei_draw_polyline(main_window, blue_poly_d, 7, *white, NULL);
-
-
-    ei_fill(main_window, &white, NULL);
-
-
-
-
-    // int radius = 120;
-    // int length;
-    ei_rect_t rectangle;
-    rectangle.size.height = 200;
-    rectangle.size.width = 400;
-    rectangle.top_left.x = 200;
-    rectangle.top_left.y = 200;
-    // bool is_top1 = false;
-    // bool is_top2 = true;
-    // ei_point_t * list = list_of_points_for_a_rounded_frame(rectangle, radius,&length, is_top1);
-    // ei_point_t * list2 = list_of_points_for_a_rounded_frame(rectangle, radius,&length, is_top2);
-
-    // ei_draw_polygon(main_window, list, length, red, NULL);
-    // ei_draw_polygon(main_window, list2, length, blue, NULL);
-
+    
+    ei_fill(main_window, &blue, NULL);
+    ei_fill(second_window, &green, NULL);
+    ei_copy_surface(main_window, &dst_rect, second_window, &src_rect, true);
 
     ei_draw_button(main_window, rectangle);
 
     // unlock, update screen.
     hw_surface_unlock(main_window);
+    hw_surface_unlock(second_window);
     hw_surface_update_rects(main_window, NULL);
 
     // Wait for a key press.

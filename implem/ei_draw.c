@@ -459,3 +459,101 @@ void ei_draw_polygon(ei_surface_t surface,
     }
 }
 
+
+
+int	ei_copy_surface		(ei_surface_t		destination,
+                            const ei_rect_t*	dst_rect,
+                            ei_surface_t		source,
+                            const ei_rect_t*	src_rect,
+                            bool			alpha)
+{
+    int dst_height, dst_width, src_height, src_width;
+    int dst_offset, src_offset;
+
+    /* The four cases if dst_rect and src_rect are NULL or not */
+    if (dst_rect == NULL && src_rect != NULL)
+    {
+        dst_height = hw_surface_get_size(destination).height;
+        dst_width = hw_surface_get_size(destination).width;
+        src_height = src_rect->size.height;
+        src_height = src_rect->size.width;
+        dst_offset = 0;
+        src_offset = hw_surface_get_size(source).width * src_rect->top_left.y + src_rect->top_left.x;
+    }
+    else if (dst_rect != NULL && src_rect == NULL)
+    {
+        dst_height = dst_rect->size.height;
+        dst_width = dst_rect->size.width;
+        src_height = hw_surface_get_size(source).height;
+        src_width = hw_surface_get_size(source).width;
+        dst_offset = hw_surface_get_size(destination).width * dst_rect->top_left.y + dst_rect->top_left.x;
+        src_offset = 0;
+    }
+    else if (dst_rect == NULL && src_rect == NULL)
+    {
+        dst_height = hw_surface_get_size(destination).height;
+        dst_width = hw_surface_get_size(destination).width;
+        src_height = hw_surface_get_size(source).height;
+        src_width = hw_surface_get_size(source).width;
+        dst_offset = 0;
+        src_offset = 0;
+    }
+    else if (dst_rect != NULL && src_rect != NULL)
+    {
+        dst_height = dst_rect->size.height;
+        dst_width = dst_rect->size.width;
+        src_height = src_rect->size.height;
+        src_width = src_rect->size.width;
+        dst_offset = hw_surface_get_size(destination).width * dst_rect->top_left.y + dst_rect->top_left.x;
+        src_offset = hw_surface_get_size(source).width * src_rect->top_left.y + src_rect->top_left.x;
+    }
+
+    // if the dst_rect and src_rest have different size
+    if ((dst_height != src_height) || (dst_width != src_width))
+    {
+        return false;
+    }
+
+    uint8_t* src_start_addr = hw_surface_get_buffer(source) + src_offset*4;
+    uint8_t* dst_start_addr = hw_surface_get_buffer(destination) + dst_offset*4;
+    int i = 0;
+    int j = 0;
+    
+    // when alpha is not defined
+    if (alpha == false)
+    {
+        for (int y = 0; y < src_height; y++)
+        {
+            for (int x = 0; x < src_width; x++)
+            {
+                *(dst_start_addr + j) = *(src_start_addr + i);
+                *(dst_start_addr + j+1) = *(src_start_addr + i+1);
+                *(dst_start_addr + j+2) = *(src_start_addr + i+2);
+                i += 4;
+                j += 4;
+            }
+            i += ((hw_surface_get_size(source).width - src_width) << 2);
+            j += ((hw_surface_get_size(destination).width - src_width) << 2);
+            
+        }
+    } 
+    else
+    {
+        for (int y = 0; y < src_height; y++)
+        {
+            for (int x = 0; x < src_width; x++)
+            {   
+                uint8_t src_alpha = *(src_start_addr + i+3);
+                *(dst_start_addr + j) = (*(dst_start_addr + j) * (255-src_alpha) + *(src_start_addr + i) * src_alpha )/ 255;
+                *(dst_start_addr + j+1) = (*(dst_start_addr + j+1) * (255-src_alpha) + *(src_start_addr + i+1) * src_alpha )/ 255;
+                *(dst_start_addr + j+2) = (*(dst_start_addr + j+2) * (255-src_alpha) + *(src_start_addr + i+2) * src_alpha )/ 255;
+                i += 4;
+                j += 4;
+            }
+            i += ((hw_surface_get_size(source).width - src_width) << 2);
+            j += ((hw_surface_get_size(destination).width - src_width) << 2);
+        }
+    }
+    return 0;
+
+}

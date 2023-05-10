@@ -467,60 +467,93 @@ int	ei_copy_surface		(ei_surface_t		destination,
                             const ei_rect_t*	src_rect,
                             bool			alpha)
 {
+    int dst_height, dst_width, src_height, src_width;
+    int dst_offset, src_offset;
 
-    // hw_surface_lock() ???
-    if (dst_rect = NULL)
+    /* The four cases if dst_rect and src_rect are NULL or not */
+    if (dst_rect == NULL && src_rect != NULL)
     {
-        *dst_rect = hw_surface_get_rect(destination);
+        dst_height = hw_surface_get_size(destination).height;
+        dst_width = hw_surface_get_size(destination).width;
+        src_height = src_rect->size.height;
+        src_height = src_rect->size.width;
+        dst_offset = 0;
+        src_offset = hw_surface_get_size(source).width * src_rect->top_left.y + src_rect->top_left.x;
     }
-    if (src_rect = NULL)
+    else if (dst_rect != NULL && src_rect == NULL)
     {
-        *src_rect = hw_surface_get_rect(source);
+        dst_height = dst_rect->size.height;
+        dst_width = dst_rect->size.width;
+        src_height = hw_surface_get_size(source).height;
+        src_width = hw_surface_get_size(source).width;
+        dst_offset = hw_surface_get_size(destination).width * dst_rect->top_left.y + dst_rect->top_left.x;
+        src_offset = 0;
     }
+    else if (dst_rect == NULL && src_rect == NULL)
+    {
+        dst_height = hw_surface_get_size(destination).height;
+        dst_width = hw_surface_get_size(destination).width;
+        src_height = hw_surface_get_size(source).height;
+        src_width = hw_surface_get_size(source).width;
+        dst_offset = 0;
+        src_offset = 0;
+    }
+    else if (dst_rect != NULL && src_rect != NULL)
+    {
+        dst_height = dst_rect->size.height;
+        dst_width = dst_rect->size.width;
+        src_height = src_rect->size.height;
+        src_width = src_rect->size.width;
+        dst_offset = hw_surface_get_size(destination).width * dst_rect->top_left.y + dst_rect->top_left.x;
+        src_offset = hw_surface_get_size(source).width * src_rect->top_left.y + src_rect->top_left.x;
+    }
+
     // if the dst_rect and src_rest have different size
-    if (dst_rect->size.width != src_rect->size.width || dst_rect->size.height != src_rect->size.height)
+    if ((dst_height != src_height) || (dst_width != src_width))
     {
         return false;
     }
-    // when alpha is not defined
-    int index_src = hw_surface_get_size(source).width * src_rect->top_left.y + src_rect->top_left.x;
-    int index_dst = hw_surface_get_size(destination).width * dst_rect->top_left.y + src_rect->top_left.x;
-    uint8_t* src_start_addr = hw_surface_get_buffer(source) + index_src;
-    uint8_t* dst_start_addr = hw_surface_get_buffer(destination) + index_dst;
 
-    if (alpha == NULL)
+    uint8_t* src_start_addr = hw_surface_get_buffer(source) + src_offset*4;
+    uint8_t* dst_start_addr = hw_surface_get_buffer(destination) + dst_offset*4;
+    int i = 0;
+    int j = 0;
+    
+    // when alpha is not defined
+    if (alpha == false)
     {
-        int i = 0;
-        (uint32_t*) src_start_addr;
-        (uint32_t*) dst_start_addr;
-        for (int y=0; y < src_rect->size.height; y++)
+        for (int y = 0; y < src_height; y++)
         {
-            for (int x = 0; x < src_rect->size.width; x++)
+            for (int x = 0; x < src_width; x++)
             {
-                *(dst_start_addr + i) = *(src_start_addr + i);
-                i ++;
+                *(dst_start_addr + j) = *(src_start_addr + i);
+                *(dst_start_addr + j+1) = *(src_start_addr + i+1);
+                *(dst_start_addr + j+2) = *(src_start_addr + i+2);
+                i += 4;
+                j += 4;
             }
-            i += hw_surface_get_size(source).width;
+            i += ((hw_surface_get_size(source).width - src_width) << 2);
+            j += ((hw_surface_get_size(destination).width - src_width) << 2);
+            
         }
     } 
     else
     {
-        int i = 0;
-        for (int y=0; y < src_rect->size.height; y++)
+        for (int y = 0; y < src_height; y++)
         {
-            for (int x = 0; x < src_rect->size.width; x++)
-            {
-                // we get the color of each pixel from the address
-                // then we calculate the new color value
-                // then we assign them to destination
-                *(dst_start_addr + i) = (*(dst_start_addr + i) * (255 - alpha) + *(src_start_addr + i) * alpha) / 255;
-                *(dst_start_addr + i+1) = (*(dst_start_addr + i+1) * (255 - alpha) + *(src_start_addr + i+1) * alpha) / 255;
-                *(dst_start_addr + i+2) = (*(dst_start_addr + i+2) * (255 - alpha) + *(src_start_addr + i+2) * alpha) / 255;
-                *(dst_start_addr + i+3) = (*(dst_start_addr + i+3) * (255 - alpha) + *(src_start_addr + i+3) * alpha) / 255;
+            for (int x = 0; x < src_width; x++)
+            {   
+                uint8_t src_alpha = *(src_start_addr + i+3);
+                *(dst_start_addr + j) = (*(dst_start_addr + j) * (255-src_alpha) + *(src_start_addr + i) * src_alpha )/ 255;
+                *(dst_start_addr + j+1) = (*(dst_start_addr + j+1) * (255-src_alpha) + *(src_start_addr + i+1) * src_alpha )/ 255;
+                *(dst_start_addr + j+2) = (*(dst_start_addr + j+2) * (255-src_alpha) + *(src_start_addr + i+2) * src_alpha )/ 255;
                 i += 4;
+                j += 4;
             }
-            i += hw_surface_get_size(source).width * 4;
+            i += ((hw_surface_get_size(source).width - src_width) << 2);
+            j += ((hw_surface_get_size(destination).width - src_width) << 2);
         }
     }
+    return 0;
 
 }

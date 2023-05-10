@@ -282,7 +282,7 @@ int main(int argc, char *argv[])
     ei_fill(second_window, &green, NULL);
     ei_copy_surface(main_window, &dst_rect, second_window, &src_rect, true);
 
-    ei_draw_button(main_window, rectangle);
+    // ei_draw_button(main_window, rectangle);
 
     // unlock, update screen.
     hw_surface_unlock(main_window);

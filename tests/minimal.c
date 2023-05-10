@@ -298,7 +298,7 @@ int main(int argc, char *argv[])
     // int length;
     ei_rect_t rectangle;
     rectangle.size.height = 200;
-    rectangle.size.width = 400;
+    rectangle.size.width = 500;
     rectangle.top_left.x = 200;
     rectangle.top_left.y = 200;
     // bool is_top1 = false;
@@ -309,8 +309,13 @@ int main(int argc, char *argv[])
     // ei_draw_polygon(main_window, list, length, red, NULL);
     // ei_draw_polygon(main_window, list2, length, blue, NULL);
 
+    ei_color_t color;
+    color.red = 100;
+    color.green = 0;
+    color.blue = 100;
+    color.alpha = 0;
 
-    ei_draw_button(main_window, rectangle);
+    ei_draw_button(main_window, rectangle,color, true );
 
     // unlock, update screen.
     hw_surface_unlock(main_window);

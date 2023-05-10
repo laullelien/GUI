@@ -514,8 +514,8 @@ int	ei_copy_surface		(ei_surface_t		destination,
         return false;
     }
 
-    uint8_t* src_start_addr = hw_surface_get_buffer(source) + src_offset*4;
-    uint8_t* dst_start_addr = hw_surface_get_buffer(destination) + dst_offset*4;
+    uint8_t* src_start_addr = hw_surface_get_buffer(source) + (src_offset << 2);
+    uint8_t* dst_start_addr = hw_surface_get_buffer(destination) + (dst_offset << 2);
     int i = 0;
     int j = 0;
     
@@ -544,9 +544,9 @@ int	ei_copy_surface		(ei_surface_t		destination,
             for (int x = 0; x < src_width; x++)
             {   
                 uint8_t src_alpha = *(src_start_addr + i+3);
-                *(dst_start_addr + j) = (*(dst_start_addr + j) * (255-src_alpha) + *(src_start_addr + i) * src_alpha )/ 255;
-                *(dst_start_addr + j+1) = (*(dst_start_addr + j+1) * (255-src_alpha) + *(src_start_addr + i+1) * src_alpha )/ 255;
-                *(dst_start_addr + j+2) = (*(dst_start_addr + j+2) * (255-src_alpha) + *(src_start_addr + i+2) * src_alpha )/ 255;
+                *(dst_start_addr + j) = (*(dst_start_addr + j) * (~src_alpha) + *(src_start_addr + i) * src_alpha )/ 255;
+                *(dst_start_addr + j+1) = (*(dst_start_addr + j+1) * (~src_alpha) + *(src_start_addr + i+1) * src_alpha )/ 255;
+                *(dst_start_addr + j+2) = (*(dst_start_addr + j+2) * (~src_alpha) + *(src_start_addr + i+2) * src_alpha )/ 255;
                 i += 4;
                 j += 4;
             }

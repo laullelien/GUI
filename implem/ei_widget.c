@@ -9,8 +9,10 @@ ei_widget_t ei_widget_create(ei_const_string_t class_name,
 {
     ei_widgetclass_t *wclass = ei_widgetclass_from_name(class_name);
     ei_widget_t widget = (*(wclass->allocfunc))();
+    widget->wclass = wclass;
     (*(wclass->setdefaultsfunc))(widget);
     widget->parent = parent;
+    parent->children_head = widget;
     widget->user_data = user_data;
     // widget->destructor = ;
     return widget;

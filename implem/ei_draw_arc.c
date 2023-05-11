@@ -457,11 +457,10 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
 }
 
 
-void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_color, bool raised)
+void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_color, bool raised, int border_width, int radius)
 {
     bool is_horizontal = rectangle.size.width > rectangle.size.height;
-    int border_width = 8;
-    int radius1 = 20;
+    int radius1 = radius;
     int radius2 = radius1-border_width;
 
     //int diag = rectangle.size.width + rectangle.size.height

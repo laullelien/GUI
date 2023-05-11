@@ -457,4 +457,5 @@ void ei_draw_polygon(ei_surface_t surface,
         free(TC_length);
         ei_TCA_free(TCA);
     }
-};
+}
+

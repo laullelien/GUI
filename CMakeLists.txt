@@ -87,7 +87,7 @@ set(LIB_EI_SOURCES
      ${SRC_DIR}/ei_widgetclass.c
 )
 
-add_library(ei STATIC			${LIB_EI_SOURCES})
+add_library(ei STATIC			${LIB_EI_SOURCES} implem/ei_draw_arc.h implem/ei_draw_arc.c)
 
 # target minimal
 
@@ -106,7 +106,7 @@ target_link_libraries(frame		ei ${PLATFORM_LIB_FLAGS})
 
 # target button
 
-add_executable(button			${TEST_DIR}/button.c)
+add_executable(button			${TEST_DIR}/button.c implem/ei_draw_arc.h implem/ei_draw_arc.c)
 target_link_libraries(button		ei ${PLATFORM_LIB_FLAGS})
 
 # target hello_world

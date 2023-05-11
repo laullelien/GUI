@@ -7,6 +7,7 @@
         "ei_draw.h": "c",
         "ei_widget_configure.h": "c",
         "ei_application.h": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "ei_widgetclass.h": "c"
     }
 }

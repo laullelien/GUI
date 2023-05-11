@@ -20,7 +20,7 @@ void ei_app_create(ei_size_t main_window_size, bool fullscreen)
     pick_surface = hw_surface_create(root_surface, main_window_size, false);
     /* creates the root widget to access the root window. */
     root_widget = widgetclass->allocfunc();
-    (*(ei_widget_t *)root_widget)->wclass = widgetclass;
+    root_widget->wclass = widgetclass;
     ei_frame_setdefaultsfunc(root_widget);
 }
 

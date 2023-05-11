@@ -1,4 +1,5 @@
 #include "../api/ei_placer.h"
+#include "ei_implementation.h"
 
 void ei_place(ei_widget_t widget,
               ei_anchor_t *anchor,
@@ -11,4 +12,5 @@ void ei_place(ei_widget_t widget,
               float *rel_width,
               float *rel_height)
 {
+    widget->screen_location.top_left = (ei_point_t){*x, *y};
 }

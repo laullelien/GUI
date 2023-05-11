@@ -2,11 +2,9 @@
 #include "ei_implementation.h"
 #include "ei_types.h"
 
-/* FRAME */
-
 typedef struct ei_impl_frame_t
 {
-    ei_impl_widget_t widget;
+    ei_impl_widget_t ei_frame_widget;
     ei_color_t color;
     int border_width;
     ei_relief_t relief;
@@ -17,7 +15,7 @@ typedef struct ei_impl_frame_t
     ei_surface_t img;
     ei_rect_ptr_t img_rect;
     ei_anchor_t img_anchor;
-} ei_frame_t;
+} ei_impl_frame_t;
 
 ei_widget_t ei_frame_allocfunc();
 void ei_frame_releasefunc(ei_widget_t frame);

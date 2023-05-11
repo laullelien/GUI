@@ -18,46 +18,48 @@ void ei_frame_configure(ei_widget_t frame,
 {
     if (requested_size)
     {
-        (*(ei_widget_t *)frame)->requested_size = *requested_size;
+        frame->requested_size = *requested_size;
     }
     if (color)
     {
-        ((ei_frame_t *)frame)->color = *color;
+        ((ei_impl_frame_t *)frame)->color = *color;
     }
     if (border_width)
     {
-        ((ei_frame_t *)frame)->border_width = *border_width;
+        ((ei_impl_frame_t *)frame)->border_width = *border_width;
     }
     if (relief)
     {
-        ((ei_frame_t *)frame)->relief = *relief;
+        ((ei_impl_frame_t *)frame)->relief = *relief;
     }
     if (text)
     {
-        ((ei_frame_t *)frame)->text = *text;
+        ((ei_impl_frame_t *)frame)->text = *text;
     }
     if (text_font)
     {
-        ((ei_frame_t *)frame)->text_font = *text_font;
+        ((ei_impl_frame_t *)frame)->text_font = *text_font;
     }
     if (text_color)
     {
-        ((ei_frame_t *)frame)->text_color = *text_color;
+        ((ei_impl_frame_t *)frame)->text_color = *text_color;
     }
     if (text_anchor)
     {
-        ((ei_frame_t *)frame)->text_anchor = *text_anchor;
+        ((ei_impl_frame_t *)frame)->text_anchor = *text_anchor;
     }
     if (img)
     {
-        ((ei_frame_t *)frame)->img = *img;
+        ((ei_impl_frame_t *)frame)->img = *img;
     }
     if (img_rect)
     {
-        ((ei_frame_t *)frame)->img_rect = *img_rect;
+        ((ei_impl_frame_t *)frame)->img_rect = *img_rect;
     }
     if (img_anchor)
     {
-        ((ei_frame_t *)frame)->img_anchor = *img_anchor;
+        ((ei_impl_frame_t *)frame)->img_anchor = *img_anchor;
     }
+    ei_color_t *cl = &((ei_impl_frame_t *)frame)->color;
+    printf("1. %u, %p\n", *((uint32_t *)cl), cl);
 }

@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 
     // colors
     // ei_color_t black = {0,0,0,0};
-    // ei_color_t white = {255,255,255,0};
+    ei_color_t white = {255,255,255,0};
     // ei_color_t red = {255,0,0,0};
     ei_color_t green = {0,255,0,80};
     ei_color_t blue = {0,0,255,200};

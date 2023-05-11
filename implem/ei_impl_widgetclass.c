@@ -3,24 +3,16 @@
 #include "ei_application.h"
 #include "ei_draw_arc.h"
 
-
 ei_widget_t ei_frame_allocfunc()
 {
     ei_widget_t frame = (ei_widget_t)calloc(1, sizeof(ei_impl_frame_t));
     return frame;
 }
 
-void ei_frame_releasefunc(ei_widget_t frame_widget)
-{
-    free((ei_impl_frame_t *)frame_widget);
-}
-
 void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pick_surface, ei_rect_t *clipper)
 {
     // if (((ei_impl_frame_t *)frame)->relief == ei_relief_none || ((ei_impl_frame_t *)frame)->border_width == 0)
     // {
-    ei_color_t *cl = &((ei_impl_frame_t *)frame)->color;
-    printf("2. %u, %p\n", *((uint32_t *)cl), cl);
     ei_fill(surface, &((ei_impl_frame_t *)frame)->color, clipper); //&frame->screen_location
     // ei_fill(pick_surface, frame->pick_color, &frame->screen_location);
     // }
@@ -28,8 +20,10 @@ void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pic
     // {
     //     // ei_draw_polygon(surface, );
     // }
-
-    // ei_draw_text(surface, ((ei_impl_frame_t *)frame)->color);
+    // else
+    // {
+    //     // ei_draw_text(surface, ((ei_impl_frame_t *)frame)->color);
+    // }
     ei_widget_t children_head = frame->children_head;
     while (children_head != NULL)
     {
@@ -58,18 +52,11 @@ void ei_frame_setdefaultsfunc(ei_widget_t frame)
 
 void ei_frame_widgetclass_create(ei_widgetclass_t *ei_frame_widgetclass)
 {
-    ei_frame_widgetclass->name[0] = 'f';
-    ei_frame_widgetclass->name[1] = 'r';
-    ei_frame_widgetclass->name[2] = 'a';
-    ei_frame_widgetclass->name[3] = 'm';
-    ei_frame_widgetclass->name[4] = 'e';
     ei_frame_widgetclass->allocfunc = &ei_frame_allocfunc;
-    ei_frame_widgetclass->releasefunc = &ei_frame_releasefunc;
+    ei_frame_widgetclass->releasefunc = NULL;
     ei_frame_widgetclass->drawfunc = &ei_frame_drawfunc;
     ei_frame_widgetclass->setdefaultsfunc = &ei_frame_setdefaultsfunc;
 }
-
-
 
 /* BUTTON */
 
@@ -91,7 +78,6 @@ void ei_frame_widgetclass_create(ei_widgetclass_t *ei_frame_widgetclass)
 // {
 //     ei_draw_button(surface,rectangle);
 // }
-
 
 // void ei_button_setdefaultsfunc(ei_widget button)
 // {
@@ -126,7 +112,6 @@ void ei_frame_widgetclass_create(ei_widgetclass_t *ei_frame_widgetclass)
 // {
 //     ei_draw_button(surface,rectangle);
 // }
-
 
 // void ei_button_setdefaultsfunc(ei_widget button)
 // {

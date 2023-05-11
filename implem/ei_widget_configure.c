@@ -61,6 +61,4 @@ void ei_frame_configure(ei_widget_t frame,
     {
         ((ei_impl_frame_t *)frame)->img_anchor = *img_anchor;
     }
-    ei_color_t *cl = &((ei_impl_frame_t *)frame)->color;
-    printf("1. %u, %p\n", *((uint32_t *)cl), cl);
 }

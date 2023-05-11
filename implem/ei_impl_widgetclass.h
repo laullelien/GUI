@@ -28,14 +28,9 @@ void ei_frame_widgetclass_create(ei_widgetclass_t *ei_frame_widgetclass);
 void ei_widgetclass_register(ei_widgetclass_t *widgetclass);
 ei_widgetclass_t *ei_widgetclass_from_name(ei_const_string_t name);
 
-
-
-
-
-
-
 /* BUTTON */
-typedef struct ei_impl_button_t {
+typedef struct ei_impl_button_t
+{
     ei_impl_widget_t button_widget;
     ei_color_t color;
     int border_width;
@@ -50,12 +45,12 @@ typedef struct ei_impl_button_t {
     ei_anchor_t img_anchor;
     ei_callback_t callback;
     ei_user_param_t user_param;
-}ei_button_t;
+} ei_button_t;
 
 ei_widget_t ei_button_allocfunc();
 void ei_button_releasefunc(ei_widget_t button);
 void ei_button_drawfunc(ei_widget_t frame,
-                       ei_surface_t surface,
-                       ei_surface_t pick_surface,
-                       ei_rect_t *clipper);
+                        ei_surface_t surface,
+                        ei_surface_t pick_surface,
+                        ei_rect_t *clipper);
 void ei_button_setdefaultsfunc(ei_widget_t button);

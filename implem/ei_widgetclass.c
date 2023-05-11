@@ -5,14 +5,13 @@
 
 ei_widget_t ei_frame_allocfunc()
 {
-    ei_widget_t frame = (ei_widget_t)malloc(sizeof(ei_frame_t));
-    (*(ei_widget_t *)frame) = malloc(sizeof(ei_impl_widget_t));
+    ei_widget_t frame = (ei_widget_t)calloc(1, sizeof(ei_impl_frame_t));
     return frame;
 }
 
-void ei_frame_releasefunc(ei_widget_t frame)
+void ei_frame_releasefunc(ei_widget_t frame_widget)
 {
-    free((ei_frame_t *)frame);
+    free((ei_impl_frame_t *)frame_widget);
 }
 
 void ei_frame_drawfunc(ei_widget_t frame,
@@ -20,21 +19,23 @@ void ei_frame_drawfunc(ei_widget_t frame,
                        ei_surface_t pick_surface,
                        ei_rect_t *clipper)
 {
-    if (((ei_frame_t *)frame)->relief == ei_relief_none || ((ei_frame_t *)frame)->border_width == 0)
+    if (((ei_impl_frame_t *)frame)->relief == ei_relief_none || ((ei_impl_frame_t *)frame)->border_width == 0)
     {
-        ei_fill(surface, &((ei_frame_t *)frame)->color, &(*(ei_widget_t *)frame)->screen_location);
-        ei_fill(pick_surface, ((ei_frame_t *)frame)->ei_frame_widget->pick_color, &(*(ei_widget_t *)frame)->screen_location);
+        ei_color_t *cl = &((ei_impl_frame_t *)frame)->color;
+        printf("2. %u, %p\n", *((uint32_t *)cl), cl);
+        ei_fill(surface, &((ei_impl_frame_t *)frame)->color, &frame->screen_location);
+        ei_fill(pick_surface, frame->pick_color, &frame->screen_location);
     }
-    else if (((ei_frame_t *)frame)->relief == ei_relief_raised)
+    else if (((ei_impl_frame_t *)frame)->relief == ei_relief_raised)
     {
         // ei_draw_polygon(surface, );
     }
 
-    // ei_draw_text(surface, ((ei_frame_t *)frame)->color);
-    ei_widget_t children_head = ((ei_frame_t *)frame)->ei_frame_widget->children_head;
+    // ei_draw_text(surface, ((ei_impl_frame_t *)frame)->color);
+    ei_widget_t children_head = frame->children_head;
     while (children_head != NULL)
     {
-        (*((*(ei_widget_t *)children_head)->wclass->drawfunc))(children_head, surface, pick_surface, (*(ei_widget_t *)frame)->content_rect);
+        (*(children_head->wclass->drawfunc))(children_head, surface, pick_surface, frame->content_rect);
         children_head = children_head->next_sibling;
     }
 }
@@ -42,16 +43,16 @@ void ei_frame_drawfunc(ei_widget_t frame,
 void ei_frame_setdefaultsfunc(ei_widget_t frame)
 {
     // (*(ei_widget_t *)frame)->requested_size = *requested_size;
-    ((ei_frame_t *)frame)->color = ei_default_background_color;
-    ((ei_frame_t *)frame)->border_width = 0;
-    ((ei_frame_t *)frame)->relief = ei_relief_none;
-    ((ei_frame_t *)frame)->text = NULL;
-    ((ei_frame_t *)frame)->text_font = ei_default_font;
-    ((ei_frame_t *)frame)->text_color = ei_font_default_color;
-    ((ei_frame_t *)frame)->text_anchor = ei_anc_center;
-    ((ei_frame_t *)frame)->img = NULL;
-    ((ei_frame_t *)frame)->img_rect = NULL;
-    ((ei_frame_t *)frame)->img_anchor = ei_anc_center;
+    ((ei_impl_frame_t *)frame)->color = ei_default_background_color;
+    ((ei_impl_frame_t *)frame)->border_width = 0;
+    ((ei_impl_frame_t *)frame)->relief = ei_relief_none;
+    ((ei_impl_frame_t *)frame)->text = NULL;
+    ((ei_impl_frame_t *)frame)->text_font = ei_default_font;
+    ((ei_impl_frame_t *)frame)->text_color = ei_font_default_color;
+    ((ei_impl_frame_t *)frame)->text_anchor = ei_anc_center;
+    ((ei_impl_frame_t *)frame)->img = NULL;
+    ((ei_impl_frame_t *)frame)->img_rect = NULL;
+    ((ei_impl_frame_t *)frame)->img_anchor = ei_anc_center;
 }
 
 void ei_frame_widgetclass_create(ei_widgetclass_t *ei_frame_widgetclass)
@@ -77,7 +78,7 @@ void ei_widgetclass_register(ei_widgetclass_t *widgetclass)
 
 ei_widgetclass_t *ei_widgetclass_from_name(ei_const_string_t name)
 {
-    ei_widgetclass_t *widgetclass = (*(ei_widget_t *)ei_app_root_widget())->wclass;
+    ei_widgetclass_t *widgetclass = ei_app_root_widget()->wclass;
     if (widgetclass->name[0] == 'f')
     {
         return widgetclass;

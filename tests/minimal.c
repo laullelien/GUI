@@ -315,7 +315,7 @@ int main(int argc, char *argv[])
     color.blue = 100;
     color.alpha = 0;
 
-    ei_draw_button(main_window, rectangle,color, true );
+    ei_draw_button(main_window, rectangle,color, true, 8, 20);
 
     // unlock, update screen.
     hw_surface_unlock(main_window);

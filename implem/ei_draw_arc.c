@@ -465,9 +465,6 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
 
     //int diag = rectangle.size.width + rectangle.size.height
 
-    int length1;
-    int length2;
-    int length3;
 
     ei_rect_t middle_rectangle;
     middle_rectangle.top_left.x = rectangle.top_left.x + border_width;
@@ -478,6 +475,10 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
     ei_color_t color_top;
     ei_color_t color_bottom;
     ei_color_t temp;
+
+    int length1;
+    int length2;
+    int length3;
 
     if(main_color.red > 215)
     {
@@ -495,30 +496,9 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
     else
     {
         color_top.blue = main_color.blue + 40;
-    }dius2 = 20;
-
-    int length1;
-    int length2;
-    int length3;
-
-    ei_rect_t middle_rectangle;
-    middle_rectangle.top_left.x = rectangle.top_left.x + 15;
-    middle_rectangle.top_left.y = rectangle.top_left.y + 15;
-    middle_rectangle.size.height = rectangle.size.height - 30;
-    middle_rectangle.size.width = rectangle.size.width - 30;
+    }
 
 
-    ei_color_t color_top;
-    color_top.red = 96;
-    color_top.green = 96;
-    color_top.blue = 96;
-    color_top.alpha = 0;
-
-    ei_color_t color_middle;
-    color_middle.red = 120;
-    color_middle.green = 120;
-    color_middle.blue = 120;
-    color_middle.alpha = 0;
 
 
     if(main_color.green > 215)

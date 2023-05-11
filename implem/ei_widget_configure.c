@@ -2,6 +2,7 @@
 #include "../api/ei_widgetclass.h"
 #include "ei_implementation.h"
 #include "ei_widgetclass.h"
+#include "ei_impl_widgetclass.h"
 
 void ei_frame_configure(ei_widget_t frame,
                         ei_size_t *requested_size,

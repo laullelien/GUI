@@ -6,6 +6,7 @@
 ei_widget_t ei_frame_allocfunc()
 {
     ei_widget_t frame = (ei_widget_t)malloc(sizeof(ei_frame_t));
+    (*(ei_widget_t *)frame) = malloc(sizeof(ei_impl_widget_t));
     return frame;
 }
 
@@ -51,7 +52,6 @@ void ei_frame_setdefaultsfunc(ei_widget_t frame)
     ((ei_frame_t *)frame)->img = NULL;
     ((ei_frame_t *)frame)->img_rect = NULL;
     ((ei_frame_t *)frame)->img_anchor = ei_anc_center;
-    printf("ici\n");
 }
 
 void ei_frame_widgetclass_create(ei_widgetclass_t *ei_frame_widgetclass)
@@ -77,7 +77,7 @@ void ei_widgetclass_register(ei_widgetclass_t *widgetclass)
 
 ei_widgetclass_t *ei_widgetclass_from_name(ei_const_string_t name)
 {
-    ei_widgetclass_t *widgetclass = ei_app_root_widget()->wclass;
+    ei_widgetclass_t *widgetclass = (*(ei_widget_t *)ei_app_root_widget())->wclass;
     if (widgetclass->name[0] == 'f')
     {
         return widgetclass;

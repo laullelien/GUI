@@ -2,7 +2,7 @@
 #include "ei_impl_widgetclass.h"
 #include "ei_draw.h"
 #include "ei_application.h"
-#include 
+#include "ei_draw_arc.h"
 
 ei_widget_t ei_frame_allocfunc()
 {
@@ -110,7 +110,7 @@ void ei_button_drawfunc(ei_widget_t button,
                        ei_surface_t pick_surface,
                        ei_rect_t *clipper)
 {
-
+    ei_draw_button(surface,ei_rect_t rectangle);
 }
 
 

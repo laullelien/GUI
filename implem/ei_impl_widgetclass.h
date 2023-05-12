@@ -45,7 +45,7 @@ typedef struct ei_impl_button_t
     ei_anchor_t img_anchor;
     ei_callback_t callback;
     ei_user_param_t user_param;
-} ei_button_t;
+} ei_impl_button_t;
 
 ei_widget_t ei_button_allocfunc();
 void ei_button_releasefunc(ei_widget_t button);
@@ -54,3 +54,4 @@ void ei_button_drawfunc(ei_widget_t frame,
                         ei_surface_t pick_surface,
                         ei_rect_t *clipper);
 void ei_button_setdefaultsfunc(ei_widget_t button);
+void ei_button_widgetclass_create(ei_widgetclass_t *ei_frame_widgetclass);

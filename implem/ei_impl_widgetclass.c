@@ -3,6 +3,7 @@
 #include "ei_application.h"
 #include "ei_draw_arc.h"
 #include "ei_widget_configure.h"
+#include <stdio.h>
 
 ei_widget_t ei_frame_allocfunc()
 {
@@ -12,7 +13,6 @@ ei_widget_t ei_frame_allocfunc()
 
 void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pick_surface, ei_rect_t *clipper)
 {
-    printf("ok\n");
     if (frame->placer_params != NULL)
     {
         ei_impl_placer_run(frame);
@@ -32,7 +32,6 @@ void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pic
     while (children_head != NULL)
     {
         (*(children_head->wclass->drawfunc))(children_head, surface, pick_surface, &children_head->screen_location);
-        printf("%i, %i\n", children_head->screen_location.size.height, children_head->screen_location.size.width);
         children_head = children_head->next_sibling;
     }
 }
@@ -95,8 +94,29 @@ void ei_button_drawfunc(ei_widget_t button,
                         ei_surface_t pick_surface,
                         ei_rect_t *clipper)
 {
-    ei_rect_t rectangle;
-    rectangle = button->screen_location;
+    printf("ok!\n");
+    if (button->placer_params != NULL) // show widget on screen iff placer_params is not NULL
+    {
+        ei_impl_placer_run(button); // calculates the position of widget with regards to the root window and update screen_location of widget
 
-    ei_draw_button(surface, rectangle, ((ei_impl_button_t *)button)->color, ((ei_impl_button_t *)button)->relief, ((ei_impl_button_t *)button)->border_width, ((ei_impl_button_t *)button)->corner_radius);
+        ei_rect_t rectangle = button->screen_location; 
+        ei_draw_button(surface, rectangle, ((ei_impl_button_t *)button)->color, ((ei_impl_button_t *)button)->relief, ((ei_impl_button_t *)button)->border_width, ((ei_impl_button_t *)button)->corner_radius);
+    }
+    
+    
+    ei_widget_t children_head = button->children_head;
+    while (children_head != NULL)
+    {
+        (*(children_head->wclass->drawfunc))(children_head, surface, pick_surface, &children_head->screen_location);
+        children_head = children_head->next_sibling;
+    }
+}
+
+
+void ei_button_widgetclass_create(ei_widgetclass_t *ei_button_widgetclass)
+{
+    ei_button_widgetclass->allocfunc = &ei_button_allocfunc;
+    ei_button_widgetclass->releasefunc = NULL; // TBC
+    ei_button_widgetclass->drawfunc = &ei_button_drawfunc;
+    ei_button_widgetclass->setdefaultsfunc = &ei_button_setdefaultsfunc;
 }

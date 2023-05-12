@@ -17,11 +17,11 @@ void ei_app_create(ei_size_t main_window_size, bool fullscreen)
     strncpy(p_widgetclass_list->name, "frame", 6 * sizeof(char));
     ei_widgetclass_register(p_widgetclass_list);
     p_widgetclass_list->next = p_widgetclass_list + 1;
-    // strncpy(p_widgetclass_list->next->name, "button", 7 * sizeof(char));
-    // ei_widgetclass_register(p_widgetclass_list);
-    // p_widgetclass_list->next->next = p_widgetclass_list + 2;
+    strncpy(p_widgetclass_list->next->name, "button", 7 * sizeof(char));
+    ei_widgetclass_register(p_widgetclass_list+1);
+    p_widgetclass_list->next->next = p_widgetclass_list + 2;
     // strncpy(p_widgetclass_list->next->next->name, "toplevel", 9 * sizeof(char));
-    // ei_widgetclass_register(p_widgetclass_list);
+    // ei_widgetclass_register(p_widgetclass_list+2);
     /* creates the root window */
     root_surface = hw_create_window(main_window_size, fullscreen);
     pick_surface = hw_surface_create(root_surface, main_window_size, false);

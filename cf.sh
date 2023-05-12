@@ -2,7 +2,7 @@
 
 
 cd cmake
-make frame
+make button
 
 cd ..
-./cmake/frame
+./cmake/button

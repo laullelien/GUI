@@ -9,10 +9,11 @@ void ei_widgetclass_register(ei_widgetclass_t *p_widgetclass_list)
     {
         ei_frame_widgetclass_create(p_widgetclass_list);
     }
-    // else if (strcmp("button", p_widgetclass_list->name) == 0)
-    // {
-    //     ei_button_widgetclass_create(p_widgetclass_list);
-    // }
+    else if (strcmp("button", p_widgetclass_list->name) == 0)
+    {
+        ei_button_widgetclass_create(p_widgetclass_list);
+        printf("rentre bien!");
+    }
     // else if (strcmp("toplevel", p_widgetclass_list->name) == 0)
     // {
     //     ei_toplevel_widgetclass_create(p_widgetclass_list);
@@ -23,15 +24,15 @@ void ei_widgetclass_register(ei_widgetclass_t *p_widgetclass_list)
 ei_widgetclass_t *ei_widgetclass_from_name(ei_const_string_t name)
 {
     ei_widgetclass_t *p_widgetclass_list = ei_app_root_widget()->wclass;
-    if (strcmp("frame", p_widgetclass_list->name) == 0)
+    if (strcmp("frame", name) == 0)
     {
         return p_widgetclass_list;
     }
-    else if (strcmp("button", p_widgetclass_list->name) == 0)
+    else if (strcmp("button", name) == 0)
     {
         return p_widgetclass_list + 1;
     }
-    else if (strcmp("toplevel", p_widgetclass_list->name) == 0)
+    else if (strcmp("toplevel", name) == 0)
     {
         return p_widgetclass_list + 2;
     }

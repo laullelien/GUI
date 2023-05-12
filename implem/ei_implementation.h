@@ -110,7 +110,19 @@ uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color);
  * \brief	A structure storing the placement parameters of a widget.
  *		You have to define this structure: no suggestion provided.
  */
-struct ei_impl_placer_params_t;
+typedef struct ei_impl_placer_params_t
+{
+	ei_anchor_t anchor;
+	int x;
+	int y;
+	int width;
+	int height;
+	int rel_x;
+	int rel_y;
+	int rel_width;
+	int rel_height;
+	
+}ei_impl_placer_params_t;
 
 /**
  * \brief	Tells the placer to recompute the geometry of a widget.
@@ -141,10 +153,11 @@ typedef struct ei_impl_widget_t
 	ei_widget_t next_sibling;  ///< Pointer to the next child of this widget's parent widget.
 
 	/* Geometry Management */
-	//	ei_impl_placer_params_t* placer_params;	///< Pointer to the placer parameters for this widget. If NULL, the widget is not currently managed and thus, is not displayed on the screen.
+	ei_impl_placer_params_t* placer_params;	///< Pointer to the placer parameters for this widget. If NULL, the widget is not currently managed and thus, is not displayed on the screen.
 	ei_size_t requested_size;  ///< Size requested by the widget (big enough for its label, for example), or by the programmer. This can be different than its screen size defined by the placer.
 	ei_rect_t screen_location; ///< Position and size of the widget expressed in the root window reference.
 	ei_rect_t *content_rect;   ///< Where to place children, when this widget is used as a container. By defaults, points to the screen_location.
+
 } ei_impl_widget_t;
 
 /**

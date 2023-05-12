@@ -1,6 +1,7 @@
 #include "ei_draw_arc.h"
 #include <stdio.h>
 #include "ei_implementation.h"
+#include "ei_types.h"
 
 
 /* angles in radian !!*/
@@ -457,7 +458,7 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
 }
 
 
-void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_color, bool raised, int border_width, int radius)
+void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_color, ei_relief_t relief, int border_width, int radius)
 {
     bool is_horizontal = rectangle.size.width > rectangle.size.height;
     int radius1 = radius;
@@ -540,7 +541,7 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
     {
         color_bottom.green = main_color.green - 40;
     }
-    if (!(raised))
+    if (relief == ei_relief_sunken)
     {
         temp = color_top;
         color_top = color_bottom;

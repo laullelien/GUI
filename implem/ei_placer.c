@@ -162,4 +162,5 @@ void ei_impl_placer_run(ei_widget_t widget)
 void ei_placer_forget(ei_widget_t widget)
 {
     free(widget->placer_params);
+    widget->placer_params = NULL;
 }

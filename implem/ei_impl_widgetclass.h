@@ -25,7 +25,6 @@ void ei_frame_drawfunc(ei_widget_t frame,
                        ei_rect_t *clipper);
 void ei_frame_setdefaultsfunc(ei_widget_t frame);
 void ei_frame_widgetclass_create(ei_widgetclass_t *ei_frame_widgetclass);
-void ei_widgetclass_register(ei_widgetclass_t *widgetclass);
 ei_widgetclass_t *ei_widgetclass_from_name(ei_const_string_t name);
 
 /* BUTTON */

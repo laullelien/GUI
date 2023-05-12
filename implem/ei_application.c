@@ -18,10 +18,10 @@ void ei_app_create(ei_size_t main_window_size, bool fullscreen)
     ei_widgetclass_register(p_widgetclass_list);
     p_widgetclass_list->next = p_widgetclass_list + 1;
     // strncpy(p_widgetclass_list->next->name, "button", 7 * sizeof(char));
-    // ei_widgetclass_register(p_widgetclass_list);
+    // ei_widgetclass_register(p_widgetclass_list+1);
     // p_widgetclass_list->next->next = p_widgetclass_list + 2;
     // strncpy(p_widgetclass_list->next->next->name, "toplevel", 9 * sizeof(char));
-    // ei_widgetclass_register(p_widgetclass_list);
+    // ei_widgetclass_register(p_widgetclass_list+2);
     /* creates the root window */
     root_surface = hw_create_window(main_window_size, fullscreen);
     pick_surface = hw_surface_create(root_surface, main_window_size, false);
@@ -30,12 +30,12 @@ void ei_app_create(ei_size_t main_window_size, bool fullscreen)
     root_widget->wclass = p_widgetclass_list;
     root_widget->screen_location.size = main_window_size;
     root_widget->content_rect = &root_widget->screen_location;
+    root_widget->placer_params = calloc(1, sizeof(ei_impl_placer_params_t));
     ei_frame_setdefaultsfunc(root_widget);
 }
 
 void ei_app_run()
 {
-    ei_place(root_widget, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     hw_surface_lock(root_surface);
     // hw_surface_lock(pick_surface);
     ei_frame_drawfunc(root_widget, root_surface, pick_surface, NULL);
@@ -54,7 +54,7 @@ ei_widget_t ei_app_root_widget()
     return root_widget;
 }
 
-ei_surface_t ei_app_root_surface(void)
+ei_surface_t ei_app_root_surface()
 {
     return root_surface;
 }

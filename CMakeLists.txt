@@ -86,6 +86,7 @@ set(LIB_EI_SOURCES
      ${SRC_DIR}/ei_widget.c
      ${SRC_DIR}/ei_widgetclass.c
      ${SRC_DIR}/ei_impl_widgetclass.c
+     ${SRC_DIR}/ei_widget_attribute.c
 
 )
 

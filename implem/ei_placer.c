@@ -58,7 +58,7 @@ void ei_place(ei_widget_t widget,
                     }
                     else if (((ei_impl_frame_t *)widget)->text != NULL)
                     {
-                        hw_text_compute_size(((ei_impl_frame_t *)widget)->text,((ei_impl_frame_t *)widget)->text_font , NULL, &widget->placer_params->width);
+                        hw_text_compute_size(((ei_impl_frame_t *)widget)->text,((ei_impl_frame_t *)widget)->text_font, &widget->placer_params->width , NULL);
                         widget->placer_params->width+=(((ei_impl_frame_t *)widget)->border_width << 1);
                     }
                 }
@@ -90,7 +90,7 @@ void ei_place(ei_widget_t widget,
                     }
                     else if (((ei_impl_frame_t *)widget)->text != NULL)
                     {
-                        hw_text_compute_size(((ei_impl_frame_t *)widget)->text,((ei_impl_frame_t *)widget)->text_font , &widget->placer_params->height, NULL);
+                        hw_text_compute_size(((ei_impl_frame_t *)widget)->text,((ei_impl_frame_t *)widget)->text_font , NULL, &widget->placer_params->height);
                         widget->placer_params->height+=(((ei_impl_frame_t *)widget)->border_width << 1);
                     }
                 }

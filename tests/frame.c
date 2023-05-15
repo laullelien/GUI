@@ -6,6 +6,9 @@
 #include "hw_interface.h"
 #include "ei_widget_configure.h"
 
+#include "../implem/ei_implementation.h"
+
+
 
 /*
  * ei_main --
@@ -26,7 +29,17 @@ int main(int argc, char** argv)
 			   			&(ei_color_t){0x88, 0x88, 0x88, 0xff},
 			 			&(int){6},
 					 	&(ei_relief_t){ei_relief_raised}, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	printf("req sizee  %i %i\n", frame->requested_size.height, frame->requested_size.width);					
 	ei_place_xy			(frame, 150, 200);
+	printf("%i, %i\n", frame->screen_location.top_left.x, frame->screen_location.top_left.y);
+	printf(" ici %i, %i\n", frame->screen_location.size.width, frame->screen_location.size.height);
+
+
+
+
+
+
+
 
 	/* Run the application's main loop. */
 	ei_app_run();

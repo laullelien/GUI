@@ -111,8 +111,6 @@ void ei_button_drawfunc(ei_widget_t button,
 {
     ei_rect_t rectangle;
     rectangle = button->screen_location;
-
-
     ei_draw_button(surface,rectangle, ((ei_impl_button_t *)button)->color, ((ei_impl_button_t *)button)->relief, ((ei_impl_button_t *)button)->border_width, ((ei_impl_button_t *)button)->corner_radius);
 }
 

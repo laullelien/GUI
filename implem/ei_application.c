@@ -24,7 +24,9 @@ void ei_app_create(ei_size_t main_window_size, bool fullscreen)
     // ei_widgetclass_register(p_widgetclass_list+2);
     /* creates the root window */
     root_surface = hw_create_window(main_window_size, fullscreen);
+
     pick_surface = hw_surface_create(root_surface, main_window_size, false);
+
     /* creates the root widget to access the root window. */
     root_widget = p_widgetclass_list->allocfunc();
     root_widget->wclass = p_widgetclass_list;
@@ -36,11 +38,11 @@ void ei_app_create(ei_size_t main_window_size, bool fullscreen)
 void ei_app_run()
 {
     hw_surface_lock(root_surface);
-    // hw_surface_lock(pick_surface);
+    hw_surface_lock(pick_surface);
     ei_rect_t root_rect=hw_surface_get_rect(root_surface);
     ei_frame_drawfunc(root_widget, root_surface, pick_surface, &root_rect);
     hw_surface_unlock(root_surface);
-    // hw_surface_unlock(pick_surface);
+    hw_surface_unlock(pick_surface);
     hw_surface_update_rects(root_surface, NULL);
     getchar();
 }

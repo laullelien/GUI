@@ -6,6 +6,11 @@
 #include "ei_widget_configure.h"
 #include <stdio.h>
 
+
+
+
+
+
 ei_widget_t ei_frame_allocfunc()
 {
     ei_widget_t frame = (ei_widget_t)calloc(1, sizeof(ei_impl_frame_t));
@@ -21,6 +26,7 @@ void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pic
         if (((ei_impl_frame_t *)frame)->relief == ei_relief_none || ((ei_impl_frame_t *)frame)->border_width == 0)
         {
             ei_fill(surface, &((ei_impl_frame_t *)frame)->color, clipper);
+            ei_fill(pick_surface, ((ei_color_t *)&(frame->pick_id)), clipper);
             if (((ei_impl_frame_t *)frame)->text != NULL)
             {
                 ei_draw_frame_text(surface, frame, clipper);
@@ -32,11 +38,6 @@ void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pic
         }
         else
         {
-            ei_rect_t inner_clipper;
-            inner_clipper.size.height = clipper->size.height - (((ei_impl_frame_t *)frame)->border_width << 1);
-            inner_clipper.size.width = clipper->size.width - (((ei_impl_frame_t *)frame)->border_width << 1);
-            inner_clipper.top_left.x = clipper->top_left.x + ((ei_impl_frame_t *)frame)->border_width;
-            inner_clipper.top_left.y = clipper->top_left.y + ((ei_impl_frame_t *)frame)->border_width;
 
             ei_color_t lighter_color = ((ei_impl_frame_t *)frame)->color;
             lighter_color.red = (lighter_color.red <= 215) ? (lighter_color.red + 40) : 255;
@@ -52,11 +53,11 @@ void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pic
             left_border[0] = clipper->top_left;
             left_border[1].x = clipper->top_left.x + clipper->size.width;
             left_border[1].y = clipper->top_left.y;
-            left_border[2].x = inner_clipper.top_left.x + inner_clipper.size.width;
-            left_border[2].y = inner_clipper.top_left.y;
-            left_border[3] = inner_clipper.top_left;
-            left_border[4].x = inner_clipper.top_left.x;
-            left_border[4].y = inner_clipper.top_left.y + inner_clipper.size.height;
+            left_border[2].x = frame->content_rect.top_left.x + frame->content_rect.size.width;
+            left_border[2].y = frame->content_rect.top_left.y;
+            left_border[3] = frame->content_rect.top_left;
+            left_border[4].x = frame->content_rect.top_left.x;
+            left_border[4].y = frame->content_rect.top_left.y + frame->content_rect.size.height;
             left_border[5].x = clipper->top_left.x;
             left_border[5].y = clipper->top_left.y + clipper->size.height;
             left_border[6] = clipper->top_left;
@@ -66,12 +67,12 @@ void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pic
             right_border[0].y = clipper->top_left.y + clipper->size.height;
             right_border[1].x = clipper->top_left.x + clipper->size.width;
             right_border[1].y = clipper->top_left.y;
-            right_border[2].x = inner_clipper.top_left.x + inner_clipper.size.width;
-            right_border[2].y = inner_clipper.top_left.y;
-            right_border[3].x = inner_clipper.top_left.x + inner_clipper.size.width;
-            right_border[3].y = inner_clipper.top_left.y + inner_clipper.size.height;
-            right_border[4].x = inner_clipper.top_left.x;
-            right_border[4].y = inner_clipper.top_left.y + inner_clipper.size.height;
+            right_border[2].x = frame->content_rect.top_left.x + frame->content_rect.size.width;
+            right_border[2].y = frame->content_rect.top_left.y;
+            right_border[3].x = frame->content_rect.top_left.x + frame->content_rect.size.width;
+            right_border[3].y = frame->content_rect.top_left.y + frame->content_rect.size.height;
+            right_border[4].x = frame->content_rect.top_left.x;
+            right_border[4].y = frame->content_rect.top_left.y + frame->content_rect.size.height;
             right_border[5].x = clipper->top_left.x;
             right_border[5].y = clipper->top_left.y + clipper->size.height;
             right_border[6].x = clipper->top_left.x + clipper->size.width;
@@ -87,14 +88,15 @@ void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pic
                 ei_draw_polygon(surface, left_border, 7, darker_color, NULL);
                 ei_draw_polygon(surface, right_border, 7, lighter_color, NULL);
             }
-            ei_fill(surface, &((ei_impl_frame_t *)frame)->color, &inner_clipper);
+            ei_fill(surface, &((ei_impl_frame_t *)frame)->color, &(frame->content_rect));
+            ei_fill(pick_surface, ((ei_color_t *)&(frame->pick_id)), &(frame->content_rect));
             if (((ei_impl_frame_t *)frame)->text != NULL)
             {
-                ei_draw_frame_text(surface, frame, &inner_clipper);
+                ei_draw_frame_text(surface, frame, &(frame->content_rect));
             }
             else if(((ei_impl_frame_t *)frame)->img != NULL)
             {
-                ei_draw_frame_img(surface, frame, &inner_clipper);
+                ei_draw_frame_img(surface, frame, &(frame->content_rect));
             }
 
         }
@@ -198,8 +200,11 @@ void ei_draw_frame_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clip
 
     if(img_width>clipper->size.width || img_height>clipper->size.height)
     {
-        printf("img_rect to big to fit\n");
-        return;
+        
+        src_rect.size.width = clipper->size.width;
+        src_rect.size.height = clipper->size.height;
+        img_width=src_rect.size.width;
+        img_height=src_rect.size.height;
     }
 
     switch (((ei_impl_frame_t *)widget)->img_anchor)
@@ -244,7 +249,9 @@ void ei_draw_frame_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clip
         break;
     }
     dst_rect.size=src_rect.size;
+    hw_surface_lock(((ei_impl_button_t *)widget)->img);
     ei_copy_surface(surface, &dst_rect, ((ei_impl_frame_t *)widget)->img, &src_rect, true);
+    hw_surface_unlock(((ei_impl_button_t *)widget)->img);
 }
 
 /* BUTTON */
@@ -253,11 +260,6 @@ ei_widget_t ei_button_allocfunc()
 {
     ei_impl_widget_t *button = (ei_impl_widget_t *)calloc(1, sizeof(ei_impl_button_t));
     return button;
-}
-
-void ei_button_releasefunc(ei_widget_t button)
-{
-    // free((ei_impl_button_t *)button);
 }
 
 void ei_button_setdefaultsfunc(ei_widget_t button)
@@ -288,25 +290,31 @@ void ei_button_drawfunc(ei_widget_t button,
         ei_impl_placer_run(button); // calculates the position of widget with regards to the root window and update screen_location of widget
 
         ei_rect_t rectangle = button->screen_location; 
-        ei_draw_button(surface, rectangle, ((ei_impl_button_t *)button)->color, ((ei_impl_button_t *)button)->relief, ((ei_impl_button_t *)button)->border_width, ((ei_impl_button_t *)button)->corner_radius);
-    }
 
- 
-    if (((ei_impl_button_t *)button)->text != NULL)
-    {
-        ei_draw_button_text(surface, button, &(button->content_rect));
-    }
-    else if(((ei_impl_button_t *)button)->img != NULL)
-    {
-        ei_draw_button_img(surface, button, &(button->content_rect));
-    }
-    
-    
-    ei_widget_t children_head = button->children_head;
-    while (children_head != NULL)
-    {
-        (*(children_head->wclass->drawfunc))(children_head, surface, pick_surface, &(button->content_rect));
-        children_head = children_head->next_sibling;
+
+
+        // uint32_t* color_pick = ;
+
+        
+
+        ei_draw_button(surface, rectangle, ((ei_impl_button_t *)button)->color, ((ei_impl_button_t *)button)->relief, ((ei_impl_button_t *)button)->border_width, ((ei_impl_button_t *)button)->corner_radius, clipper, pick_surface ,*((ei_color_t*)(&(button->pick_id))));
+
+
+
+        if (((ei_impl_button_t *)button)->text != NULL)
+        {
+            ei_draw_button_text(surface, button, &(button->content_rect));
+        }
+        else if(((ei_impl_button_t *)button)->img != NULL)
+        {
+            ei_draw_button_img(surface, button, &(button->content_rect));
+        }
+            ei_widget_t children_head = button->children_head;
+        while (children_head != NULL)
+        {
+            (*(children_head->wclass->drawfunc))(children_head, surface, pick_surface, &(button->content_rect));
+            children_head = children_head->next_sibling;
+        }
     }
 }
 
@@ -374,10 +382,15 @@ void ei_draw_button_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *cli
     int img_width=src_rect.size.width;
     int img_height=src_rect.size.height;
 
+
+
+
     if(img_width>clipper->size.width || img_height>clipper->size.height)
     {
-        printf("img_rect to big to fit\n");
-        return;
+        src_rect.size.width = clipper->size.width;
+        src_rect.size.height = clipper->size.height;
+        img_width=src_rect.size.width;
+        img_height=src_rect.size.height;
     }
 
     switch (((ei_impl_frame_t *)widget)->img_anchor)
@@ -414,6 +427,7 @@ void ei_draw_button_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *cli
         dst_rect.top_left.x= clipper->top_left.x;
         dst_rect.top_left.y= ((clipper->size.height-img_height)>>1)+clipper->top_left.y;
         break;
+
     case ei_anc_northwest:
         dst_rect.top_left.x= clipper->top_left.x;
         dst_rect.top_left.y= clipper->top_left.y;
@@ -422,7 +436,9 @@ void ei_draw_button_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *cli
         break;
     }
     dst_rect.size=src_rect.size;
+    hw_surface_lock(((ei_impl_button_t *)widget)->img);
     ei_copy_surface(surface, &dst_rect, ((ei_impl_button_t *)widget)->img, &src_rect, true);
+    hw_surface_unlock(((ei_impl_button_t *)widget)->img);
 }
 
 void ei_button_widgetclass_create(ei_widgetclass_t *ei_button_widgetclass)

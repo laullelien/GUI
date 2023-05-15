@@ -4,6 +4,7 @@
 #include "ei_types.h"
 
 
+
 /* angles in radian !!*/
 void list_of_points_for_an_arc( ei_point_t center,
                                 int radius,
@@ -458,8 +459,9 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
 }
 
 
-void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_color, ei_relief_t relief, int border_width, int radius)
+void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_color, ei_relief_t relief, int border_width, int radius, ei_rect_t *clipper, ei_surface_t pick_surface, ei_color_t pick_color)
 {
+    
     bool is_horizontal = rectangle.size.width > rectangle.size.height;
     int radius1 = radius;
     int radius2 = radius1-border_width;
@@ -549,7 +551,6 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
     }
 
 
-
     int area1 = 0;
     int area2 = 1;
     int area3 = 2;
@@ -561,11 +562,16 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
 
     ei_point_t * list3 = list_of_points_for_a_rounded_frame(middle_rectangle, radius2,&length3, area3, is_horizontal);
 
-    ei_draw_polygon(surface, list, length1, color_top, NULL);
-    ei_draw_polygon(surface, list2, length2, color_bottom, NULL);
+    ei_draw_polygon(surface, list, length1, color_top, clipper);
+    ei_draw_polygon(surface, list2, length2, color_bottom, clipper);
 
-    ei_draw_polygon(surface, list3, length3, main_color, NULL);
+    ei_draw_polygon(surface, list3, length3, main_color, clipper);
+
+    ei_draw_polygon(pick_surface, list3, length3, pick_color, clipper);
 
 
-
+    free(list);
+    free(list2);
+    free(list3);
+    
 }

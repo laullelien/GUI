@@ -105,6 +105,27 @@ int main(int argc, char* argv[])
 	ei_draw_text(main_window, &((ei_point_t){0, 0}), name, ei_default_font, (ei_color_t){0xff, 0x55, 0xf0, 0xff}, &root_rect); 
 	printf("%i\n",ei_copy_surface(main_window, &dst_rect, copy_surface, &src_rect, true));
 
+    // button test
+    ei_rect_t src_rect2;
+    src_rect2.top_left.x=100;
+    src_rect2.top_left.y=100;
+    src_rect2.size.width=300;
+    src_rect2.size.height=200;
+
+    ei_color_t grey;
+    grey.red = 200;
+    grey.green = 200;
+    grey.blue = 200;
+    grey.alpha = 0;
+
+    ei_rect_t clipper;
+    clipper.top_left.y=50;
+    clipper.size.width=150;
+    clipper.top_left.x=50;
+    clipper.size.height=150;
+
+    ei_draw_button(main_window ,src_rect2, grey, ei_relief_sunken, 5, 20, &clipper);
+
 	// unlock, update screen.
 	hw_surface_unlock(main_window);
 	hw_surface_unlock(copy_surface);

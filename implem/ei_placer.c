@@ -207,10 +207,10 @@ void ei_impl_placer_run(ei_widget_t widget)
     }
     else if (strcmp("button", widget->wclass->name) == 0)
     {
-        widget->content_rect.top_left.x = widget->screen_location.top_left.x + ((ei_impl_button_t *)widget)->border_width;
-        widget->content_rect.top_left.y = widget->screen_location.top_left.y + ((ei_impl_button_t *)widget)->border_width;
-        widget->content_rect.size.width = widget->screen_location.size.width - (((ei_impl_button_t *)widget)->border_width << 1);
-        widget->content_rect.size.height = widget->screen_location.size.height - (((ei_impl_button_t *)widget)->border_width << 1);
+        widget->content_rect.top_left.x = widget->screen_location.top_left.x + ((ei_impl_button_t *)widget)->corner_radius;
+        widget->content_rect.top_left.y = widget->screen_location.top_left.y + ((ei_impl_button_t *)widget)->corner_radius;
+        widget->content_rect.size.width = widget->screen_location.size.width - (((ei_impl_button_t *)widget)->corner_radius << 1);
+        widget->content_rect.size.height = widget->screen_location.size.height - (((ei_impl_button_t *)widget)->corner_radius << 1);
     }
     //     else if (strcmp("toplevel", widget->wclass->name) == 0)
     // {

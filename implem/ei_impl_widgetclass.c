@@ -132,113 +132,53 @@ void ei_frame_widgetclass_create(ei_widgetclass_t *ei_frame_widgetclass)
     ei_frame_widgetclass->setdefaultsfunc = &ei_frame_setdefaultsfunc;
 }
 
-/* BUTTON */
-
-ei_widget_t ei_button_allocfunc()
-{
-    ei_impl_widget_t *button = (ei_impl_widget_t *)calloc(1, sizeof(ei_impl_button_t));
-    return button;
-}
-
-void ei_button_releasefunc(ei_widget_t button)
-{
-    // free((ei_impl_button_t *)button);
-}
-
-void ei_button_setdefaultsfunc(ei_widget_t button)
-{
-    ((ei_impl_button_t *)button)->color = ei_default_background_color;
-    ((ei_impl_button_t *)button)->border_width = k_default_button_border_width;
-    ((ei_impl_button_t *)button)->corner_radius = k_default_button_corner_radius;
-    ((ei_impl_button_t *)button)->relief = ei_relief_raised;
-    ((ei_impl_button_t *)button)->text = NULL;
-    ((ei_impl_button_t *)button)->text_font = ei_default_font;
-    ((ei_impl_button_t *)button)->text_color = ei_font_default_color;
-    ((ei_impl_button_t *)button)->text_anchor = ei_anc_center;
-    ((ei_impl_button_t *)button)->img = NULL;
-    ((ei_impl_button_t *)button)->img_rect = NULL;
-    ((ei_impl_button_t *)button)->img_anchor = ei_anc_center;
-    ((ei_impl_button_t *)button)->callback = NULL;
-    ((ei_impl_button_t *)button)->user_param = NULL;
-}
-
-void ei_button_drawfunc(ei_widget_t button,
-                        ei_surface_t surface,
-                        ei_surface_t pick_surface,
-                        ei_rect_t *clipper)
-{
-    printf("ok!\n");
-    if (button->placer_params != NULL) // show widget on screen iff placer_params is not NULL
-    {
-        ei_impl_placer_run(button); // calculates the position of widget with regards to the root window and update screen_location of widget
-
-        ei_rect_t rectangle = button->screen_location; 
-        ei_draw_button(surface, rectangle, ((ei_impl_button_t *)button)->color, ((ei_impl_button_t *)button)->relief, ((ei_impl_button_t *)button)->border_width, ((ei_impl_button_t *)button)->corner_radius);
-    }
-    
-    
-    ei_widget_t children_head = button->children_head;
-    while (children_head != NULL)
-    {
-        (*(children_head->wclass->drawfunc))(children_head, surface, pick_surface, &children_head->screen_location);
-        children_head = children_head->next_sibling;
-    }
-}
-
-
-void ei_button_widgetclass_create(ei_widgetclass_t *ei_button_widgetclass)
-{
-    ei_button_widgetclass->allocfunc = &ei_button_allocfunc;
-    ei_button_widgetclass->releasefunc = NULL; // TBC
-    ei_button_widgetclass->drawfunc = &ei_button_drawfunc;
-    ei_button_widgetclass->setdefaultsfunc = &ei_button_setdefaultsfunc;
 void ei_draw_frame_text(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clipper)
 {
     int text_width, text_height;
     hw_text_compute_size(((ei_impl_frame_t *)widget)->text, ((ei_impl_frame_t *)widget)->text_font, &text_width, &text_height);
-    ei_point_t topl_left;
+    ei_point_t top_left;
     switch (((ei_impl_frame_t *)widget)->text_anchor)
     {
     case ei_anc_center:
-        topl_left.x= ((clipper->size.width-text_width)>>1)+clipper->top_left.x;
-        topl_left.y= ((clipper->size.height-text_height)>>1)+clipper->top_left.y;
+        top_left.x= ((clipper->size.width-text_width)>>1)+clipper->top_left.x;
+        top_left.y= ((clipper->size.height-text_height)>>1)+clipper->top_left.y;
         break;
     case ei_anc_north:
-        topl_left.x= ((clipper->size.width-text_width)>>1)+clipper->top_left.x;
-        topl_left.y= clipper->top_left.y;
+        top_left.x= ((clipper->size.width-text_width)>>1)+clipper->top_left.x;
+        top_left.y= clipper->top_left.y;
         break;
     case ei_anc_northeast:
-        topl_left.x= clipper->size.width-text_width+clipper->top_left.x;
-        topl_left.y= clipper->top_left.y;
+        top_left.x= clipper->size.width-text_width+clipper->top_left.x;
+        top_left.y= clipper->top_left.y;
         break;
     case ei_anc_east:
-        topl_left.x= clipper->size.width-text_width+clipper->top_left.x;
-        topl_left.y= ((clipper->size.height-text_height)>>1)+clipper->top_left.y;
+        top_left.x= clipper->size.width-text_width+clipper->top_left.x;
+        top_left.y= ((clipper->size.height-text_height)>>1)+clipper->top_left.y;
         break;
     case ei_anc_southeast:
-        topl_left.x= clipper->size.width-text_width+clipper->top_left.x;
-        topl_left.y= clipper->size.height-text_height+clipper->top_left.y;
+        top_left.x= clipper->size.width-text_width+clipper->top_left.x;
+        top_left.y= clipper->size.height-text_height+clipper->top_left.y;
         break;
     case ei_anc_south:
-        topl_left.x= ((clipper->size.width-text_width)>>1)+clipper->top_left.x;
-        topl_left.y= clipper->size.height-text_height+clipper->top_left.y;
+        top_left.x= ((clipper->size.width-text_width)>>1)+clipper->top_left.x;
+        top_left.y= clipper->size.height-text_height+clipper->top_left.y;
         break;
     case ei_anc_southwest:
-        topl_left.x= clipper->top_left.x;
-        topl_left.y= clipper->size.height-text_height+clipper->top_left.y;
+        top_left.x= clipper->top_left.x;
+        top_left.y= clipper->size.height-text_height+clipper->top_left.y;
         break;
     case ei_anc_west:
-        topl_left.x= clipper->top_left.x;
-        topl_left.y= ((clipper->size.height-text_height)>>1)+clipper->top_left.y;
+        top_left.x= clipper->top_left.x;
+        top_left.y= ((clipper->size.height-text_height)>>1)+clipper->top_left.y;
         break;
     case ei_anc_northwest:
-        topl_left.x= clipper->top_left.x;
-        topl_left.y= clipper->top_left.y;
+        top_left.x= clipper->top_left.x;
+        top_left.y= clipper->top_left.y;
         break;
     default:
         break;
     }
-    ei_draw_text(surface, &topl_left, ((ei_impl_frame_t *)widget)->text, ((ei_impl_frame_t *)widget)->text_font, ((ei_impl_frame_t *)widget)->text_color, clipper);
+    ei_draw_text(surface, &top_left, ((ei_impl_frame_t *)widget)->text, ((ei_impl_frame_t *)widget)->text_font, ((ei_impl_frame_t *)widget)->text_color, clipper);
 }
 
 void ei_draw_frame_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clipper)
@@ -305,5 +245,189 @@ void ei_draw_frame_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clip
     }
     dst_rect.size=src_rect.size;
     ei_copy_surface(surface, &dst_rect, ((ei_impl_frame_t *)widget)->img, &src_rect, true);
+}
 
+/* BUTTON */
+
+ei_widget_t ei_button_allocfunc()
+{
+    ei_impl_widget_t *button = (ei_impl_widget_t *)calloc(1, sizeof(ei_impl_button_t));
+    return button;
+}
+
+void ei_button_releasefunc(ei_widget_t button)
+{
+    // free((ei_impl_button_t *)button);
+}
+
+void ei_button_setdefaultsfunc(ei_widget_t button)
+{
+    ((ei_impl_button_t *)button)->color = ei_default_background_color;
+    ((ei_impl_button_t *)button)->border_width = k_default_button_border_width;
+    ((ei_impl_button_t *)button)->corner_radius = k_default_button_corner_radius;
+    ((ei_impl_button_t *)button)->relief = ei_relief_raised;
+    ((ei_impl_button_t *)button)->text = NULL;
+    ((ei_impl_button_t *)button)->text_font = ei_default_font;
+    ((ei_impl_button_t *)button)->text_color = ei_font_default_color;
+    ((ei_impl_button_t *)button)->text_anchor = ei_anc_center;
+    ((ei_impl_button_t *)button)->img = NULL;
+    ((ei_impl_button_t *)button)->img_rect = NULL;
+    ((ei_impl_button_t *)button)->img_anchor = ei_anc_center;
+    ((ei_impl_button_t *)button)->callback = NULL;
+    ((ei_impl_button_t *)button)->user_param = NULL;
+}
+
+void ei_button_drawfunc(ei_widget_t button,
+                        ei_surface_t surface,
+                        ei_surface_t pick_surface,
+                        ei_rect_t *clipper)
+{
+    if (button->placer_params != NULL) // show widget on screen iff placer_params is not NULL
+    {
+        ei_impl_placer_run(button); // calculates the position of widget with regards to the root window and update screen_location of widget
+
+        ei_rect_t rectangle = button->screen_location; 
+        ei_draw_button(surface, rectangle, ((ei_impl_button_t *)button)->color, ((ei_impl_button_t *)button)->relief, ((ei_impl_button_t *)button)->border_width, ((ei_impl_button_t *)button)->corner_radius);
+    }
+
+ 
+    if (((ei_impl_button_t *)button)->text != NULL)
+    {
+        ei_draw_button_text(surface, button, &(button->content_rect));
+    }
+    else if(((ei_impl_button_t *)button)->img != NULL)
+    {
+        ei_draw_button_img(surface, button, &(button->content_rect));
+    }
+    
+    
+    ei_widget_t children_head = button->children_head;
+    while (children_head != NULL)
+    {
+        (*(children_head->wclass->drawfunc))(children_head, surface, pick_surface, &(button->content_rect));
+        children_head = children_head->next_sibling;
+    }
+}
+
+void ei_draw_button_text(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clipper)
+{
+    int text_width, text_height;
+    hw_text_compute_size(((ei_impl_button_t *)widget)->text, ((ei_impl_button_t *)widget)->text_font, &text_width, &text_height);
+    ei_point_t top_left;
+    switch (((ei_impl_button_t *)widget)->text_anchor)
+    {
+    case ei_anc_center:
+        top_left.x= ((clipper->size.width-text_width)>>1)+clipper->top_left.x;
+        top_left.y= ((clipper->size.height-text_height)>>1)+clipper->top_left.y;
+        break;
+    case ei_anc_north:
+        top_left.x= ((clipper->size.width-text_width)>>1)+clipper->top_left.x;
+        top_left.y= clipper->top_left.y;
+        break;
+    case ei_anc_northeast:
+        top_left.x= clipper->size.width-text_width+clipper->top_left.x;
+        top_left.y= clipper->top_left.y;
+        break;
+    case ei_anc_east:
+        top_left.x= clipper->size.width-text_width+clipper->top_left.x;
+        top_left.y= ((clipper->size.height-text_height)>>1)+clipper->top_left.y;
+        break;
+    case ei_anc_southeast:
+        top_left.x= clipper->size.width-text_width+clipper->top_left.x;
+        top_left.y= clipper->size.height-text_height+clipper->top_left.y;
+        break;
+    case ei_anc_south:
+        top_left.x= ((clipper->size.width-text_width)>>1)+clipper->top_left.x;
+        top_left.y= clipper->size.height-text_height+clipper->top_left.y;
+        break;
+    case ei_anc_southwest:
+        top_left.x= clipper->top_left.x;
+        top_left.y= clipper->size.height-text_height+clipper->top_left.y;
+        break;
+    case ei_anc_west:
+        top_left.x= clipper->top_left.x;
+        top_left.y= ((clipper->size.height-text_height)>>1)+clipper->top_left.y;
+        break;
+    case ei_anc_northwest:
+        top_left.x= clipper->top_left.x;
+        top_left.y= clipper->top_left.y;
+        break;
+    default:
+        break;
+    }
+    ei_draw_text(surface, &top_left, ((ei_impl_button_t *)widget)->text, ((ei_impl_button_t *)widget)->text_font, ((ei_impl_button_t *)widget)->text_color, clipper);
+}
+
+void ei_draw_button_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clipper)
+{
+    ei_rect_t src_rect;
+    ei_rect_t dst_rect;
+    if(((ei_impl_button_t *)widget)->img_rect!=NULL)
+    {
+        src_rect=*((ei_impl_button_t *)widget)->img_rect;
+    }
+    else
+    {
+        src_rect=hw_surface_get_rect(((ei_impl_button_t *)widget)->img);
+    }
+    int img_width=src_rect.size.width;
+    int img_height=src_rect.size.height;
+
+    if(img_width>clipper->size.width || img_height>clipper->size.height)
+    {
+        printf("img_rect to big to fit\n");
+        return;
+    }
+
+    switch (((ei_impl_frame_t *)widget)->img_anchor)
+    {
+    case ei_anc_center:
+        dst_rect.top_left.x= ((clipper->size.width-img_width)>>1)+clipper->top_left.x;
+        dst_rect.top_left.y= ((clipper->size.height-img_height)>>1)+clipper->top_left.y;
+        break;
+    case ei_anc_north:
+        dst_rect.top_left.x= ((clipper->size.width-img_width)>>1)+clipper->top_left.x;
+        dst_rect.top_left.y= clipper->top_left.y;
+        break;
+    case ei_anc_northeast:
+        dst_rect.top_left.x= clipper->size.width-img_width+clipper->top_left.x;
+        dst_rect.top_left.y= clipper->top_left.y;
+        break;
+    case ei_anc_east:
+        dst_rect.top_left.x= clipper->size.width-img_width+clipper->top_left.x;
+        dst_rect.top_left.y= ((clipper->size.height-img_height)>>1)+clipper->top_left.y;
+        break;
+    case ei_anc_southeast:
+        dst_rect.top_left.x= clipper->size.width-img_width+clipper->top_left.x;
+        dst_rect.top_left.y= clipper->size.height-img_height+clipper->top_left.y;
+        break;
+    case ei_anc_south:
+        dst_rect.top_left.x= ((clipper->size.width-img_width)>>1)+clipper->top_left.x;
+        dst_rect.top_left.y= clipper->size.height-img_height+clipper->top_left.y;
+        break;
+    case ei_anc_southwest:
+        dst_rect.top_left.x= clipper->top_left.x;
+        dst_rect.top_left.y= clipper->size.height-img_height+clipper->top_left.y;
+        break;
+    case ei_anc_west:
+        dst_rect.top_left.x= clipper->top_left.x;
+        dst_rect.top_left.y= ((clipper->size.height-img_height)>>1)+clipper->top_left.y;
+        break;
+    case ei_anc_northwest:
+        dst_rect.top_left.x= clipper->top_left.x;
+        dst_rect.top_left.y= clipper->top_left.y;
+        break;
+    default:
+        break;
+    }
+    dst_rect.size=src_rect.size;
+    ei_copy_surface(surface, &dst_rect, ((ei_impl_button_t *)widget)->img, &src_rect, true);
+}
+
+void ei_button_widgetclass_create(ei_widgetclass_t *ei_button_widgetclass)
+{
+    ei_button_widgetclass->allocfunc = &ei_button_allocfunc;
+    ei_button_widgetclass->releasefunc = NULL; // TBC
+    ei_button_widgetclass->drawfunc = &ei_button_drawfunc;
+    ei_button_widgetclass->setdefaultsfunc = &ei_button_setdefaultsfunc;
 }

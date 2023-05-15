@@ -12,7 +12,6 @@ void ei_widgetclass_register(ei_widgetclass_t *p_widgetclass_list)
     else if (strcmp("button", p_widgetclass_list->name) == 0)
     {
         ei_button_widgetclass_create(p_widgetclass_list);
-        printf("rentre bien!");
     }
     // else if (strcmp("toplevel", p_widgetclass_list->name) == 0)
     // {

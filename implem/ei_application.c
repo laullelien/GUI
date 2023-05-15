@@ -5,7 +5,7 @@
 #include "../api/ei_widget_configure.h"
 
 static ei_widget_t root_widget;
-static ei_widgetclass_t widgetclass[1];
+static ei_widgetclass_t p_widgetclass_list[3];
 static ei_surface_t root_surface;
 static ei_surface_t pick_surface;
 
@@ -14,15 +14,22 @@ void ei_app_create(ei_size_t main_window_size, bool fullscreen)
     /* initializes the hardware */
     hw_init();
     /* registers all classes of widget */
-    ei_widgetclass_register(widgetclass);
+    strncpy(p_widgetclass_list->name, "frame", 6 * sizeof(char));
+    ei_widgetclass_register(p_widgetclass_list);
+    p_widgetclass_list->next = p_widgetclass_list + 1;
+    strncpy(p_widgetclass_list->next->name, "button", 7 * sizeof(char));
+    ei_widgetclass_register(p_widgetclass_list+1);
+    p_widgetclass_list->next->next = p_widgetclass_list + 2;
+    // strncpy(p_widgetclass_list->next->next->name, "toplevel", 9 * sizeof(char));
+    // ei_widgetclass_register(p_widgetclass_list+2);
     /* creates the root window */
     root_surface = hw_create_window(main_window_size, fullscreen);
     pick_surface = hw_surface_create(root_surface, main_window_size, false);
     /* creates the root widget to access the root window. */
-    root_widget = widgetclass->allocfunc();
-    root_widget->wclass = widgetclass;
-    root_widget->screen_location.size=main_window_size;
-    root_widget->content_rect=&root_widget->screen_location;
+    root_widget = p_widgetclass_list->allocfunc();
+    root_widget->wclass = p_widgetclass_list;
+    root_widget->screen_location.size = main_window_size;
+    root_widget->content_rect = &root_widget->screen_location;
     ei_frame_setdefaultsfunc(root_widget);
 }
 

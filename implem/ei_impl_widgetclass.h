@@ -52,7 +52,6 @@ typedef struct ei_impl_button_t
 } ei_impl_button_t;
 
 ei_widget_t ei_button_allocfunc();
-void ei_button_releasefunc(ei_widget_t button);
 void ei_button_drawfunc(ei_widget_t frame,
                         ei_surface_t surface,
                         ei_surface_t pick_surface,

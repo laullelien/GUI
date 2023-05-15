@@ -198,8 +198,11 @@ void ei_draw_frame_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clip
 
     if(img_width>clipper->size.width || img_height>clipper->size.height)
     {
-        printf("img_rect to big to fit\n");
-        return;
+        
+        src_rect.size.width = clipper->size.width;
+        src_rect.size.height = clipper->size.height;
+        img_width=src_rect.size.width;
+        img_height=src_rect.size.height;
     }
 
     switch (((ei_impl_frame_t *)widget)->img_anchor)
@@ -244,7 +247,9 @@ void ei_draw_frame_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clip
         break;
     }
     dst_rect.size=src_rect.size;
+    hw_surface_lock(((ei_impl_button_t *)widget)->img);
     ei_copy_surface(surface, &dst_rect, ((ei_impl_frame_t *)widget)->img, &src_rect, true);
+    hw_surface_unlock(((ei_impl_button_t *)widget)->img);
 }
 
 /* BUTTON */
@@ -253,11 +258,6 @@ ei_widget_t ei_button_allocfunc()
 {
     ei_impl_widget_t *button = (ei_impl_widget_t *)calloc(1, sizeof(ei_impl_button_t));
     return button;
-}
-
-void ei_button_releasefunc(ei_widget_t button)
-{
-    // free((ei_impl_button_t *)button);
 }
 
 void ei_button_setdefaultsfunc(ei_widget_t button)
@@ -287,25 +287,21 @@ void ei_button_drawfunc(ei_widget_t button,
         ei_impl_placer_run(button); // calculates the position of widget with regards to the root window and update screen_location of widget
 
         ei_rect_t rectangle = button->screen_location; 
-        ei_draw_button(surface, rectangle, ((ei_impl_button_t *)button)->color, ((ei_impl_button_t *)button)->relief, ((ei_impl_button_t *)button)->border_width, ((ei_impl_button_t *)button)->corner_radius);
-    }
-
- 
-    if (((ei_impl_button_t *)button)->text != NULL)
-    {
-        ei_draw_button_text(surface, button, &(button->content_rect));
-    }
-    else if(((ei_impl_button_t *)button)->img != NULL)
-    {
-        ei_draw_button_img(surface, button, &(button->content_rect));
-    }
-    
-    
-    ei_widget_t children_head = button->children_head;
-    while (children_head != NULL)
-    {
-        (*(children_head->wclass->drawfunc))(children_head, surface, pick_surface, &(button->content_rect));
-        children_head = children_head->next_sibling;
+        ei_draw_button(surface, rectangle, ((ei_impl_button_t *)button)->color, ((ei_impl_button_t *)button)->relief, ((ei_impl_button_t *)button)->border_width, ((ei_impl_button_t *)button)->corner_radius, clipper);
+        if (((ei_impl_button_t *)button)->text != NULL)
+        {
+            ei_draw_button_text(surface, button, &(button->content_rect));
+        }
+        else if(((ei_impl_button_t *)button)->img != NULL)
+        {
+            ei_draw_button_img(surface, button, &(button->content_rect));
+        }
+            ei_widget_t children_head = button->children_head;
+        while (children_head != NULL)
+        {
+            (*(children_head->wclass->drawfunc))(children_head, surface, pick_surface, &(button->content_rect));
+            children_head = children_head->next_sibling;
+        }
     }
 }
 
@@ -373,10 +369,15 @@ void ei_draw_button_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *cli
     int img_width=src_rect.size.width;
     int img_height=src_rect.size.height;
 
+
+
+
     if(img_width>clipper->size.width || img_height>clipper->size.height)
     {
-        printf("img_rect to big to fit\n");
-        return;
+        src_rect.size.width = clipper->size.width;
+        src_rect.size.height = clipper->size.height;
+        img_width=src_rect.size.width;
+        img_height=src_rect.size.height;
     }
 
     switch (((ei_impl_frame_t *)widget)->img_anchor)
@@ -413,6 +414,7 @@ void ei_draw_button_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *cli
         dst_rect.top_left.x= clipper->top_left.x;
         dst_rect.top_left.y= ((clipper->size.height-img_height)>>1)+clipper->top_left.y;
         break;
+
     case ei_anc_northwest:
         dst_rect.top_left.x= clipper->top_left.x;
         dst_rect.top_left.y= clipper->top_left.y;
@@ -421,7 +423,9 @@ void ei_draw_button_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *cli
         break;
     }
     dst_rect.size=src_rect.size;
+    hw_surface_lock(((ei_impl_button_t *)widget)->img);
     ei_copy_surface(surface, &dst_rect, ((ei_impl_button_t *)widget)->img, &src_rect, true);
+    hw_surface_unlock(((ei_impl_button_t *)widget)->img);
 }
 
 void ei_button_widgetclass_create(ei_widgetclass_t *ei_button_widgetclass)

@@ -49,25 +49,42 @@ int main(int argc, char** argv)
 	// ei_event_set_default_handle_func(process_key);
 
 	/* Create, configure and place the button on screen. */
+
+    ei_rect_t * rect = malloc(sizeof(ei_rect_t));
+    rect->top_left.y=50;
+    rect->size.width=3000;
+    rect->top_left.x=50;
+    rect->size.height=3350;
+
+
+    static ei_string_t image_filename = "misc/klimt.jpg";
 	button = ei_widget_create	("button", ei_app_root_widget(), NULL, NULL);
-	ei_anchor_t anchor = ei_anc_center;
+	ei_anchor_t anchor = ei_anc_west;
+
+    ei_anchor_t img_anchor = ei_anc_center;
+	ei_surface_t image = hw_image_load(image_filename, ei_app_root_surface());
 
 	ei_button_configure		(button, &((ei_size_t){300, 200}),
 						&(ei_color_t){0x88, 0x88, 0x88, 0xff},
 					 	&(int){6},
 					 	&(int){40},
 					 	&(ei_relief_t){ei_relief_raised},
-					 	&(ei_string_t){"Mon premier Boutedfzefgzeufiuuiofhziaeuuiozehfuzhfofhohon !"}, NULL,
-					 	&(ei_color_t){0x00, 0x00, 0x00, 0xff}, NULL, NULL, NULL, NULL,
+					 	NULL, NULL,
+					 	&(ei_color_t){0x00, 0x00, 0x00, 0xff}, NULL, &image, &rect, &img_anchor,
 					 	&(ei_callback_t){button_press}, NULL);
 	// ei_place_xy			(button, 150, 200);
 	ei_place(button, &anchor, & (int){150}, & (int){300}, NULL, NULL, NULL, NULL, NULL, NULL);
+
 
 	/* Run the application's main loop. */
     	ei_app_run();
 
 	/* We just exited from the main loop. Terminate the application (cleanup). */
 	ei_app_free();
+
+	
+	free(rect);
+
 
 	return (EXIT_SUCCESS);
 }

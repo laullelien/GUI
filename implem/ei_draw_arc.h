@@ -60,7 +60,8 @@ void ei_draw_button(ei_surface_t surface,
                     ei_color_t main_color, 
                     ei_relief_t relief,  
                     int border_width, 
-                    int radius);
+                    int radius,
+                    ei_rect_t *clipper);
 
 
 #endif //PROJETC_IG_EI_DRAW_ARC_H

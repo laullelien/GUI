@@ -43,10 +43,10 @@ const ei_rect_t *ei_widget_get_screen_location(ei_widget_t widget)
 
 const ei_rect_t *ei_widget_get_content_rect(ei_widget_t widget)
 {
-    return widget->content_rect;
+    return &widget->content_rect;
 }
 
 void ei_widget_set_content_rect(ei_widget_t widget, const ei_rect_t *content_rect)
 {
-    widget->content_rect = (ei_rect_t *)content_rect;
+    widget->content_rect = *content_rect;
 }

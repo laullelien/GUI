@@ -50,16 +50,18 @@ int main(int argc, char** argv)
 
 	/* Create, configure and place the button on screen. */
 	button = ei_widget_create	("button", ei_app_root_widget(), NULL, NULL);
-	printf("%s\n", button->wclass->name);
+	ei_anchor_t anchor = ei_anc_northwest;
+    ei_anchor_t text_anchor = ei_anc_northwest;
 	ei_button_configure		(button, &((ei_size_t){300, 200}),
 						&(ei_color_t){0x88, 0x88, 0x88, 0xff},
 					 	&(int){6},
 					 	&(int){30},
 					 	&(ei_relief_t){ei_relief_raised},
-					 	&(ei_string_t){"Mon premier Bouton !"}, NULL,
-					 	&(ei_color_t){0x00, 0x00, 0x00, 0xff}, NULL, NULL, NULL, NULL,
+					 	&(ei_string_t){"Mon premier Boutedfzefgzeufiuuiofhziaeuuiozehfuzhfofhohon !"}, NULL,
+					 	&(ei_color_t){0x00, 0x00, 0x00, 0xff}, &text_anchor, NULL, NULL, NULL,
 					 	&(ei_callback_t){button_press}, NULL);
-	ei_place_xy			(button, 150, 200);
+	// ei_place_xy			(button, 150, 200);
+	ei_place(button, &anchor, & (int){150}, & (int){300}, NULL, NULL, NULL, NULL, NULL, NULL);
 
 	/* Run the application's main loop. */
     	ei_app_run();

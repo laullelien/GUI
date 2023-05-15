@@ -29,16 +29,16 @@ void ei_app_create(ei_size_t main_window_size, bool fullscreen)
     root_widget = p_widgetclass_list->allocfunc();
     root_widget->wclass = p_widgetclass_list;
     root_widget->screen_location.size = main_window_size;
-    root_widget->content_rect = &root_widget->screen_location;
+    root_widget->placer_params = calloc(1, sizeof(ei_impl_placer_params_t));
     ei_frame_setdefaultsfunc(root_widget);
 }
 
 void ei_app_run()
 {
-    ei_place(root_widget, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     hw_surface_lock(root_surface);
     // hw_surface_lock(pick_surface);
-    ei_frame_drawfunc(root_widget, root_surface, pick_surface, NULL);
+    ei_rect_t root_rect=hw_surface_get_rect(root_surface);
+    ei_frame_drawfunc(root_widget, root_surface, pick_surface, &root_rect);
     hw_surface_unlock(root_surface);
     // hw_surface_unlock(pick_surface);
     hw_surface_update_rects(root_surface, NULL);
@@ -47,6 +47,9 @@ void ei_app_run()
 
 void ei_app_free()
 {
+    ei_widget_destroy(root_widget);
+    hw_surface_free(pick_surface);
+    hw_quit();
 }
 
 ei_widget_t ei_app_root_widget()
@@ -54,7 +57,7 @@ ei_widget_t ei_app_root_widget()
     return root_widget;
 }
 
-ei_surface_t ei_app_root_surface(void)
+ei_surface_t ei_app_root_surface()
 {
     return root_surface;
 }

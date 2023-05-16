@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 
     // colors
     // ei_color_t black = {0,0,0,0};
-    // ei_color_t white = {255,255,255,0};
+    ei_color_t white = {255,255,255,0};
     // ei_color_t red = {255,0,0,0};
     ei_color_t green = {0,255,0,80};
     ei_color_t blue = {0,0,255,200};
@@ -282,7 +282,33 @@ int main(int argc, char *argv[])
     ei_fill(second_window, &green, NULL);
     ei_copy_surface(main_window, &dst_rect, second_window, &src_rect, true);
 
-    // ei_draw_button(main_window, rectangle);
+    ei_fill(main_window, &white, NULL);
+
+
+
+
+    // int radius = 120;
+    // int length;
+    ei_rect_t rectangle;
+    rectangle.size.height = 200;
+    rectangle.size.width = 500;
+    rectangle.top_left.x = 200;
+    rectangle.top_left.y = 200;
+    // bool is_top1 = false;
+    // bool is_top2 = true;
+    // ei_point_t * list = list_of_points_for_a_rounded_frame(rectangle, radius,&length, is_top1);
+    // ei_point_t * list2 = list_of_points_for_a_rounded_frame(rectangle, radius,&length, is_top2);
+
+    // ei_draw_polygon(main_window, list, length, red, NULL);
+    // ei_draw_polygon(main_window, list2, length, blue, NULL);
+
+    ei_color_t color;
+    color.red = 100;
+    color.green = 0;
+    color.blue = 100;
+    color.alpha = 0;
+
+    ei_draw_button(main_window, rectangle,color, true, 8, 20);
 
     // unlock, update screen.
     hw_surface_unlock(main_window);

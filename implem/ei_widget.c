@@ -3,6 +3,8 @@
 #include "ei_implementation.h"
 #include "ei_impl_widget.h"
 #include "ei_widget_attributes.h"
+#include "ei_impl_widgetclass.h"
+
 
 ei_widget_t ei_widget_create(ei_const_string_t class_name,
                              ei_widget_t parent,
@@ -31,5 +33,38 @@ void ei_insert_child(ei_widget_t parent, ei_widget_t child)
     {
         parent->children_tail->next_sibling = child;
         parent->children_tail = child;
+    }
+}
+
+void ei_widget_destroy(ei_widget_t widget)
+{
+    ei_placer_forget(widget);
+    if (widget->wclass->releasefunc!=NULL)
+    {
+        (*(widget->wclass->releasefunc))(widget);
+    }
+    if(widget->destructor!=NULL)
+    {
+        (*(widget->destructor))(widget);
+    }
+    ei_widget_t child = widget->children_head;
+    ei_widget_t next_sibling;
+    if (strcmp("frame", widget->wclass->name) == 0)
+    {
+        free((ei_impl_frame_t *)widget);
+    }
+    else if (strcmp("button", widget->wclass->name) == 0)
+    {
+        free((ei_impl_button_t *)widget);
+    }
+    // else if (strcmp("toplevel", widget->wclass->name) == 0)
+    // {
+    //     free((ei_impl_toplevel_t *)widget);
+    // }
+    while(child!=NULL)
+    {
+        next_sibling=child->next_sibling;
+        ei_widget_destroy(child);
+        child=next_sibling;
     }
 }

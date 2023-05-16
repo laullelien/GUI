@@ -25,7 +25,8 @@ void ei_frame_drawfunc(ei_widget_t frame,
                        ei_rect_t *clipper);
 void ei_frame_setdefaultsfunc(ei_widget_t frame);
 void ei_frame_widgetclass_create(ei_widgetclass_t *ei_frame_widgetclass);
-ei_widgetclass_t *ei_widgetclass_from_name(ei_const_string_t name);
+void ei_draw_frame_text(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clipper);
+void ei_draw_frame_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clipper);
 
 /* BUTTON */
 typedef struct ei_impl_button_t
@@ -54,3 +55,23 @@ void ei_button_drawfunc(ei_widget_t frame,
                         ei_rect_t *clipper);
 void ei_button_setdefaultsfunc(ei_widget_t button);
 void ei_button_widgetclass_create(ei_widgetclass_t *ei_frame_widgetclass);
+
+typedef struct ei_impl_toplevel_t
+{
+    ei_impl_widget_t toplevel_widget;
+    ei_color_t color;
+    int border_width;
+    ei_string_t title;
+    bool closable;
+    ei_axis_set_t resizable;
+    ei_size_ptr_t min_size;
+} ei_impl_toplevel_t;
+
+ei_widget_t ei_toplevel_allocfunc();
+void ei_toplevel_releasefunc(ei_widget_t toplevel);
+void ei_toplevel_drawfunc(ei_widget_t toplevel,
+                          ei_surface_t surface,
+                          ei_surface_t pick_surface,
+                          ei_rect_t *clipper);
+void ei_toplevel_setdefaultsfunc(ei_widget_t toplevel);
+void ei_toplevel_widgetclass_create(ei_widgetclass_t *ei_toplevel_widgetclass);

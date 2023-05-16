@@ -1,6 +1,8 @@
 #include "ei_draw_arc.h"
 #include <stdio.h>
 #include "ei_implementation.h"
+#include "ei_types.h"
+
 
 
 /* angles in radian !!*/
@@ -457,8 +459,9 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
 }
 
 
-void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_color, bool raised, int border_width, int radius)
+void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_color, ei_relief_t relief, int border_width, int radius, ei_rect_t *clipper, ei_surface_t pick_surface, ei_color_t pick_color)
 {
+    
     bool is_horizontal = rectangle.size.width > rectangle.size.height;
     int radius1 = radius;
     int radius2 = radius1-border_width;
@@ -498,9 +501,6 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
         color_top.blue = main_color.blue + 40;
     }
 
-
-
-
     if(main_color.green > 215)
     {
         color_top.green = 255;
@@ -512,7 +512,6 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
 
     color_top.alpha = main_color.alpha;
     color_bottom.alpha = main_color.alpha;
-
 
     if(main_color.red < 40)
     {
@@ -540,14 +539,12 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
     {
         color_bottom.green = main_color.green - 40;
     }
-    if (!(raised))
+    if (relief == ei_relief_sunken)
     {
         temp = color_top;
         color_top = color_bottom;
         color_bottom = temp;
     }
-
-
 
     int area1 = 0;
     int area2 = 1;
@@ -555,16 +552,17 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
 
 
     ei_point_t * list = list_of_points_for_a_rounded_frame(rectangle, radius1,&length1, area1, is_horizontal);
-
     ei_point_t * list2 = list_of_points_for_a_rounded_frame(rectangle, radius1,&length2, area2, is_horizontal);
-
     ei_point_t * list3 = list_of_points_for_a_rounded_frame(middle_rectangle, radius2,&length3, area3, is_horizontal);
 
-    ei_draw_polygon(surface, list, length1, color_top, NULL);
-    ei_draw_polygon(surface, list2, length2, color_bottom, NULL);
+    ei_draw_polygon(surface, list, length1, color_top, clipper);
+    ei_draw_polygon(surface, list2, length2, color_bottom, clipper);
+    ei_draw_polygon(surface, list3, length3, main_color, clipper);
+    ei_draw_polygon(pick_surface, list, length1, pick_color, clipper);
+    ei_draw_polygon(pick_surface, list2, length2, pick_color, clipper);
 
-    ei_draw_polygon(surface, list3, length3, main_color, NULL);
-
-
-
+    free(list);
+    free(list2);
+    free(list3);
+    
 }

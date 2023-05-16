@@ -110,7 +110,19 @@ uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color);
  * \brief	A structure storing the placement parameters of a widget.
  *		You have to define this structure: no suggestion provided.
  */
-struct ei_impl_placer_params_t;
+typedef struct ei_impl_placer_params_t
+{
+	ei_anchor_t anchor;
+	int x;
+	int y;
+	int width;
+	int height;
+	int rel_x;
+	int rel_y;
+	int rel_width;
+	int rel_height;
+
+} ei_impl_placer_params_t;
 
 /**
  * \brief	Tells the placer to recompute the geometry of a widget.
@@ -130,7 +142,7 @@ typedef struct ei_impl_widget_t
 {
 	ei_widgetclass_t *wclass;		   ///< The class of widget of this widget. Avoids the field name "class" which is a keyword in C++.
 	uint32_t pick_id;				   ///< Id of this widget in the picking offscreen.
-	ei_color_t *pick_color;			   ///< pick_id encoded as a color.
+	//ei_color_t *pick_color;			   ///< pick_id encoded as a color.
 	void *user_data;				   ///< Pointer provided by the programmer for private use. May be NULL.
 	ei_widget_destructor_t destructor; ///< Pointer to the programmer's function to call before destroying this widget. May be NULL.
 
@@ -141,10 +153,10 @@ typedef struct ei_impl_widget_t
 	ei_widget_t next_sibling;  ///< Pointer to the next child of this widget's parent widget.
 
 	/* Geometry Management */
-	//	ei_impl_placer_params_t* placer_params;	///< Pointer to the placer parameters for this widget. If NULL, the widget is not currently managed and thus, is not displayed on the screen.
-	ei_size_t requested_size;  ///< Size requested by the widget (big enough for its label, for example), or by the programmer. This can be different than its screen size defined by the placer.
-	ei_rect_t screen_location; ///< Position and size of the widget expressed in the root window reference.
-	ei_rect_t *content_rect;   ///< Where to place children, when this widget is used as a container. By defaults, points to the screen_location.
+	ei_impl_placer_params_t *placer_params; ///< Pointer to the placer parameters for this widget. If NULL, the widget is not currently managed and thus, is not displayed on the screen.
+	ei_size_t requested_size;				///< Size requested by the widget (big enough for its label, for example), or by the programmer. This can be different than its screen size defined by the placer.
+	ei_rect_t screen_location;				///< Position and size of the widget expressed in the root window reference.
+	ei_rect_t content_rect;				///< Where to place children, when this widget is used as a container. By defaults, points to the screen_location.
 } ei_impl_widget_t;
 
 /**
@@ -187,7 +199,7 @@ void ei_initialize_borders(const ei_rect_t *clipper,
 						   ei_borders *borders);
 
 /**
- * @brief   Indicates wether the point to draw is inside the clipper
+ * @brief   Indicates whether the point to draw is inside the clipper
  *
  * @param	point       The point to draw
  * @param	clipper		If not NULL, the drawing is restricted within this rectangle.
@@ -198,6 +210,5 @@ void ei_initialize_borders(const ei_rect_t *clipper,
 bool ei_inside_clipper(ei_point_t *point,
 					   const ei_rect_t *clipper,
 					   ei_borders *borders);
-
 
 #endif

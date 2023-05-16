@@ -459,101 +459,134 @@ void ei_draw_polygon(ei_surface_t surface,
     }
 }
 
-
-
-int	ei_copy_surface		(ei_surface_t		destination,
-                            const ei_rect_t*	dst_rect,
-                            ei_surface_t		source,
-                            const ei_rect_t*	src_rect,
-                            bool			alpha)
+int ei_copy_surface(ei_surface_t destination,
+                    const ei_rect_t *dst_rect,
+                    ei_surface_t source,
+                    const ei_rect_t *src_rect,
+                    bool alpha)
 {
     int dst_height, dst_width, src_height, src_width;
     int dst_offset, src_offset;
 
-    /* The four cases if dst_rect and src_rect are NULL or not */
-    if (dst_rect == NULL && src_rect != NULL)
+    if (dst_rect == NULL)
     {
         dst_height = hw_surface_get_size(destination).height;
         dst_width = hw_surface_get_size(destination).width;
-        src_height = src_rect->size.height;
-        src_height = src_rect->size.width;
         dst_offset = 0;
-        src_offset = hw_surface_get_size(source).width * src_rect->top_left.y + src_rect->top_left.x;
     }
-    else if (dst_rect != NULL && src_rect == NULL)
+    else
     {
         dst_height = dst_rect->size.height;
         dst_width = dst_rect->size.width;
-        src_height = hw_surface_get_size(source).height;
-        src_width = hw_surface_get_size(source).width;
         dst_offset = hw_surface_get_size(destination).width * dst_rect->top_left.y + dst_rect->top_left.x;
-        src_offset = 0;
     }
-    else if (dst_rect == NULL && src_rect == NULL)
+    if (src_rect == NULL)
     {
-        dst_height = hw_surface_get_size(destination).height;
-        dst_width = hw_surface_get_size(destination).width;
         src_height = hw_surface_get_size(source).height;
         src_width = hw_surface_get_size(source).width;
-        dst_offset = 0;
         src_offset = 0;
     }
-    else if (dst_rect != NULL && src_rect != NULL)
+    else
     {
-        dst_height = dst_rect->size.height;
-        dst_width = dst_rect->size.width;
         src_height = src_rect->size.height;
         src_width = src_rect->size.width;
-        dst_offset = hw_surface_get_size(destination).width * dst_rect->top_left.y + dst_rect->top_left.x;
         src_offset = hw_surface_get_size(source).width * src_rect->top_left.y + src_rect->top_left.x;
     }
 
     // if the dst_rect and src_rest have different size
     if ((dst_height != src_height) || (dst_width != src_width))
     {
-        return false;
+        return 1;
     }
+    uint8_t *src_start_addr = hw_surface_get_buffer(source) + (src_offset << 2);
+    uint8_t *dst_start_addr = hw_surface_get_buffer(destination) + (dst_offset << 2);
 
-    uint8_t* src_start_addr = hw_surface_get_buffer(source) + (src_offset << 2);
-    uint8_t* dst_start_addr = hw_surface_get_buffer(destination) + (dst_offset << 2);
-    int i = 0;
-    int j = 0;
-    
-    // when alpha is not defined
-    if (alpha == false)
+    // int i = 0;
+    // int j = 0;
+    int ir, ig, ib, ia;
+    hw_surface_get_channel_indices(source, &ir, &ig, &ib, &ia);
+    // the final pixels are an exact copy of the source pixels, including the alpha channel
+    if (alpha == false || ia == -1)
     {
         for (int y = 0; y < src_height; y++)
         {
             for (int x = 0; x < src_width; x++)
             {
-                *(dst_start_addr + j) = *(src_start_addr + i);
-                *(dst_start_addr + j+1) = *(src_start_addr + i+1);
-                *(dst_start_addr + j+2) = *(src_start_addr + i+2);
-                i += 4;
-                j += 4;
+                *((uint32_t *)dst_start_addr) = *((uint32_t *)src_start_addr);
+                dst_start_addr += 4;
+                src_start_addr += 4;
             }
-            i += ((hw_surface_get_size(source).width - src_width) << 2);
-            j += ((hw_surface_get_size(destination).width - src_width) << 2);
-            
+            dst_start_addr += (hw_surface_get_size(destination).width - src_width) << 2;
+            src_start_addr += (hw_surface_get_size(source).width - src_width) << 2;
         }
-    } 
+    }
     else
     {
+        uint16_t src_alpha;
         for (int y = 0; y < src_height; y++)
         {
             for (int x = 0; x < src_width; x++)
-            {   
-                uint8_t src_alpha = *(src_start_addr + i+3);
-                *(dst_start_addr + j) = (*(dst_start_addr + j) * (~src_alpha) + *(src_start_addr + i) * src_alpha )/ 255;
-                *(dst_start_addr + j+1) = (*(dst_start_addr + j+1) * (~src_alpha) + *(src_start_addr + i+1) * src_alpha )/ 255;
-                *(dst_start_addr + j+2) = (*(dst_start_addr + j+2) * (~src_alpha) + *(src_start_addr + i+2) * src_alpha )/ 255;
-                i += 4;
-                j += 4;
+            {
+                src_alpha = (uint16_t)(*(src_start_addr + ia));
+                src_alpha++;
+                *(dst_start_addr + ia) = 255;
+                *(dst_start_addr + ir) = (uint8_t)(((uint16_t)(*(dst_start_addr + ir)) * (255 - src_alpha) + (uint16_t)(*(src_start_addr + ir)) * src_alpha) / 255);
+                *(dst_start_addr + ig) = (uint8_t)(((uint16_t)(*(dst_start_addr + ig)) * (255 - src_alpha) + (uint16_t)(*(src_start_addr + ig)) * src_alpha) / 255);
+                *(dst_start_addr + ib) = (uint8_t)(((uint16_t)(*(dst_start_addr + ib)) * (255 - src_alpha) + (uint16_t)(*(src_start_addr + ib)) * src_alpha) / 255);
+                dst_start_addr += 4;
+                src_start_addr += 4;
             }
-            i += ((hw_surface_get_size(source).width - src_width) << 2);
-            j += ((hw_surface_get_size(destination).width - src_width) << 2);
+            dst_start_addr += (hw_surface_get_size(destination).width - src_width) << 2;
+            src_start_addr += (hw_surface_get_size(source).width - src_width) << 2;
         }
     }
     return 0;
+}
 
+void ei_draw_text(ei_surface_t surface,
+                  const ei_point_t *where,
+                  ei_const_string_t text,
+                  ei_font_t font,
+                  ei_color_t color,
+                  const ei_rect_t *clipper)
+{
+    ei_surface_t text_surface = hw_text_create_surface(text, font, color);
+    hw_surface_lock(text_surface);
+    ei_rect_t dst_rect;
+    ei_rect_t src_rect;
+    src_rect.top_left = (ei_point_t){0, 0};
+    dst_rect.top_left = *where;
+    hw_text_compute_size(text, font, &dst_rect.size.width, &dst_rect.size.height);
+
+    if (clipper != NULL)
+    {
+        /* intersect clipper and dst_rect and apply same modifications on src_rect */
+        if (dst_rect.size.width + dst_rect.top_left.x > clipper->size.width + clipper->top_left.x)
+        {
+            dst_rect.size.width -= dst_rect.size.width + dst_rect.top_left.x - clipper->size.width - clipper->top_left.x;
+        }
+        if (dst_rect.size.height + dst_rect.top_left.y > clipper->size.height + clipper->top_left.y)
+        {
+            dst_rect.size.height -= dst_rect.size.height + dst_rect.top_left.y - clipper->size.height - clipper->top_left.y;
+        }
+        if (dst_rect.top_left.x < clipper->top_left.x)
+        {
+            dst_rect.size.width -= clipper->top_left.x - dst_rect.top_left.x;
+            src_rect.top_left.x += clipper->top_left.x - dst_rect.top_left.x;
+            dst_rect.top_left.x = clipper->top_left.x;
+        }
+        if (dst_rect.top_left.y < clipper->top_left.y)
+        {
+            dst_rect.size.height -= clipper->top_left.y - dst_rect.top_left.y;
+            src_rect.top_left.y += clipper->top_left.y - dst_rect.top_left.y;
+            dst_rect.top_left.y = clipper->top_left.y;
+        }
+    }
+    src_rect.size = dst_rect.size;
+    if (dst_rect.size.width > 0 && dst_rect.size.height > 0)
+    {
+        ei_copy_surface(surface, &dst_rect, text_surface, &src_rect, true);
+    }
+    hw_surface_unlock(text_surface);
+    hw_surface_free(text_surface);
 }

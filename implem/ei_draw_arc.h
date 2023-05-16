@@ -58,9 +58,12 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
 void ei_draw_button(ei_surface_t surface,
                     ei_rect_t rectangle, 
                     ei_color_t main_color, 
-                    bool raised,  
+                    ei_relief_t relief,  
                     int border_width, 
-                    int radius);
+                    int radius,
+                    ei_rect_t *clipper,
+                    ei_surface_t picksurface,
+                    ei_color_t pick_color);
 
 
 #endif //PROJETC_IG_EI_DRAW_ARC_H

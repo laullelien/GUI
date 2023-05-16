@@ -27,15 +27,24 @@ void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pic
 
         if (((ei_impl_frame_t *)frame)->relief == ei_relief_none || ((ei_impl_frame_t *)frame)->border_width == 0)
         {
-            ei_fill(surface, &((ei_impl_frame_t *)frame)->color, clipper);
-            ei_fill(pick_surface, ((ei_color_t *)&(frame->pick_id)), clipper);
+            ei_point_t frame_points[5];
+            frame_points[0] = frame->screen_location.top_left;
+            frame_points[1].x = frame->screen_location.top_left.x + frame->screen_location.size.width;
+            frame_points[1].y = frame_points[0].y;
+            frame_points[2].x = frame_points[1].x;
+            frame_points[2].y = frame_points[1].y + frame->screen_location.size.height;
+            frame_points[3].x = frame_points[0].x;
+            frame_points[3].y = frame_points[2].y;
+            frame_points[4] = frame->screen_location.top_left;
+            ei_draw_polygon(surface, frame_points, 5, ((ei_impl_frame_t *)frame)->color, clipper);
+            ei_draw_polygon(pick_surface, frame_points, 5, *((ei_color_t *)&(frame->pick_id)), clipper);
             if (((ei_impl_frame_t *)frame)->text != NULL)
             {
-                ei_draw_frame_text(surface, frame, clipper);
+                ei_draw_frame_text(surface, frame, &(frame->content_rect));
             }
             else if (((ei_impl_frame_t *)frame)->img != NULL)
             {
-                ei_draw_frame_img(surface, frame, clipper);
+                ei_draw_frame_img(surface, frame, &(frame->content_rect));
             }
         }
         else
@@ -52,46 +61,57 @@ void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pic
             darker_color.blue = (darker_color.blue >= 40) ? (darker_color.blue - 40) : 0;
 
             ei_point_t left_border[7];
-            left_border[0] = clipper->top_left;
-            left_border[1].x = clipper->top_left.x + clipper->size.width;
-            left_border[1].y = clipper->top_left.y;
+            left_border[0] = frame->screen_location.top_left;
+            left_border[1].x = frame->screen_location.top_left.x + frame->screen_location.size.width;
+            left_border[1].y = frame->screen_location.top_left.y;
             left_border[2].x = frame->content_rect.top_left.x + frame->content_rect.size.width;
             left_border[2].y = frame->content_rect.top_left.y;
             left_border[3] = frame->content_rect.top_left;
             left_border[4].x = frame->content_rect.top_left.x;
             left_border[4].y = frame->content_rect.top_left.y + frame->content_rect.size.height;
-            left_border[5].x = clipper->top_left.x;
-            left_border[5].y = clipper->top_left.y + clipper->size.height;
-            left_border[6] = clipper->top_left;
+            left_border[5].x = frame->screen_location.top_left.x;
+            left_border[5].y = frame->screen_location.top_left.y + frame->screen_location.size.height;
+            left_border[6] = frame->screen_location.top_left;
 
             ei_point_t right_border[7];
-            right_border[0].x = clipper->top_left.x + clipper->size.width;
-            right_border[0].y = clipper->top_left.y + clipper->size.height;
-            right_border[1].x = clipper->top_left.x + clipper->size.width;
-            right_border[1].y = clipper->top_left.y;
+            right_border[0].x = frame->screen_location.top_left.x + frame->screen_location.size.width;
+            right_border[0].y = frame->screen_location.top_left.y + frame->screen_location.size.height;
+            right_border[1].x = frame->screen_location.top_left.x + frame->screen_location.size.width;
+            right_border[1].y = frame->screen_location.top_left.y;
             right_border[2].x = frame->content_rect.top_left.x + frame->content_rect.size.width;
             right_border[2].y = frame->content_rect.top_left.y;
             right_border[3].x = frame->content_rect.top_left.x + frame->content_rect.size.width;
             right_border[3].y = frame->content_rect.top_left.y + frame->content_rect.size.height;
             right_border[4].x = frame->content_rect.top_left.x;
             right_border[4].y = frame->content_rect.top_left.y + frame->content_rect.size.height;
-            right_border[5].x = clipper->top_left.x;
-            right_border[5].y = clipper->top_left.y + clipper->size.height;
-            right_border[6].x = clipper->top_left.x + clipper->size.width;
-            right_border[6].y = clipper->top_left.y + clipper->size.height;
+            right_border[5].x = frame->screen_location.top_left.x;
+            right_border[5].y = frame->screen_location.top_left.y + frame->screen_location.size.height;
+            right_border[6].x = frame->screen_location.top_left.x + frame->screen_location.size.width;
+            right_border[6].y = frame->screen_location.top_left.y + frame->screen_location.size.height;
 
             if (((ei_impl_frame_t *)frame)->relief == ei_relief_raised)
             {
-                ei_draw_polygon(surface, left_border, 7, lighter_color, NULL);
-                ei_draw_polygon(surface, right_border, 7, darker_color, NULL);
+                ei_draw_polygon(surface, left_border, 7, lighter_color, clipper);
+                ei_draw_polygon(surface, right_border, 7, darker_color, clipper);
             }
             else
             {
-                ei_draw_polygon(surface, left_border, 7, darker_color, NULL);
-                ei_draw_polygon(surface, right_border, 7, lighter_color, NULL);
+                ei_draw_polygon(surface, left_border, 7, darker_color, clipper);
+                ei_draw_polygon(surface, right_border, 7, lighter_color, clipper);
             }
-            ei_fill(surface, &((ei_impl_frame_t *)frame)->color, &(frame->content_rect));
-            ei_fill(pick_surface, ((ei_color_t *)&(frame->pick_id)), &(frame->content_rect));
+
+            ei_point_t frame_points[5];
+            frame_points[0] = frame->content_rect.top_left;
+            frame_points[1].x = frame->content_rect.top_left.x + frame->content_rect.size.width;
+            frame_points[1].y = frame_points[0].y;
+            frame_points[2].x = frame_points[1].x;
+            frame_points[2].y = frame_points[1].y + frame->content_rect.size.height;
+            frame_points[3].x = frame_points[0].x;
+            frame_points[3].y = frame_points[2].y;
+            frame_points[4] = frame->content_rect.top_left;
+            ei_draw_polygon(surface, frame_points, 5, ((ei_impl_frame_t *)frame)->color, clipper);
+            ei_draw_polygon(pick_surface, frame_points, 5, *((ei_color_t *)&(frame->pick_id)), clipper);
+
             if (((ei_impl_frame_t *)frame)->text != NULL)
             {
                 ei_draw_frame_text(surface, frame, &(frame->content_rect));
@@ -107,7 +127,7 @@ void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pic
         ei_widget_t child = frame->children_head;
         while (child != NULL)
         {
-            (*(child->wclass->drawfunc))(child, surface, pick_surface, &child->screen_location);
+            (*(child->wclass->drawfunc))(child, surface, pick_surface, &frame->content_rect);
             child = child->next_sibling;
         }
     }
@@ -466,38 +486,28 @@ void ei_toplevel_drawfunc(ei_widget_t toplevel,
     {
         ei_impl_placer_run(toplevel);
 
-        /* content rectangle */
-        ei_fill(surface, &((ei_impl_toplevel_t *)toplevel)->color, &toplevel->content_rect);
-        ei_fill(pick_surface, ((ei_color_t *)&(toplevel->pick_id)), &toplevel->content_rect);
-
-
         /* bottom part of the border */
         ei_point_t bottom_border[11];
         bottom_border[0] = toplevel->content_rect.top_left;
         bottom_border[1].x = toplevel->content_rect.top_left.x;
         bottom_border[1].y = toplevel->content_rect.top_left.y + toplevel->content_rect.size.height;
-        bottom_border[2].x = toplevel->content_rect.top_left.x + toplevel->content_rect.size.width - 15 + ((ei_impl_toplevel_t *)toplevel)->border_width;
-        bottom_border[2].y = toplevel->content_rect.top_left.y + toplevel->content_rect.size.height;
+        bottom_border[2].x = toplevel->content_rect.top_left.x + toplevel->content_rect.size.width;
+        bottom_border[2].y = bottom_border[1].y;
         bottom_border[3].x = bottom_border[2].x;
-        bottom_border[3].y = bottom_border[2].y - 15 + ((ei_impl_toplevel_t *)toplevel)->border_width;
-        bottom_border[4].x = toplevel->content_rect.top_left.x + toplevel->content_rect.size.width;
+        bottom_border[3].y = toplevel->content_rect.top_left.y;
+        bottom_border[4].x = bottom_border[3].x + ((ei_impl_toplevel_t *)toplevel)->border_width;
         bottom_border[4].y = bottom_border[3].y;
-        bottom_border[5].x = bottom_border[4].x;
-        bottom_border[5].y = toplevel->content_rect.top_left.y;
-        bottom_border[6].x = bottom_border[5].x + ((ei_impl_toplevel_t *)toplevel)->border_width;
-        bottom_border[6].y = bottom_border[5].y;
-        bottom_border[7].x = bottom_border[6].x;
-        bottom_border[7].y = bottom_border[5].y + toplevel->content_rect.size.height + ((ei_impl_toplevel_t *)toplevel)->border_width;
-        bottom_border[8].x = toplevel->screen_location.top_left.x;
-        bottom_border[8].y = bottom_border[5].y + toplevel->content_rect.size.height + ((ei_impl_toplevel_t *)toplevel)->border_width;
-        bottom_border[9].x = toplevel->screen_location.top_left.x;
-        bottom_border[9].y = toplevel->content_rect.top_left.y;
-        bottom_border[10] = bottom_border[0];
+        bottom_border[5].x = bottom_border[2].x + ((ei_impl_toplevel_t *)toplevel)->border_width;
+        bottom_border[5].y = bottom_border[2].y + ((ei_impl_toplevel_t *)toplevel)->border_width;
+        bottom_border[6].x = toplevel->screen_location.top_left.x;
+        bottom_border[6].y = bottom_border[1].y + ((ei_impl_toplevel_t *)toplevel)->border_width;
+        bottom_border[7].x = toplevel->screen_location.top_left.x;
+        bottom_border[7].y = toplevel->content_rect.top_left.y;
+        bottom_border[8] = bottom_border[0];
 
         ei_color_t border_color = {100, 100, 100, 255};
-        ei_draw_polygon(surface, bottom_border, 11, border_color, clipper);
-        ei_draw_polygon(pick_surface, bottom_border, 11, *((ei_color_t *)&(toplevel->pick_id)), clipper);
-
+        ei_draw_polygon(surface, bottom_border, 9, border_color, clipper);
+        ei_draw_polygon(pick_surface, bottom_border, 9, *((ei_color_t *)&(toplevel->pick_id)), clipper);
 
         /* upper part of the border */
         int text_height;
@@ -534,24 +544,49 @@ void ei_toplevel_drawfunc(ei_widget_t toplevel,
         ei_draw_polygon(surface, upper_border, 2 * length + 7, border_color, clipper);
         ei_draw_polygon(pick_surface, upper_border, 2 * length + 7, *((ei_color_t *)&(toplevel->pick_id)), clipper);
 
-
         /* close button */
         ei_rect_t button_square;
         button_square.top_left.x = close_button_center.x - close_button_radius;
         button_square.top_left.y = close_button_center.y - close_button_radius;
         button_square.size.width = close_button_radius << 1;
         button_square.size.height = close_button_radius << 1;
-        ei_draw_button(surface, button_square, (ei_color_t){200, 0, 0, 255}, ei_relief_raised, 2, close_button_radius, NULL,pick_surface, *((ei_color_t *)&(toplevel->pick_id)));
+        ei_draw_button(surface, button_square, (ei_color_t){200, 0, 0, 255}, ei_relief_raised, 2, close_button_radius, NULL, pick_surface, *((ei_color_t *)&(toplevel->pick_id)));
 
         /* title */
         ei_point_t title_top_left = {toplevel->screen_location.top_left.x + (window_corner_radius << 1), toplevel->screen_location.top_left.y + ((ei_impl_toplevel_t *)toplevel)->border_width};
         ei_draw_text(surface, &title_top_left, ((ei_impl_toplevel_t *)toplevel)->title, ei_default_font, (ei_color_t){255, 255, 255, 255}, clipper);
         ei_widget_t child = toplevel->children_head;
+
+        /* content rectangle */
+        ei_point_t content_rect_points[5];
+        content_rect_points[0] = toplevel->content_rect.top_left;
+        content_rect_points[1].x = toplevel->content_rect.top_left.x + toplevel->content_rect.size.width;
+        content_rect_points[1].y = content_rect_points[0].y;
+        content_rect_points[2].x = content_rect_points[1].x;
+        content_rect_points[2].y = content_rect_points[1].y + toplevel->content_rect.size.height;
+        content_rect_points[3].x = content_rect_points[0].x;
+        content_rect_points[3].y = content_rect_points[2].y;
+        content_rect_points[4] = toplevel->content_rect.top_left;
+        ei_draw_polygon(surface, content_rect_points, 5, ((ei_impl_toplevel_t *)toplevel)->color, clipper);
+        ei_draw_polygon(pick_surface, content_rect_points, 5, *((ei_color_t *)&(toplevel->pick_id)), clipper);
+
         while (child != NULL)
         {
-            (*(child->wclass->drawfunc))(child, surface, pick_surface, &child->screen_location);
+            (*(child->wclass->drawfunc))(child, surface, pick_surface, &toplevel->content_rect);
             child = child->next_sibling;
         }
+        /* resize square */
+        ei_point_t resize_square[5];
+        resize_square[0].x = bottom_border[2].x - 10;
+        resize_square[0].y = bottom_border[2].y - 10;
+        resize_square[1].x = bottom_border[2].x;
+        resize_square[1].y = resize_square[0].y;
+        resize_square[2] = bottom_border[2];
+        resize_square[3].x = resize_square[0].x;
+        resize_square[3].y = bottom_border[2].y;
+        resize_square[4] = resize_square[0];
+        ei_draw_polygon(surface, resize_square, 5, border_color, clipper);
+        ei_draw_polygon(pick_surface, resize_square, 5, *((ei_color_t *)&(toplevel->pick_id)), clipper);
     }
 }
 

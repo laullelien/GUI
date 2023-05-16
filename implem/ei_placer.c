@@ -58,8 +58,8 @@ void ei_place(ei_widget_t widget,
                     }
                     else if (((ei_impl_frame_t *)widget)->text != NULL)
                     {
-                        hw_text_compute_size(((ei_impl_frame_t *)widget)->text,((ei_impl_frame_t *)widget)->text_font, &widget->placer_params->width , NULL);
-                        widget->placer_params->width+=(((ei_impl_frame_t *)widget)->border_width << 1);
+                        hw_text_compute_size(((ei_impl_frame_t *)widget)->text, ((ei_impl_frame_t *)widget)->text_font, &widget->placer_params->width, NULL);
+                        widget->placer_params->width += (((ei_impl_frame_t *)widget)->border_width << 1);
                     }
                 }
             }
@@ -90,8 +90,8 @@ void ei_place(ei_widget_t widget,
                     }
                     else if (((ei_impl_frame_t *)widget)->text != NULL)
                     {
-                        hw_text_compute_size(((ei_impl_frame_t *)widget)->text,((ei_impl_frame_t *)widget)->text_font , NULL, &widget->placer_params->height);
-                        widget->placer_params->height+=(((ei_impl_frame_t *)widget)->border_width << 1);
+                        hw_text_compute_size(((ei_impl_frame_t *)widget)->text, ((ei_impl_frame_t *)widget)->text_font, NULL, &widget->placer_params->height);
+                        widget->placer_params->height += (((ei_impl_frame_t *)widget)->border_width << 1);
                     }
                 }
             }
@@ -212,13 +212,15 @@ void ei_impl_placer_run(ei_widget_t widget)
         widget->content_rect.size.width = widget->screen_location.size.width - (((ei_impl_button_t *)widget)->corner_radius << 1);
         widget->content_rect.size.height = widget->screen_location.size.height - (((ei_impl_button_t *)widget)->corner_radius << 1);
     }
-    //     else if (strcmp("toplevel", widget->wclass->name) == 0)
-    // {
-    //     widget->content_rect.top_left.x = widget->screen_location.top_left.x + (ei_impl_toplevel_t *)widget->border_width;
-    //     widget->content_rect.top_left.y = widget->screen_location.top_left.y + (ei_impl_toplevel_t *)widget->border_width;
-    //     widget->content_rect.size.width = widget->screen_location.size.width - (ei_impl_toplevel_t *)widget->border_width << 1;
-    //     widget->content_rect.size.height = widget->screen_location.size.height - (ei_impl_toplevel_t *)widget->border_width << 1;
-    // }
+    else if (strcmp("toplevel", widget->wclass->name) == 0)
+    {
+        int text_height;
+        hw_text_compute_size(((ei_impl_toplevel_t *)widget)->title, ei_default_font, NULL, &text_height);
+        widget->content_rect.top_left.x = widget->screen_location.top_left.x + ((ei_impl_toplevel_t *)widget)->border_width;
+        widget->content_rect.top_left.y = widget->screen_location.top_left.y + (((ei_impl_toplevel_t *)widget)->border_width << 1) + text_height;
+        widget->content_rect.size.width = widget->screen_location.size.width - (((ei_impl_toplevel_t *)widget)->border_width << 1);
+        widget->content_rect.size.height = widget->screen_location.size.height - text_height - 3 * ((ei_impl_toplevel_t *)widget)->border_width;
+    }
 }
 
 void ei_placer_forget(ei_widget_t widget)

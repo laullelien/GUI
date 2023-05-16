@@ -86,8 +86,9 @@ set(LIB_EI_SOURCES
      ${SRC_DIR}/ei_widget.c
      ${SRC_DIR}/ei_widgetclass.c
      ${SRC_DIR}/ei_impl_widgetclass.c
+     ${SRC_DIR}/ei_widget_attribute.c
 
-)
+        implem/ei_impl_widget.c)
 
 add_library(ei STATIC			${LIB_EI_SOURCES} implem/ei_draw_arc.h implem/ei_draw_arc.c)
 

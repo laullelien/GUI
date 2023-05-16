@@ -562,12 +562,23 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
 
     ei_point_t * list3 = list_of_points_for_a_rounded_frame(middle_rectangle, radius2,&length3, area3, is_horizontal);
 
+
     ei_draw_polygon(surface, list, length1, color_top, clipper);
     ei_draw_polygon(surface, list2, length2, color_bottom, clipper);
 
     ei_draw_polygon(surface, list3, length3, main_color, clipper);
 
-    ei_draw_polygon(pick_surface, list3, length3, pick_color, clipper);
+    ei_draw_polygon(pick_surface, list, length1, pick_color, clipper);
+    ei_draw_polygon(pick_surface, list2, length2, pick_color, clipper);
+
+
+
+
+
+    printf("color pick : %i %i %i %i \n", pick_color.red, pick_color.green, pick_color.blue, pick_color.alpha);
+
+
+
 
 
     free(list);

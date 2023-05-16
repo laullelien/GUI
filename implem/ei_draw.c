@@ -493,44 +493,6 @@ int ei_copy_surface(ei_surface_t destination,
         src_offset = hw_surface_get_size(source).width * src_rect->top_left.y + src_rect->top_left.x;
     }
 
-    // /* The four cases if dst_rect and src_rect are NULL or not */
-    // if (dst_rect == NULL && src_rect != NULL)
-    // {
-    //     dst_height = hw_surface_get_size(destination).height;
-    //     dst_width = hw_surface_get_size(destination).width;
-    //     src_height = src_rect->size.height;
-    //     src_height = src_rect->size.width;
-    //     dst_offset = 0;
-    //     src_offset = hw_surface_get_size(source).width * src_rect->top_left.y + src_rect->top_left.x;
-    // }
-    // else if (dst_rect != NULL && src_rect == NULL)
-    // {
-    //     dst_height = dst_rect->size.height;
-    //     dst_width = dst_rect->size.width;
-    //     src_height = hw_surface_get_size(source).height;
-    //     src_width = hw_surface_get_size(source).width;
-    //     dst_offset = hw_surface_get_size(destination).width * dst_rect->top_left.y + dst_rect->top_left.x;
-    //     src_offset = 0;
-    // }
-    // else if (dst_rect == NULL && src_rect == NULL)
-    // {
-    //     dst_height = hw_surface_get_size(destination).height;
-    //     dst_width = hw_surface_get_size(destination).width;
-    //     src_height = hw_surface_get_size(source).height;
-    //     src_width = hw_surface_get_size(source).width;
-    //     dst_offset = 0;
-    //     src_offset = 0;
-    // }
-    // else if (dst_rect != NULL && src_rect != NULL)
-    // {
-    //     dst_height = dst_rect->size.height;
-    //     dst_width = dst_rect->size.width;
-    //     src_height = src_rect->size.height;
-    //     src_width = src_rect->size.width;
-    //     dst_offset = hw_surface_get_size(destination).width * dst_rect->top_left.y + dst_rect->top_left.x;
-    //     src_offset = hw_surface_get_size(source).width * src_rect->top_left.y + src_rect->top_left.x;
-    // }
-
     // if the dst_rect and src_rest have different size
     if ((dst_height != src_height) || (dst_width != src_width))
     {
@@ -546,19 +508,6 @@ int ei_copy_surface(ei_surface_t destination,
     // the final pixels are an exact copy of the source pixels, including the alpha channel
     if (alpha == false || ia == -1)
     {
-        // for (int y = 0; y < src_height; y++)
-        // {
-        //     for (int x = 0; x < src_width; x++)
-        //     {
-        //         *(dst_start_addr + j) = *(src_start_addr + i);
-        //         *(dst_start_addr + j + 1) = *(src_start_addr + i + 1);
-        //         *(dst_start_addr + j + 2) = *(src_start_addr + i + 2);
-        //         i += 4;
-        //         j += 4;
-        //     }
-        //     i += ((hw_surface_get_size(source).width - src_width) << 2);
-        //     j += ((hw_surface_get_size(destination).width - src_width) << 2);
-        // }
         for (int y = 0; y < src_height; y++)
         {
             for (int x = 0; x < src_width; x++)
@@ -572,24 +521,6 @@ int ei_copy_surface(ei_surface_t destination,
         }
     }
     else
-    //  the final pixels are a combination of source and destination pixels weighted by the source alpha channel
-    // and the transparency of the final pixels is set to opaque
-    // {
-    //     for (int y = 0; y < src_height; y++)
-    //     {
-    //         for (int x = 0; x < src_width; x++)
-    //         {
-    //             uint8_t src_alpha = *(src_start_addr + i + 3);
-    //             *(dst_start_addr + j) = (*(dst_start_addr + j) * (~src_alpha) + *(src_start_addr + i) * src_alpha) / 255;
-    //             *(dst_start_addr + j + 1) = (*(dst_start_addr + j + 1) * (~src_alpha) + *(src_start_addr + i + 1) * src_alpha) / 255;
-    //             *(dst_start_addr + j + 2) = (*(dst_start_addr + j + 2) * (~src_alpha) + *(src_start_addr + i + 2) * src_alpha) / 255;
-    //             i += 4;
-    //             j += 4;
-    //         }
-    //         i += ((hw_surface_get_size(source).width - src_width) << 2);
-    //         j += ((hw_surface_get_size(destination).width - src_width) << 2);
-    //     }
-    // }
     {
         uint16_t src_alpha;
         for (int y = 0; y < src_height; y++)
@@ -599,9 +530,9 @@ int ei_copy_surface(ei_surface_t destination,
                 src_alpha = (uint16_t)(*(src_start_addr + ia));
                 src_alpha++;
                 *(dst_start_addr + ia) = 255;
-                *(dst_start_addr + ir) = ((uint16_t)(*(dst_start_addr + ir)) * (255 - src_alpha) + (uint16_t)(*(src_start_addr + ir)) * src_alpha) / 255;
-                *(dst_start_addr + ig) = ((uint16_t)(*(dst_start_addr + ig)) * (255 - src_alpha) + (uint16_t)(*(src_start_addr + ig)) * src_alpha) / 255;
-                *(dst_start_addr + ib) = ((uint16_t)(*(dst_start_addr + ib)) * (255 - src_alpha) + (uint16_t)(*(src_start_addr + ib)) * src_alpha) / 255;
+                *(dst_start_addr + ir) = (uint8_t)(((uint16_t)(*(dst_start_addr + ir)) * (255 - src_alpha) + (uint16_t)(*(src_start_addr + ir)) * src_alpha) / 255);
+                *(dst_start_addr + ig) = (uint8_t)(((uint16_t)(*(dst_start_addr + ig)) * (255 - src_alpha) + (uint16_t)(*(src_start_addr + ig)) * src_alpha) / 255);
+                *(dst_start_addr + ib) = (uint8_t)(((uint16_t)(*(dst_start_addr + ib)) * (255 - src_alpha) + (uint16_t)(*(src_start_addr + ib)) * src_alpha) / 255);
                 dst_start_addr += 4;
                 src_start_addr += 4;
             }

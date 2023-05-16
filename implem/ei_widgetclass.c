@@ -13,10 +13,10 @@ void ei_widgetclass_register(ei_widgetclass_t *p_widgetclass_list)
     {
         ei_button_widgetclass_create(p_widgetclass_list);
     }
-    // else if (strcmp("toplevel", p_widgetclass_list->name) == 0)
-    // {
-    //     ei_toplevel_widgetclass_create(p_widgetclass_list);
-    // }
+    else if (strcmp("toplevel", p_widgetclass_list->name) == 0)
+    {
+        ei_toplevel_widgetclass_create(p_widgetclass_list);
+    }
     return;
 }
 

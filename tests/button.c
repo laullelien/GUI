@@ -75,6 +75,8 @@ int main(int argc, char** argv)
 					 	&(ei_callback_t){button_press}, NULL);
 	// ei_place_xy			(button, 150, 200);
 	ei_place(button, &anchor, & (int){150}, & (int){300}, NULL, NULL, NULL, NULL, NULL, NULL);
+    ei_widget_t toplevel= ei_widget_create("toplevel", ei_app_root_widget(), NULL, NULL);
+    ei_place_xy(toplevel, 100, 100);
 
 
 	/* Run the application's main loop. */

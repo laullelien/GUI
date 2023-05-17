@@ -65,3 +65,7 @@ ei_surface_t ei_app_root_surface()
 {
     return root_surface;
 }
+
+void ei_app_invalidate_rect(const ei_rect_t *rect)
+{
+}

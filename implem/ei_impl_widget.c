@@ -19,11 +19,6 @@ ei_widget_t ** get_widget_list()
 void insert_widget(ei_widget_t widget, ei_widget_t ** plist)
 {
 
-
-
-
-
-
     if (current_picking_id % 10 == 9)
     {
         ei_widget_t * temp = calloc(current_picking_id + 11, sizeof(ei_widget_t));

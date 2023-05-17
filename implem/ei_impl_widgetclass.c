@@ -6,6 +6,8 @@
 #include "ei_widget_configure.h"
 #include <stdio.h>
 
+/* FRAME */
+
 ei_widget_t ei_frame_allocfunc()
 {
     ei_widget_t frame = (ei_widget_t)calloc(1, sizeof(ei_impl_frame_t));
@@ -431,13 +433,28 @@ void ei_draw_button_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *cli
     hw_surface_unlock(((ei_impl_button_t *)widget)->img);
 }
 
+
+bool ei_button_handlefunc(ei_widget_t widget, struct ei_event_t* event)
+{
+
+}
+
+
+
+
+
+
+
 void ei_button_widgetclass_create(ei_widgetclass_t *ei_button_widgetclass)
 {
     ei_button_widgetclass->allocfunc = &ei_button_allocfunc;
     ei_button_widgetclass->releasefunc = NULL; // TBC
     ei_button_widgetclass->drawfunc = &ei_button_drawfunc;
     ei_button_widgetclass->setdefaultsfunc = &ei_button_setdefaultsfunc;
+    ei_button_widgetclass->handlefunc = &ei_button_handlefunc;
 }
+
+
 
 /* TOP LEVEL */
 

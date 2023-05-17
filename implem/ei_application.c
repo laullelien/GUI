@@ -4,12 +4,14 @@
 #include "../api/hw_interface.h"
 #include "../api/ei_widget_configure.h"
 #include "ei_impl_widget.h"
-
+#include <stdbool.h>
 
 static ei_widget_t root_widget;
 static ei_widgetclass_t p_widgetclass_list[3];
 static ei_surface_t root_surface;
 static ei_surface_t pick_surface;
+static ei_event_t event;
+static bool stop = false;
 
 void ei_app_create(ei_size_t main_window_size, bool fullscreen)
 {
@@ -41,13 +43,26 @@ void ei_app_run()
 {
     hw_surface_lock(root_surface);
     hw_surface_lock(pick_surface);
-    ei_rect_t root_rect=hw_surface_get_rect(root_surface);
+    ei_rect_t root_rect = hw_surface_get_rect(root_surface);
     ei_frame_drawfunc(root_widget, root_surface, pick_surface, &root_rect);
-    // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
     hw_surface_unlock(root_surface);
     hw_surface_unlock(pick_surface);
     hw_surface_update_rects(root_surface, NULL);
-    getchar();
+
+    while (!stop)
+    {
+        hw_event_wait_next(&event);
+        bool handled_event = (*ei_default_handle_func_t)(&event);
+        if (!handled_event)
+        {
+            ei_event_get_default_handle_func()(&event);
+        }
+
+        // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);*
+        hw_surface_lock(root_surface);
+        hw_surface_lock(pick_surface);
+        hw_surface_update_rects(root_surface, NULL);
+    }
 }
 
 void ei_app_free()
@@ -65,4 +80,10 @@ ei_widget_t ei_app_root_widget()
 ei_surface_t ei_app_root_surface()
 {
     return root_surface;
+}
+
+
+void ei_app_quit_request()
+{
+    stop = true;
 }

@@ -19,11 +19,6 @@ ei_widget_t ** get_widget_list()
 void insert_widget(ei_widget_t widget, ei_widget_t ** plist)
 {
 
-
-
-
-
-
     if (current_picking_id % 10 == 9)
     {
         ei_widget_t * temp = calloc(current_picking_id + 11, sizeof(ei_widget_t));
@@ -41,6 +36,9 @@ void insert_widget(ei_widget_t widget, ei_widget_t ** plist)
     current_picking_id+=100;
 }
 
+ei_widget_t * widgets_inside_rect(ei_rect_t )
+
+
 void ei_insert_child(ei_widget_t parent, ei_widget_t child)
 {
     if (parent->children_head == NULL)
@@ -54,3 +52,4 @@ void ei_insert_child(ei_widget_t parent, ei_widget_t child)
         parent->children_tail = child;
     }
 }
+

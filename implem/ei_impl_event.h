@@ -1,0 +1,12 @@
+#ifndef PROJETC_IG_EI_IMPL_EVENT_H
+#define PROJETC_IG_EI_IMPL_EVENT_H
+
+
+
+
+
+
+
+
+
+#endif //PROJETC_IG_EI_IMPL_EVENT_H

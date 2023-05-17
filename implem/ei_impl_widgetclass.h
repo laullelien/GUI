@@ -2,7 +2,6 @@
 #include "ei_implementation.h"
 #include "ei_types.h"
 
-
 /* FRAME */
 typedef struct ei_impl_frame_t
 {

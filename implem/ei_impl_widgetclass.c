@@ -431,6 +431,7 @@ void ei_draw_button_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *cli
     hw_surface_unlock(((ei_impl_button_t *)widget)->img);
 }
 
+
 void ei_button_widgetclass_create(ei_widgetclass_t *ei_button_widgetclass)
 {
     ei_button_widgetclass->allocfunc = &ei_button_allocfunc;

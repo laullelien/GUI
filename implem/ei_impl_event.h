@@ -2,6 +2,7 @@
 #define PROJETC_IG_EI_IMPL_EVENT_H
 
 
+void merge_rect_clipper(ei_linked_rect_t * rects);
 
 
 

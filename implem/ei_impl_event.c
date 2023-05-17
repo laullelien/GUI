@@ -1,4 +1,84 @@
+#include "ei_types.h"
+#include "ei_impl_widgetclass.h"
+#include "ei_impl_event.h"
+
+void merge_rect_clipper(ei_linked_rect_t * rects)
+{
+    int total_area = 0;
+    ei_linked_rect_t * current = rects;
+
+    int minimal_top = current->rect.top_left.y;;
+    int minimal_left = current->rect.top_left.x;
+    int maximal_right = current->rect.top_left.x + current->rect.size.width;
+    int maximal_bottom = current->rect.top_left.y + current->rect.size.height;
 
 
+    while (current != NULL)
+    {
 
-void mer
+
+        int x_top_left = current->rect.top_left.x;
+        int y_top_left = current->rect.top_left.y;
+        int x_bottom_right = current->rect.top_left.x + current->rect.size.width;
+        int y_bottom_right = current->rect.top_left.y + current->rect.size.height;
+
+
+        if (minimal_top > y_top_left)
+        {
+            minimal_top = y_top_left;
+        }
+
+        if (minimal_left > x_top_left)
+        {
+            minimal_left = x_top_left;
+        }
+
+        if (maximal_bottom < y_bottom_right)
+        {
+            maximal_bottom = y_bottom_right;
+        }
+
+        if (maximal_right < x_bottom_right)
+        {
+            maximal_right = x_bottom_right;
+        }
+
+
+        total_area += (current->rect.size.height * current->rect.size.width);
+        current = current->next;
+    }
+
+    ei_point_t main_top_left = {minimal_left, minimal_top};
+    ei_point_t main_bottom_right = {maximal_right, maximal_bottom};
+
+    int total_area2 = (main_bottom_right.x - main_top_left.x)*(main_bottom_right.y - main_top_left.y);
+
+    if (total_area2 < total_area)
+    {
+
+        ei_rect_t rect;
+        rect.top_left.x = minimal_left;
+        rect.top_left.y = minimal_top;
+        rect.size.width = main_bottom_right.x - main_top_left.x;
+        rect.size.height = main_bottom_right.y - main_top_left.y;
+
+        ei_linked_rect_t * current2 = rects->next;
+        ei_linked_rect_t * last = rects->next;
+
+        if (current2== NULL)
+        {
+            rects->rect = rect;
+        }
+        else
+        {
+            while (current2 != NULL)
+            {
+                current2 = current2->next;
+                free(last);
+                last = current2;
+            }
+            rects->next = NULL;
+            rects->rect = rect;
+        }
+    }
+}

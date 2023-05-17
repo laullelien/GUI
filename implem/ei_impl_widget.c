@@ -11,7 +11,7 @@ void initialize_widget_list()
     current_picking_id = 0;
     widget_list = calloc(10, sizeof(ei_widget_t));
 }
-ei_widget_t ** get_widget_list()
+ei_widget_t ** get_widget_list_pointer()
 {
     return &widget_list;
 }
@@ -31,10 +31,11 @@ void insert_widget(ei_widget_t widget, ei_widget_t ** plist)
     else
     {
         widget->pick_id=current_picking_id;
-        (*plist)[current_picking_id/100] = widget;
+        (*plist)[current_picking_id] = widget;
     }
-    current_picking_id+=100;
+    current_picking_id++;
 }
+
 
 void ei_insert_child(ei_widget_t parent, ei_widget_t child)
 {
@@ -49,3 +50,4 @@ void ei_insert_child(ei_widget_t parent, ei_widget_t child)
         parent->children_tail = child;
     }
 }
+

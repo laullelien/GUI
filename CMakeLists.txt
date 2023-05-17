@@ -82,13 +82,16 @@ set(LIB_EI_SOURCES
      ${SRC_DIR}/ei_implementation.c
      ${SRC_DIR}/ei_placer.c
      ${SRC_DIR}/ei_application.c
+	 ${SRC_DIR}/ei_event.c
      ${SRC_DIR}/ei_widget_configure.c
      ${SRC_DIR}/ei_widget.c
      ${SRC_DIR}/ei_widgetclass.c
      ${SRC_DIR}/ei_impl_widgetclass.c
      ${SRC_DIR}/ei_widget_attribute.c
 	 ${SRC_DIR}/ei_impl_widget.c
-	 ${SRC_DIR}/ei_event.c)
+	 ${SRC_DIR}/ei_impl_event.c
+	 ${SRC_DIR}/ei_impl_application.c)
+
 
 add_library(ei STATIC			${LIB_EI_SOURCES} implem/ei_draw_arc.h implem/ei_draw_arc.c)
 

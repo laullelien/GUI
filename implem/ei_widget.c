@@ -22,7 +22,7 @@ ei_widget_t ei_widget_create(ei_const_string_t class_name,
     ei_insert_child(parent, child);
     child->user_data = user_data;
     child->destructor = destructor;
-    insert_widget(child, get_widget_list());
+    insert_widget(child, get_widget_list_pointer());
     return child;
 }
 

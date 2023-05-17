@@ -4,6 +4,9 @@
 #include "../api/hw_interface.h"
 #include "../api/ei_widget_configure.h"
 #include "ei_impl_widget.h"
+#include "ei_types.h"
+#include "ei_event.h"
+#include "ei_impl_application.h"
 #include <stdbool.h>
 
 static ei_widget_t root_widget;
@@ -27,16 +30,18 @@ void ei_app_create(ei_size_t main_window_size, bool fullscreen)
     p_widgetclass_list->next->next = p_widgetclass_list + 2;
     strncpy(p_widgetclass_list->next->next->name, "toplevel", 9 * sizeof(char));
     ei_widgetclass_register(p_widgetclass_list + 2);
+
     /* creates the root window */
     root_surface = hw_create_window(main_window_size, fullscreen);
     pick_surface = hw_surface_create(root_surface, main_window_size, false);
+
     /* creates the root widget to access the root window. */
     root_widget = p_widgetclass_list->allocfunc();
     root_widget->wclass = p_widgetclass_list;
     root_widget->screen_location.size = main_window_size;
     root_widget->placer_params = calloc(1, sizeof(ei_impl_placer_params_t));
     ei_frame_setdefaultsfunc(root_widget);
-    insert_widget(root_widget, get_widget_list());
+    insert_widget(root_widget, get_widget_list_pointer());
 }
 
 void ei_app_run()
@@ -48,20 +53,29 @@ void ei_app_run()
     hw_surface_unlock(root_surface);
     hw_surface_unlock(pick_surface);
     hw_surface_update_rects(root_surface, NULL);
+    ei_linked_rect_t* p_rect_cell;
 
-    while (!stop)
+    while (false)
     {
         hw_event_wait_next(&event);
-        bool handled_event = (*ei_default_handle_func_t)(&event);
-        if (!handled_event)
-        {
-            ei_event_get_default_handle_func()(&event);
-        }
+        // bool handled_event = (ei_default_handle_func_t*)(&event);
+        // if (!handled_event)
+        // {
+        //     ei_event_get_default_handle_func()(&event);
+        // }
 
-        // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);*
-        hw_surface_lock(root_surface);
-        hw_surface_lock(pick_surface);
-        hw_surface_update_rects(root_surface, NULL);
+        // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
+        p_rect_cell = get_p_rect_cell();
+        // while (p_rect_cell != NULL)
+        // {   
+        //     hw_surface_lock(root_surface);
+        //     hw_surface_lock(pick_surface);
+        //     ei_frame_drawfunc(root_widget, root_surface, pick_surface, &(p_rect_cell->rect));
+        //     hw_surface_unlock(root_surface);
+        //     hw_surface_unlock(pick_surface);
+        //     p_rect_cell = p_rect_cell->next;
+        // }
+        hw_surface_update_rects(root_surface, p_rect_cell);
     }
 }
 
@@ -86,4 +100,24 @@ ei_surface_t ei_app_root_surface()
 void ei_app_quit_request()
 {
     stop = true;
+}
+
+void ei_app_invalidate_rect(const ei_rect_t* rect)
+{
+    ei_linked_rect_t** pp_rect_cell = get_pp_rect_cell();
+    if ((*pp_rect_cell) == NULL)
+    {
+        *pp_rect_cell = calloc(1, sizeof(ei_linked_rect_t));
+        (*pp_rect_cell)->rect = *rect;
+    }
+    else 
+    {
+        ei_linked_rect_t* p_rect_cell = get_p_rect_cell();
+        while (p_rect_cell->next != NULL)
+        {
+            p_rect_cell = p_rect_cell->next;
+        }
+        p_rect_cell->next = calloc(1, sizeof(ei_linked_rect_t));
+        p_rect_cell->next->rect = *rect;
+    }
 }

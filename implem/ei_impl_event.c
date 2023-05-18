@@ -4,7 +4,7 @@
 
 void merge_rect_clipper(ei_linked_rect_t * rects)
 {
-    int total_area = 0;
+    int rect_sum_area = 0;
     ei_linked_rect_t * current = rects;
 
     int minimal_top = current->rect.top_left.y;;
@@ -44,16 +44,16 @@ void merge_rect_clipper(ei_linked_rect_t * rects)
         }
 
 
-        total_area += (current->rect.size.height * current->rect.size.width);
+        rect_sum_area += (current->rect.size.height * current->rect.size.width);
         current = current->next;
     }
 
     ei_point_t main_top_left = {minimal_left, minimal_top};
     ei_point_t main_bottom_right = {maximal_right, maximal_bottom};
 
-    int total_area2 = (main_bottom_right.x - main_top_left.x)*(main_bottom_right.y - main_top_left.y);
+    int total_area = (main_bottom_right.x - main_top_left.x)*(main_bottom_right.y - main_top_left.y);
 
-    if (total_area2 < total_area)
+    if (total_area < rect_sum_area)
     {
 
         ei_rect_t rect;

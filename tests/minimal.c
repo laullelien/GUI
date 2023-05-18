@@ -56,7 +56,7 @@
 #include "ei_draw.h"
 #include "../implem/ei_implementation.h"
 #include "../implem/ei_draw_arc.h"
-
+#include "../implem/ei_impl_event.h"
 
 int main(int argc, char* argv[])
 {
@@ -106,25 +106,37 @@ int main(int argc, char* argv[])
 	printf("%i\n",ei_copy_surface(main_window, &dst_rect, copy_surface, &src_rect, true));
 
     // button test
-    ei_rect_t src_rect2;
-    src_rect2.top_left.x=100;
-    src_rect2.top_left.y=100;
-    src_rect2.size.width=300;
-    src_rect2.size.height=200;
+    // ei_rect_t src_rect2;
+    // src_rect2.top_left.x=100;
+    // src_rect2.top_left.y=100;
+    // src_rect2.size.width=300;
+    // src_rect2.size.height=200;
 
-    ei_color_t grey;
-    grey.red = 200;
-    grey.green = 200;
-    grey.blue = 200;
-    grey.alpha = 0;
+    // ei_color_t grey;
+    // grey.red = 200;
+    // grey.green = 200;
+    // grey.blue = 200;
+    // grey.alpha = 0;
 
-    ei_rect_t clipper;
-    clipper.top_left.y=50;
-    clipper.size.width=150;
-    clipper.top_left.x=50;
-    clipper.size.height=150;
+    // ei_rect_t clipper;
+    // clipper.top_left.y=50;
+    // clipper.size.width=150;
+    // clipper.top_left.x=50;
+    // clipper.size.height=150;
 
-    ei_draw_button(main_window ,src_rect2, grey, ei_relief_sunken, 5, 20, &clipper);
+	ei_linked_rect_t * rectangle = malloc(sizeof(ei_linked_rect_t));
+
+	ei_rect_t rect;
+	rect.top_left.x = 100;
+	rect.top_left.y = 100;
+	rect.size.height = 300;
+	rect.size.width = 900;
+
+	rectangle->rect = rect;
+	rectangle->next = NULL;
+
+	merge_rect_clipper(rectangle);
+	free(rectangle);
 
 	// unlock, update screen.
 	hw_surface_unlock(main_window);

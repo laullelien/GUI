@@ -43,7 +43,7 @@ void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pic
             frame_points[4] = frame->screen_location.top_left;
 
             ei_draw_polygon(surface, frame_points, 5, ((ei_impl_frame_t *)frame)->color, screen_location_intersection);
-            ei_draw_polygon(pick_surface, frame_points, 5, *((ei_color_t *)&(frame->pick_id)), screen_location_intersection);
+            ei_draw_polygon(pick_surface, frame_points, 5, (ei_color_t){frame->pick_id, 0, 0, 0}, screen_location_intersection);
 
             if (((ei_impl_frame_t *)frame)->text != NULL && content_rect_intersection != NULL)
             {
@@ -118,7 +118,7 @@ void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pic
                 frame_points[3].y = frame_points[2].y;
                 frame_points[4] = frame->content_rect.top_left;
                 ei_draw_polygon(surface, frame_points, 5, ((ei_impl_frame_t *)frame)->color, content_rect_intersection);
-                ei_draw_polygon(pick_surface, frame_points, 5, *((ei_color_t *)&(frame->pick_id)), content_rect_intersection);
+                ei_draw_polygon(pick_surface, frame_points, 5, (ei_color_t){frame->pick_id, 0, 0, 0} , content_rect_intersection);
 
                 if (((ei_impl_frame_t *)frame)->text != NULL)
                 {
@@ -328,7 +328,7 @@ void ei_button_drawfunc(ei_widget_t button,
 
         ei_rect_t rectangle = button->screen_location;
 
-        ei_draw_button(surface, rectangle, ((ei_impl_button_t *)button)->color, ((ei_impl_button_t *)button)->relief, ((ei_impl_button_t *)button)->border_width, ((ei_impl_button_t *)button)->corner_radius, screen_location_intersection, pick_surface, *((ei_color_t *)(&(button->pick_id))));
+        ei_draw_button(surface, rectangle, ((ei_impl_button_t *)button)->color, ((ei_impl_button_t *)button)->relief, ((ei_impl_button_t *)button)->border_width, ((ei_impl_button_t *)button)->corner_radius, screen_location_intersection, pick_surface, (ei_color_t){button->pick_id, 0, 0, 0});
 
         if (content_rect_intersection != NULL)
         {
@@ -481,19 +481,23 @@ bool ei_button_handlefunc(ei_widget_t widget, struct ei_event_t *event)
         if (((ei_impl_button_t *)widget)->relief == ei_relief_raised)
         {
             ((ei_impl_button_t *)widget)->relief = ei_relief_sunken;
+            ei_app_invalidate_rect(&widget->screen_location);
         }
+        return true;
     }
     else if (event->type == ei_ev_mouse_buttonup && event->param.mouse.button == ei_mouse_button_left && ei_event_get_active_widget() == widget)
     {
         ei_event_set_active_widget(NULL);
         if (((ei_impl_button_t *)widget)->relief == ei_relief_sunken)
         {
+            ei_app_invalidate_rect(&widget->screen_location);
             ((ei_impl_button_t *)widget)->relief = ei_relief_raised;
         }
         if (((ei_impl_button_t *)widget)->callback != NULL)
         {
             (*(((ei_impl_button_t *)widget)->callback))(widget, event, ((ei_impl_button_t *)widget)->user_param);
         }
+        return true;
     }
     // if (((ei_impl_button_t *)widget)->relief == ei_relief_none)
     // {
@@ -585,7 +589,7 @@ void ei_toplevel_drawfunc(ei_widget_t toplevel,
 
         ei_color_t border_color = {100, 100, 100, 255};
         ei_draw_polygon(surface, bottom_border, 9, border_color, screen_location_intersection);
-        ei_draw_polygon(pick_surface, bottom_border, 9, *((ei_color_t *)&(toplevel->pick_id)), screen_location_intersection);
+        ei_draw_polygon(pick_surface, bottom_border, 9, (ei_color_t){toplevel->pick_id, 0, 0, 0 }, screen_location_intersection);
 
         /* upper part of the border */
         int text_height;
@@ -620,7 +624,7 @@ void ei_toplevel_drawfunc(ei_widget_t toplevel,
         upper_border[2 * length + 6] = upper_border[0];
 
         ei_draw_polygon(surface, upper_border, 2 * length + 7, border_color, screen_location_intersection);
-        ei_draw_polygon(pick_surface, upper_border, 2 * length + 7, *((ei_color_t *)&(toplevel->pick_id)), screen_location_intersection);
+        ei_draw_polygon(pick_surface, upper_border, 2 * length + 7, (ei_color_t){toplevel->pick_id, 0, 0, 0 }, screen_location_intersection);
 
         /* close button */
         ei_rect_t button_square;
@@ -628,7 +632,7 @@ void ei_toplevel_drawfunc(ei_widget_t toplevel,
         button_square.top_left.y = close_button_center.y - close_button_radius;
         button_square.size.width = close_button_radius << 1;
         button_square.size.height = close_button_radius << 1;
-        ei_draw_button(surface, button_square, (ei_color_t){200, 0, 0, 255}, ei_relief_raised, 2, close_button_radius, screen_location_intersection, pick_surface, *((ei_color_t *)&(toplevel->pick_id)));
+        ei_draw_button(surface, button_square, (ei_color_t){200, 0, 0, 255}, ei_relief_raised, 2, close_button_radius, screen_location_intersection, pick_surface, (ei_color_t){toplevel->pick_id, 0, 0, 0 });
 
         /* title */
         ei_point_t title_top_left = {toplevel->screen_location.top_left.x + (window_corner_radius << 1), toplevel->screen_location.top_left.y + ((ei_impl_toplevel_t *)toplevel)->border_width};
@@ -648,7 +652,7 @@ void ei_toplevel_drawfunc(ei_widget_t toplevel,
             content_rect_points[3].y = content_rect_points[2].y;
             content_rect_points[4] = toplevel->content_rect.top_left;
             ei_draw_polygon(surface, content_rect_points, 5, ((ei_impl_toplevel_t *)toplevel)->color, content_rect_intersection);
-            ei_draw_polygon(pick_surface, content_rect_points, 5, *((ei_color_t *)&(toplevel->pick_id)), content_rect_intersection);
+            ei_draw_polygon(pick_surface, content_rect_points, 5, (ei_color_t){toplevel->pick_id, 0, 0, 0 }, content_rect_intersection);
 
             while (child != NULL)
             {
@@ -668,7 +672,7 @@ void ei_toplevel_drawfunc(ei_widget_t toplevel,
         resize_square[3].y = bottom_border[2].y;
         resize_square[4] = resize_square[0];
         ei_draw_polygon(surface, resize_square, 5, border_color, screen_location_intersection);
-        ei_draw_polygon(pick_surface, resize_square, 5, *((ei_color_t *)&(toplevel->pick_id)), screen_location_intersection);
+        ei_draw_polygon(pick_surface, resize_square, 5, (ei_color_t){toplevel->pick_id, 0, 0, 0 }, screen_location_intersection);
 
         free(content_rect_intersection);
     }

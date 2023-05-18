@@ -63,16 +63,19 @@ void ei_app_run()
         hw_event_wait_next(&event);
         active_widget = ei_event_get_active_widget();
         handled_event = false;
+        if(event.type == ei_ev_keydown && event.param.key.key_code==SDLK_ESCAPE)
+        {
+            stop=true;
+        }
         if (active_widget != NULL)
         {
             handled_event = (*(active_widget->wclass->handlefunc))(active_widget, &event);
         }
         /* if the event is localised */
-        // else if (event.type == ei_ev_mouse_move || event.type == ei_ev_mouse_buttondown || event.type == ei_ev_mouse_buttonup)
-        else if (event.type == ei_ev_mouse_buttondown || event.type == ei_ev_mouse_buttonup)
-
+        else if (event.type == ei_ev_mouse_move || event.type == ei_ev_mouse_buttondown || event.type == ei_ev_mouse_buttonup)
         {
             ei_widget_t clicked_widget = get_widget_from_mouse_location(&event, pick_surface);
+            printf("%s, id = %i\n", clicked_widget->wclass->name, clicked_widget->pick_id);
             if (clicked_widget->wclass->handlefunc != NULL)
             {
                 handled_event = (*(clicked_widget->wclass->handlefunc))(clicked_widget, &event);
@@ -84,7 +87,6 @@ void ei_app_run()
         //     (*(ei_event_get_default_handle_func()))(&event);
         // }
 
-        // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
         p_rect_cell = get_p_rect_cell();
         while (p_rect_cell != NULL)
         {
@@ -95,6 +97,7 @@ void ei_app_run()
             hw_surface_unlock(pick_surface);
             p_rect_cell = p_rect_cell->next;
         }
+        // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
         hw_surface_update_rects(root_surface, p_rect_cell);
         free_p_rect_cell();
     }

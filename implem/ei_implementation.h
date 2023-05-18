@@ -104,6 +104,8 @@ void ei_update(ei_segment *TCA);
  */
 void ei_TCA_free(ei_segment *TCA);
 
+int ei_get_red(ei_surface_t surface, uint32_t * color);
+
 uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color);
 
 /**

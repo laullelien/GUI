@@ -483,6 +483,11 @@ bool ei_button_handlefunc(ei_widget_t widget, struct ei_event_t *event)
             ((ei_impl_button_t *)widget)->relief = ei_relief_sunken;
             ei_app_invalidate_rect(&widget->screen_location);
         }
+        else if(((ei_impl_button_t *)widget)->relief == ei_relief_sunken)
+        {
+            ((ei_impl_button_t *)widget)->relief = ei_relief_raised;
+            ei_app_invalidate_rect(&widget->screen_location);            
+        }
         return true;
     }
     else if (event->type == ei_ev_mouse_buttonup && event->param.mouse.button == ei_mouse_button_left && ei_event_get_active_widget() == widget)
@@ -492,6 +497,11 @@ bool ei_button_handlefunc(ei_widget_t widget, struct ei_event_t *event)
         {
             ei_app_invalidate_rect(&widget->screen_location);
             ((ei_impl_button_t *)widget)->relief = ei_relief_raised;
+        }
+        else if (((ei_impl_button_t *)widget)->relief == ei_relief_raised)
+        {
+            ei_app_invalidate_rect(&widget->screen_location);
+            ((ei_impl_button_t *)widget)->relief = ei_relief_sunken;
         }
         if (((ei_impl_button_t *)widget)->callback != NULL)
         {

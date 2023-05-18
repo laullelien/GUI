@@ -7,6 +7,11 @@
 #include "ei_event.h"
 #include <stdio.h>
 
+static ei_point_t ancient_mouse_location;
+static int is_top_toplevel = 0; // 0 == false; 1 == true;
+static int is_small_square_toplevel = 0;
+
+
 /* FRAME */
 
 ei_widget_t ei_frame_allocfunc()
@@ -608,7 +613,74 @@ void ei_toplevel_setdefaultsfunc(ei_widget_t toplevel)
 bool ei_toplevel_handlefunc(ei_widget_t		widget,
 						 	 struct ei_event_t*	event)
 {
-    // verify that mouse click is on the top
+
+    // verify if there is an active widget
+    if (ei_event_get_active_widget() != NULL)
+    {
+        int delta_x, delta_y;
+        delta_x = event->param.mouse.where.x - ancient_mouse_location.x;
+        delta_y = event->param.mouse.where.y - ancient_mouse_location.y;
+
+        // if we have clicked on the top of the toplevel
+        if (is_top_toplevel == 1 && is_small_square_toplevel == 0)
+        {
+            widget->placer_params->x += delta_x;
+            widget->placer_params->y += delta_y;
+            ancient_mouse_location = event->param.mouse.where;
+        }
+        // if we have clicked on the small square at the bottom right corner of the toplevel
+        else if (is_top_toplevel == 0 && is_small_square_toplevel == 1)
+        {
+            widget->placer_params->width += delta_x;
+            widget->placer_params->height += delta_y;
+            ancient_mouse_location = event->param.mouse.where;
+        }
+        // update the screen by adding the rectangles into invalide rect list
+        ////////////////////////////////////////////////////////////////////////////////////
+        ei_app_invalidate_rect(&widget->screen_location);
+        // calculate the new rect and put inside the function
+        ei_app_invalidate_rect(p_new_rect);
+    }
+    else 
+    {
+        /* when there's no active widget */
+
+        if (event->type == ei_ev_mouse_buttondown && event->param.mouse.button == ei_mouse_button_left)
+        {
+            // verify that mouse click is on the top of toplevel
+            int height_text, width_text;
+            hw_text_compute_size (((ei_impl_toplevel_t*) widget)->title, ei_default_font, &width_text, &height_text);
+            int height_top_of_the_toplevel = height_text + ((ei_impl_toplevel_t*) widget)->border_width << 1;
+            
+            if (event->param.mouse.where.y < (widget->screen_location.top_left.y + height_top_of_the_toplevel))
+            {
+                ei_event_set_active_widget(widget);
+                is_top_toplevel = 1;
+                is_small_square_toplevel = 0;
+                ancient_mouse_location = event->param.mouse.where;
+            }
+            
+            // verify that mouse click is in the small square at the botton right corner
+            
+            if ( (  event->param.mouse.where.x <= (widget->screen_location.top_left.x + widget->screen_location.size.width) ) && 
+                 (  event->param.mouse.where.x >= (widget->screen_location.top_left.x + widget->screen_location.size.width - (15 + ((ei_impl_toplevel_t*) widget)->border_width)) ) &&
+                 (  event->param.mouse.where.y <= (widget->screen_location.top_left.y + widget->screen_location.size.height) ) && 
+                 (  event->param.mouse.where.y >= (widget->screen_location.top_left.y + widget->screen_location.size.height - (15 + ((ei_impl_toplevel_t*) widget)->border_width)) )
+            )
+            {
+                ei_event_set_active_widget(widget);
+                is_top_toplevel = 0;
+                is_small_square_toplevel = 1;
+                ancient_mouse_location = event->param.mouse.where;
+            }
+        }
+    }
+    
+    
+    
+
+    // verify that mouse click is in the small rectangle at the bottom right corner
+    return false;
 }
 
 

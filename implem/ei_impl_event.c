@@ -14,7 +14,6 @@ ei_widget_t get_widget_from_mouse_location(ei_event_t *event, ei_surface_t pick_
     return *(*get_widget_list_pointer() + *p_first_pixel);
 }
 
-
 void merge_rect_clipper(ei_linked_rect_t * rects)
 {
     int rect_sum_area = 0;
@@ -28,8 +27,6 @@ void merge_rect_clipper(ei_linked_rect_t * rects)
 
     while (current != NULL)
     {
-
-
         int x_top_left = current->rect.top_left.x;
         int y_top_left = current->rect.top_left.y;
         int x_bottom_right = current->rect.top_left.x + current->rect.size.width;

@@ -604,6 +604,14 @@ void ei_toplevel_setdefaultsfunc(ei_widget_t toplevel)
     *(((ei_impl_toplevel_t *)toplevel)->min_size) = (ei_size_t){160, 120};
 }
 
+
+bool ei_toplevel_handlefunc(ei_widget_t		widget,
+						 	 struct ei_event_t*	event)
+{
+    // verify that mouse click is on the top
+}
+
+
 void ei_toplevel_widgetclass_create(ei_widgetclass_t *ei_toplevel_widgetclass)
 {
     ei_toplevel_widgetclass->allocfunc = &ei_toplevel_allocfunc;

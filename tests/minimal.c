@@ -94,6 +94,7 @@ int main(int argc, char* argv[])
 	free_p_rect_cell();
 
 
+<<<<<<< HEAD
 
 
 	// ei_color_t copy_color;
@@ -108,6 +109,40 @@ int main(int argc, char* argv[])
 	// dst_rect.top_left.y=150;
 	// dst_rect.size.width=100;
 	// dst_rect.size.height=100;
+=======
+    // button test
+    // ei_rect_t src_rect2;
+    // src_rect2.top_left.x=100;
+    // src_rect2.top_left.y=100;
+    // src_rect2.size.width=300;
+    // src_rect2.size.height=200;
+
+    // ei_color_t grey;
+    // grey.red = 200;
+    // grey.green = 200;
+    // grey.blue = 200;
+    // grey.alpha = 0;
+
+    // ei_rect_t clipper;
+    // clipper.top_left.y=50;
+    // clipper.size.width=150;
+    // clipper.top_left.x=50;
+    // clipper.size.height=150;
+
+	ei_linked_rect_t * rectangle = malloc(sizeof(ei_linked_rect_t));
+
+	ei_rect_t rect;
+	rect.top_left.x = 100;
+	rect.top_left.y = 100;
+	rect.size.height = 300;
+	rect.size.width = 900;
+
+	rectangle->rect = rect;
+	rectangle->next = NULL;
+
+	merge_rect_clipper(rectangle);
+	free(rectangle);
+>>>>>>> origin/event_dorian
 
 	// ei_rect_t src_rect;
 	// src_rect.top_left.x=200;

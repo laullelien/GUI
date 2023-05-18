@@ -13,7 +13,7 @@ static ei_widget_t root_widget;
 static ei_widgetclass_t p_widgetclass_list[3];
 static ei_surface_t root_surface;
 static ei_surface_t pick_surface;
-static ei_event_t event;
+// static ei_event_t event;
 static bool stop = false;
 
 void ei_app_create(ei_size_t main_window_size, bool fullscreen)
@@ -53,32 +53,32 @@ void ei_app_run()
     hw_surface_unlock(root_surface);
     hw_surface_unlock(pick_surface);
     hw_surface_update_rects(root_surface, NULL);
-    ei_linked_rect_t* p_rect_cell;
-    // getchar();
+    // ei_linked_rect_t* p_rect_cell;
+    getchar();
 
-    while (!stop)
-    {
-        hw_event_wait_next(&event);
-        bool handled_event = (ei_default_handle_func_t*)(&event);
-        if (!handled_event)
-        {
-            ei_event_get_default_handle_func()(&event);
-        }
+    // while (!stop)
+    // {
+    //     hw_event_wait_next(&event);
+    //     bool handled_event = (ei_default_handle_func_t*)(&event);
+    //     if (!handled_event)
+    //     {
+    //         ei_event_get_default_handle_func()(&event);
+    //     }
 
-        // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
-        p_rect_cell = get_p_rect_cell();
-        while (p_rect_cell != NULL)
-        {   
-            hw_surface_lock(root_surface);
-            hw_surface_lock(pick_surface);
-            ei_frame_drawfunc(root_widget, root_surface, pick_surface, &(p_rect_cell->rect));
-            hw_surface_unlock(root_surface);
-            hw_surface_unlock(pick_surface);
-            p_rect_cell = p_rect_cell->next;
-        }
-        hw_surface_update_rects(root_surface, p_rect_cell);
-        free_p_rect_cell();
-    }
+    //     // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
+    //     p_rect_cell = get_p_rect_cell();
+    //     while (p_rect_cell != NULL)
+    //     {   
+    //         hw_surface_lock(root_surface);
+    //         hw_surface_lock(pick_surface);
+    //         ei_frame_drawfunc(root_widget, root_surface, pick_surface, &(p_rect_cell->rect));
+    //         hw_surface_unlock(root_surface);
+    //         hw_surface_unlock(pick_surface);
+    //         p_rect_cell = p_rect_cell->next;
+    //     }
+    //     hw_surface_update_rects(root_surface, p_rect_cell);
+    //     free_p_rect_cell();
+    // }
 }
 
 void ei_app_free()

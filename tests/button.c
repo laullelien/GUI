@@ -6,7 +6,7 @@
 #include "hw_interface.h"
 #include "ei_widget_configure.h"
 #include "../implem/ei_implementation.h"
-
+#include "../implem/ei_impl_widget.h"
 
 /*
  * button_press --

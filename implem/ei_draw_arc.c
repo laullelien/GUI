@@ -501,9 +501,6 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
         color_top.blue = main_color.blue + 40;
     }
 
-
-
-
     if(main_color.green > 215)
     {
         color_top.green = 255;
@@ -515,7 +512,6 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
 
     color_top.alpha = main_color.alpha;
     color_bottom.alpha = main_color.alpha;
-
 
     if(main_color.red < 40)
     {
@@ -550,36 +546,20 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
         color_bottom = temp;
     }
 
-
     int area1 = 0;
     int area2 = 1;
     int area3 = 2;
 
 
     ei_point_t * list = list_of_points_for_a_rounded_frame(rectangle, radius1,&length1, area1, is_horizontal);
-
     ei_point_t * list2 = list_of_points_for_a_rounded_frame(rectangle, radius1,&length2, area2, is_horizontal);
-
     ei_point_t * list3 = list_of_points_for_a_rounded_frame(middle_rectangle, radius2,&length3, area3, is_horizontal);
-
 
     ei_draw_polygon(surface, list, length1, color_top, clipper);
     ei_draw_polygon(surface, list2, length2, color_bottom, clipper);
-
     ei_draw_polygon(surface, list3, length3, main_color, clipper);
-
     ei_draw_polygon(pick_surface, list, length1, pick_color, clipper);
     ei_draw_polygon(pick_surface, list2, length2, pick_color, clipper);
-
-
-
-
-
-    printf("color pick : %i %i %i %i \n", pick_color.red, pick_color.green, pick_color.blue, pick_color.alpha);
-
-
-
-
 
     free(list);
     free(list2);

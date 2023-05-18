@@ -54,6 +54,7 @@ void ei_button_drawfunc(ei_widget_t frame,
                         ei_surface_t pick_surface,
                         ei_rect_t *clipper);
 void ei_button_setdefaultsfunc(ei_widget_t button);
+bool ei_button_handlefunc(ei_widget_t widget, struct ei_event_t *event);
 void ei_button_widgetclass_create(ei_widgetclass_t *ei_frame_widgetclass);
 void ei_draw_button_text(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clipper);
 void ei_draw_button_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clipper);

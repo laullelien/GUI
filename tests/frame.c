@@ -70,7 +70,6 @@ int main(int argc, char **argv)
 	ei_app_create((ei_size_t){600, 600}, false);
 	ei_frame_set_bg_color(ei_app_root_widget(), (ei_color_t){0x52, 0x7f, 0xb4, 0xff});
 	ei_surface_t image = hw_image_load(image_filename, ei_app_root_surface());
-	printf("%p\n", image);
 	hw_surface_lock(image);
 	/* Create, configure and place the frame on screen. */
 	frame = ei_widget_create("frame", ei_app_root_widget(), NULL, NULL);

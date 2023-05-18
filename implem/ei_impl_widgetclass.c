@@ -4,7 +4,10 @@
 #include "ei_application.h"
 #include "ei_draw_arc.h"
 #include "ei_widget_configure.h"
+#include "ei_event.h"
 #include <stdio.h>
+
+/* FRAME */
 
 ei_widget_t ei_frame_allocfunc()
 {
@@ -160,7 +163,7 @@ void ei_frame_setdefaultsfunc(ei_widget_t frame)
 void ei_frame_widgetclass_create(ei_widgetclass_t *ei_frame_widgetclass)
 {
     ei_frame_widgetclass->allocfunc = &ei_frame_allocfunc;
-    ei_frame_widgetclass->releasefunc = &ei_frame_releasefunc;
+    ei_frame_widgetclass->releasefunc = NULL;
     ei_frame_widgetclass->drawfunc = &ei_frame_drawfunc;
     ei_frame_widgetclass->setdefaultsfunc = &ei_frame_setdefaultsfunc;
 }
@@ -470,12 +473,66 @@ void ei_draw_button_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *cli
     hw_surface_unlock(((ei_impl_button_t *)widget)->img);
 }
 
+bool ei_button_handlefunc(ei_widget_t widget, struct ei_event_t *event)
+{
+    if (event->type == ei_ev_mouse_buttondown && event->param.mouse.button == ei_mouse_button_left)
+    {
+        ei_event_set_active_widget(widget);
+        if (((ei_impl_button_t *)widget)->relief == ei_relief_raised)
+        {
+            ((ei_impl_button_t *)widget)->relief = ei_relief_sunken;
+        }
+    }
+    else if (event->type == ei_ev_mouse_buttonup && event->param.mouse.button == ei_mouse_button_left && ei_event_get_active_widget() == widget)
+    {
+        ei_event_set_active_widget(NULL);
+        if (((ei_impl_button_t *)widget)->relief == ei_relief_sunken)
+        {
+            ((ei_impl_button_t *)widget)->relief = ei_relief_raised;
+        }
+        if (((ei_impl_button_t *)widget)->callback != NULL)
+        {
+            (*(((ei_impl_button_t *)widget)->callback))(widget, event, ((ei_impl_button_t *)widget)->user_param);
+        }
+    }
+    // if (((ei_impl_button_t *)widget)->relief == ei_relief_none)
+    // {
+    //     return true;
+    // }
+    // if (event->type == ei_ev_mouse_buttondown && event->param.mouse.button == ei_mouse_button_left) /*define a global var active*/
+    // {
+    //     if (((ei_impl_button_t *)widget)->relief == ei_relief_raised)
+    //     {
+    //         ((ei_impl_button_t *)widget)->relief = ei_relief_sunken;
+    //         ei_app_invalidate_rect(&widget->screen_location);
+    //         ei_event_set_active_widget(widget);
+    //     }
+    //     return true;
+    // }
+    // if (event->type == ei_ev_mouse_buttonup && event->param.mouse.button == ei_mouse_button_left)
+    // {
+    //     if (((ei_impl_button_t *)widget)->relief == ei_relief_sunken)
+    //     {
+    //         ((ei_impl_button_t *)widget)->relief = ei_relief_raised;
+    //         ei_app_invalidate_rect(&widget->screen_location);
+    //         if (strcmp("button", widget->wclass->name) == 0 && ((ei_impl_button_t *)widget)->callback != 0)
+    //         {
+    //             *(((ei_impl_button_t *)widget)->callback)(widget, &event, ((ei_impl_button_t *)active_widget)->user_param);
+    //         }
+    //         ei_event_set_active_widget(NULL);
+    //     }
+    //     return true;
+    // }
+    return false;
+}
+
 void ei_button_widgetclass_create(ei_widgetclass_t *ei_button_widgetclass)
 {
     ei_button_widgetclass->allocfunc = &ei_button_allocfunc;
     ei_button_widgetclass->releasefunc = NULL; // TBC
     ei_button_widgetclass->drawfunc = &ei_button_drawfunc;
     ei_button_widgetclass->setdefaultsfunc = &ei_button_setdefaultsfunc;
+    ei_button_widgetclass->handlefunc = &ei_button_handlefunc;
 }
 
 /* TOP LEVEL */

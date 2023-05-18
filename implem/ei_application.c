@@ -54,28 +54,30 @@ void ei_app_run()
     hw_surface_unlock(pick_surface);
     hw_surface_update_rects(root_surface, NULL);
     ei_linked_rect_t* p_rect_cell;
+    // getchar();
 
-    while (false)
+    while (!stop)
     {
         hw_event_wait_next(&event);
-        // bool handled_event = (ei_default_handle_func_t*)(&event);
-        // if (!handled_event)
-        // {
-        //     ei_event_get_default_handle_func()(&event);
-        // }
+        bool handled_event = (ei_default_handle_func_t*)(&event);
+        if (!handled_event)
+        {
+            ei_event_get_default_handle_func()(&event);
+        }
 
         // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
         p_rect_cell = get_p_rect_cell();
-        // while (p_rect_cell != NULL)
-        // {   
-        //     hw_surface_lock(root_surface);
-        //     hw_surface_lock(pick_surface);
-        //     ei_frame_drawfunc(root_widget, root_surface, pick_surface, &(p_rect_cell->rect));
-        //     hw_surface_unlock(root_surface);
-        //     hw_surface_unlock(pick_surface);
-        //     p_rect_cell = p_rect_cell->next;
-        // }
+        while (p_rect_cell != NULL)
+        {   
+            hw_surface_lock(root_surface);
+            hw_surface_lock(pick_surface);
+            ei_frame_drawfunc(root_widget, root_surface, pick_surface, &(p_rect_cell->rect));
+            hw_surface_unlock(root_surface);
+            hw_surface_unlock(pick_surface);
+            p_rect_cell = p_rect_cell->next;
+        }
         hw_surface_update_rects(root_surface, p_rect_cell);
+        free_p_rect_cell();
     }
 }
 

@@ -1,11 +1,11 @@
 #include "ei_implementation.h"
 #include <stdint.h>
 
-static int ir;
+static int ir, ig, ib;
 
 uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color)
 {
-    int ig, ib, ia;
+    int ia;
     hw_surface_get_channel_indices(surface, &ir, &ig, &ib, &ia);
     uint8_t pixel_color[4];
     pixel_color[ir] = color.red;
@@ -18,10 +18,10 @@ uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color)
     return *((uint32_t *)pixel_color);
 }
 
-int ei_get_red(ei_surface_t surface, uint32_t * color)
+uint32_t ei_get_id(ei_surface_t surface, uint32_t * color)
 {
     /* ir will always be initiated by ei_impl_map_rgba*/
-    return ((uint8_t *)color)[ir];
+    return (((uint8_t *)color)[ir]<<16)+(((uint8_t *)color)[ig]<<8)+(((uint8_t *)color)[ib]);
 }
 
 int *ei_TC_length(ei_point_t *point_array, size_t point_array_size)

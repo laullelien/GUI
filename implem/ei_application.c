@@ -38,7 +38,7 @@ void ei_app_create(ei_size_t main_window_size, bool fullscreen)
     /* creates the root widget to access the root window. */
     root_widget = p_widgetclass_list->allocfunc();
     root_widget->wclass = p_widgetclass_list;
-    root_widget->screen_location.size = main_window_size;
+    root_widget->content_rect.size = main_window_size;
     root_widget->placer_params = calloc(1, sizeof(ei_impl_placer_params_t));
     ei_frame_setdefaultsfunc(root_widget);
     insert_widget(root_widget, get_widget_list_pointer());
@@ -56,45 +56,47 @@ void ei_app_run()
     ei_linked_rect_t *p_rect_cell;
     ei_widget_t active_widget;
     bool handled_event = false;
-    // getchar();
 
     while (!stop)
     {
+        hw_surface_lock(root_surface);
+        hw_surface_lock(pick_surface);
         hw_event_wait_next(&event);
         active_widget = ei_event_get_active_widget();
         handled_event = false;
+        // if(event.type == ei_ev_keydown && event.param.key.key_code==SDLK_ESCAPE)
+        // {
+        //     stop=true;
+        // }
         if (active_widget != NULL)
         {
             handled_event = (*(active_widget->wclass->handlefunc))(active_widget, &event);
         }
         /* if the event is localised */
-        // else if (event.type == ei_ev_mouse_move || event.type == ei_ev_mouse_buttondown || event.type == ei_ev_mouse_buttonup)
-        else if (event.type == ei_ev_mouse_buttondown || event.type == ei_ev_mouse_buttonup)
-
+        else if (event.type == ei_ev_mouse_move || event.type == ei_ev_mouse_buttondown || event.type == ei_ev_mouse_buttonup)
         {
             ei_widget_t clicked_widget = get_widget_from_mouse_location(&event, pick_surface);
+            // printf("%s, id = %i\n", clicked_widget->wclass->name, clicked_widget->pick_id);
             if (clicked_widget->wclass->handlefunc != NULL)
             {
                 handled_event = (*(clicked_widget->wclass->handlefunc))(clicked_widget, &event);
             }
         }
         handled_event = handled_event;
-        // if (!handled_event && ei_event_get_default_handle_func() != NULL)
-        // {
-        //     (*(ei_event_get_default_handle_func()))(&event);
-        // }
+        if (!handled_event && ei_event_get_default_handle_func() != NULL)
+        {
+            (*(ei_event_get_default_handle_func()))(&event);
+        }
 
-        // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
         p_rect_cell = get_p_rect_cell();
         while (p_rect_cell != NULL)
         {
-            hw_surface_lock(root_surface);
-            hw_surface_lock(pick_surface);
             ei_frame_drawfunc(root_widget, root_surface, pick_surface, &(p_rect_cell->rect));
-            hw_surface_unlock(root_surface);
-            hw_surface_unlock(pick_surface);
             p_rect_cell = p_rect_cell->next;
         }
+        hw_surface_unlock(root_surface);
+        hw_surface_unlock(pick_surface);
+        // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
         hw_surface_update_rects(root_surface, p_rect_cell);
         free_p_rect_cell();
     }
@@ -105,6 +107,7 @@ void ei_app_free()
     ei_widget_destroy(root_widget);
     hw_surface_free(pick_surface);
     hw_quit();
+    free_p_rect_cell();
 }
 
 ei_widget_t ei_app_root_widget()

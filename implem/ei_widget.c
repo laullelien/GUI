@@ -5,6 +5,8 @@
 #include "ei_widget_attributes.h"
 #include <stdio.h>
 #include "ei_impl_widgetclass.h"
+#include "ei_impl_widget.h"
+
 
 
 
@@ -30,33 +32,27 @@ ei_widget_t ei_widget_create(ei_const_string_t class_name,
 
 void ei_widget_destroy(ei_widget_t widget)
 {
-    ei_placer_forget(widget);
-    if (widget->wclass->releasefunc!=NULL)
+    /* We remove the widget from the list of its parent children */
+    ei_app_invalidate_rect(&widget->screen_location);
+    if(widget->parent!=NULL)
     {
-        (*(widget->wclass->releasefunc))(widget);
+        ei_widget_t p_widget=widget->parent->children_head;
+        if(p_widget==widget)
+        {
+            widget->parent->children_head=widget->parent->children_head->next_sibling;
+        }
+        else
+        {
+            while(p_widget->next_sibling!=widget)
+            {
+                p_widget=p_widget->next_sibling;
+            }
+            p_widget->next_sibling=widget->next_sibling;
+            if(widget->parent->children_tail==widget)
+            {
+                widget->parent->children_tail=p_widget;
+            }
+        }
     }
-    if(widget->destructor!=NULL)
-    {
-        (*(widget->destructor))(widget);
-    }
-    ei_widget_t child = widget->children_head;
-    ei_widget_t next_sibling;
-    if (strcmp("frame", widget->wclass->name) == 0)
-    {
-        free((ei_impl_frame_t *)widget);
-    }
-    else if (strcmp("button", widget->wclass->name) == 0)
-    {
-        free((ei_impl_button_t *)widget);
-    }
-    else if (strcmp("toplevel", widget->wclass->name) == 0)
-    {
-        free((ei_impl_toplevel_t *)widget);
-    }
-    while(child!=NULL)
-    {
-        next_sibling=child->next_sibling;
-        ei_widget_destroy(child);
-        child=next_sibling;
-    }
+    ei_widget_destroy_rec(widget);
 }

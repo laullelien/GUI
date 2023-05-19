@@ -7,13 +7,13 @@
 #include "ei_types.h"
 #include "ei_event.h"
 #include "ei_impl_application.h"
-#include <stdbool.h>
+#include "ei_impl_event.h"
 
 static ei_widget_t root_widget;
 static ei_widgetclass_t p_widgetclass_list[3];
 static ei_surface_t root_surface;
 static ei_surface_t pick_surface;
-// static ei_event_t event;
+static ei_event_t event;
 static bool stop = false;
 
 void ei_app_create(ei_size_t main_window_size, bool fullscreen)
@@ -53,32 +53,51 @@ void ei_app_run()
     hw_surface_unlock(root_surface);
     hw_surface_unlock(pick_surface);
     hw_surface_update_rects(root_surface, NULL);
-    // ei_linked_rect_t* p_rect_cell;
-    getchar();
+    ei_linked_rect_t *p_rect_cell;
+    ei_widget_t active_widget;
+    bool handled_event = false;
+    // getchar();
 
-    // while (!stop)
-    // {
-    //     hw_event_wait_next(&event);
-    //     bool handled_event = (ei_default_handle_func_t*)(&event);
-    //     if (!handled_event)
-    //     {
-    //         ei_event_get_default_handle_func()(&event);
-    //     }
+    while (!stop)
+    {
+        hw_event_wait_next(&event);
+        active_widget = ei_event_get_active_widget();
+        handled_event = false;
+        if (active_widget != NULL)
+        {
+            handled_event = (*(active_widget->wclass->handlefunc))(active_widget, &event);
+        }
+        /* if the event is localised */
+        // else if (event.type == ei_ev_mouse_move || event.type == ei_ev_mouse_buttondown || event.type == ei_ev_mouse_buttonup)
+        else if (event.type == ei_ev_mouse_buttondown || event.type == ei_ev_mouse_buttonup)
 
-    //     // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
-    //     p_rect_cell = get_p_rect_cell();
-    //     while (p_rect_cell != NULL)
-    //     {   
-    //         hw_surface_lock(root_surface);
-    //         hw_surface_lock(pick_surface);
-    //         ei_frame_drawfunc(root_widget, root_surface, pick_surface, &(p_rect_cell->rect));
-    //         hw_surface_unlock(root_surface);
-    //         hw_surface_unlock(pick_surface);
-    //         p_rect_cell = p_rect_cell->next;
-    //     }
-    //     hw_surface_update_rects(root_surface, p_rect_cell);
-    //     free_p_rect_cell();
-    // }
+        {
+            ei_widget_t clicked_widget = get_widget_from_mouse_location(&event, pick_surface);
+            if (clicked_widget->wclass->handlefunc != NULL)
+            {
+                handled_event = (*(clicked_widget->wclass->handlefunc))(clicked_widget, &event);
+            }
+        }
+        handled_event = handled_event;
+        // if (!handled_event && ei_event_get_default_handle_func() != NULL)
+        // {
+        //     (*(ei_event_get_default_handle_func()))(&event);
+        // }
+
+        // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
+        p_rect_cell = get_p_rect_cell();
+        while (p_rect_cell != NULL)
+        {
+            hw_surface_lock(root_surface);
+            hw_surface_lock(pick_surface);
+            ei_frame_drawfunc(root_widget, root_surface, pick_surface, &(p_rect_cell->rect));
+            hw_surface_unlock(root_surface);
+            hw_surface_unlock(pick_surface);
+            p_rect_cell = p_rect_cell->next;
+        }
+        hw_surface_update_rects(root_surface, p_rect_cell);
+        free_p_rect_cell();
+    }
 }
 
 void ei_app_free()
@@ -98,23 +117,22 @@ ei_surface_t ei_app_root_surface()
     return root_surface;
 }
 
-
 void ei_app_quit_request()
 {
     stop = true;
 }
 
-void ei_app_invalidate_rect(const ei_rect_t* rect)
+void ei_app_invalidate_rect(const ei_rect_t *rect)
 {
-    ei_linked_rect_t** pp_rect_cell = get_pp_rect_cell();
+    ei_linked_rect_t **pp_rect_cell = get_pp_rect_cell();
     if ((*pp_rect_cell) == NULL)
     {
         *pp_rect_cell = calloc(1, sizeof(ei_linked_rect_t));
         (*pp_rect_cell)->rect = *rect;
     }
-    else 
+    else
     {
-        ei_linked_rect_t* p_rect_cell = get_p_rect_cell();
+        ei_linked_rect_t *p_rect_cell = get_p_rect_cell();
         while (p_rect_cell->next != NULL)
         {
             p_rect_cell = p_rect_cell->next;

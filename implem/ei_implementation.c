@@ -336,5 +336,5 @@ bool ei_inside_clipper(ei_point_t *point,
                        const ei_rect_t *clipper,
                        ei_borders *borders)
 {
-    return (clipper == 0) || ((point->x >= borders->left) && (point->x <= borders->right) && (point->y >= borders->upper) && (point->y <= borders->lower));
+    return (clipper == 0) || ((point->x >= borders->left) && (point->x < borders->right) && (point->y >= borders->upper) && (point->y < borders->lower));
 }

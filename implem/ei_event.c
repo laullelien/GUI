@@ -24,6 +24,13 @@ ei_default_handle_func_t	ei_event_get_default_handle_func(void)
 }
 
 
+// ei_default_handle_func_t ei_event_get_default_handle_func()
+// {
+
+//     return
+// }
+
+
 void ei_event_set_active_widget(ei_widget_t widget)
 {
     active_widget = widget;

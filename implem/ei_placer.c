@@ -59,7 +59,17 @@ void ei_place(ei_widget_t widget,
                     else if (((ei_impl_frame_t *)widget)->text != NULL)
                     {
                         hw_text_compute_size(((ei_impl_frame_t *)widget)->text, ((ei_impl_frame_t *)widget)->text_font, &widget->placer_params->width, NULL);
-                        widget->placer_params->width += (((ei_impl_frame_t *)widget)->border_width << 1);
+                    }
+                }
+                else if(strcmp("button", widget->wclass->name) == 0)
+                {
+                    if(((ei_impl_button_t *)widget)->img_rect != NULL)
+                    {
+                        widget->placer_params->width = ((ei_impl_button_t *)widget)->img_rect->size.width;
+                    }
+                    else if(((ei_impl_button_t *)widget)->text != NULL)
+                    {
+                        hw_text_compute_size(((ei_impl_button_t *)widget)->text, ((ei_impl_button_t *)widget)->text_font, &widget->placer_params->width, NULL);
                     }
                 }
             }
@@ -86,12 +96,22 @@ void ei_place(ei_widget_t widget,
                 {
                     if (((ei_impl_frame_t *)widget)->img_rect != NULL)
                     {
-                        widget->placer_params->height = ((ei_impl_frame_t *)widget)->img_rect->size.height + (((ei_impl_frame_t *)widget)->border_width << 1);
+                        widget->placer_params->height = ((ei_impl_frame_t *)widget)->img_rect->size.height;
                     }
                     else if (((ei_impl_frame_t *)widget)->text != NULL)
                     {
                         hw_text_compute_size(((ei_impl_frame_t *)widget)->text, ((ei_impl_frame_t *)widget)->text_font, NULL, &widget->placer_params->height);
-                        widget->placer_params->height += (((ei_impl_frame_t *)widget)->border_width << 1);
+                    }
+                }
+                else if(strcmp("button", widget->wclass->name) == 0)
+                {
+                    if(((ei_impl_button_t *)widget)->img_rect != NULL)
+                    {
+                        widget->placer_params->height = ((ei_impl_button_t *)widget)->img_rect->size.height;
+                    }
+                    else if(((ei_impl_button_t *)widget)->text != NULL)
+                    {
+                        hw_text_compute_size(((ei_impl_button_t *)widget)->text, ((ei_impl_button_t *)widget)->text_font, NULL, &widget->placer_params->height);
                     }
                 }
             }
@@ -143,83 +163,83 @@ void ei_impl_placer_run(ei_widget_t widget)
         widget_width = widget->placer_params->rel_width * parent_rect.size.width + widget->placer_params->width;
         widget_height = widget->placer_params->rel_height * parent_rect.size.height + widget->placer_params->height;
 
-        widget->screen_location.size.width = widget_width;
-        widget->screen_location.size.height = widget_height;
+        widget->content_rect.size.width = widget_width;
+        widget->content_rect.size.height = widget_height;
     }
     else
     {
         anchor_coord.x = widget->placer_params->x;
         anchor_coord.y = widget->placer_params->y;
 
-        widget_width = widget->screen_location.size.width;
-        widget_height = widget->screen_location.size.height;
+        widget_width = widget->content_rect.size.width;
+        widget_height = widget->content_rect.size.height;
     }
-    /* set screen_location */
+    /* set content_rect */
     switch (widget->placer_params->anchor)
     {
 
     case ei_anc_center:
-        widget->screen_location.top_left.x = anchor_coord.x - (widget_width >> 1);
-        widget->screen_location.top_left.y = anchor_coord.y - (widget_height >> 1);
+        widget->content_rect.top_left.x = anchor_coord.x - (widget_width >> 1);
+        widget->content_rect.top_left.y = anchor_coord.y - (widget_height >> 1);
         break;
     case ei_anc_north:
-        widget->screen_location.top_left.x = anchor_coord.x - (widget_width >> 1);
-        widget->screen_location.top_left.y = anchor_coord.y;
+        widget->content_rect.top_left.x = anchor_coord.x - (widget_width >> 1);
+        widget->content_rect.top_left.y = anchor_coord.y;
         break;
     case ei_anc_northeast:
-        widget->screen_location.top_left.x = anchor_coord.x - widget_width;
-        widget->screen_location.top_left.y = anchor_coord.y;
+        widget->content_rect.top_left.x = anchor_coord.x - widget_width;
+        widget->content_rect.top_left.y = anchor_coord.y;
         break;
     case ei_anc_east:
-        widget->screen_location.top_left.x = anchor_coord.x - widget_width;
-        widget->screen_location.top_left.y = anchor_coord.y - (widget_height >> 1);
+        widget->content_rect.top_left.x = anchor_coord.x - widget_width;
+        widget->content_rect.top_left.y = anchor_coord.y - (widget_height >> 1);
         break;
     case ei_anc_southeast:
-        widget->screen_location.top_left.x = anchor_coord.x - widget_width;
-        widget->screen_location.top_left.y = anchor_coord.y - widget_height;
+        widget->content_rect.top_left.x = anchor_coord.x - widget_width;
+        widget->content_rect.top_left.y = anchor_coord.y - widget_height;
         break;
     case ei_anc_south:
-        widget->screen_location.top_left.x = anchor_coord.x - (widget_width >> 1);
-        widget->screen_location.top_left.y = anchor_coord.y - widget_height;
+        widget->content_rect.top_left.x = anchor_coord.x - (widget_width >> 1);
+        widget->content_rect.top_left.y = anchor_coord.y - widget_height;
         break;
     case ei_anc_southwest:
-        widget->screen_location.top_left.x = anchor_coord.x;
-        widget->screen_location.top_left.y = anchor_coord.y - widget_height;
+        widget->content_rect.top_left.x = anchor_coord.x;
+        widget->content_rect.top_left.y = anchor_coord.y - widget_height;
         break;
     case ei_anc_west:
-        widget->screen_location.top_left.x = anchor_coord.x;
-        widget->screen_location.top_left.y = anchor_coord.y - (widget_height >> 1);
+        widget->content_rect.top_left.x = anchor_coord.x;
+        widget->content_rect.top_left.y = anchor_coord.y - (widget_height >> 1);
         break;
     case ei_anc_northwest:
-        widget->screen_location.top_left.x = anchor_coord.x;
-        widget->screen_location.top_left.y = anchor_coord.y;
+        widget->content_rect.top_left.x = anchor_coord.x;
+        widget->content_rect.top_left.y = anchor_coord.y;
         break;
     default:
         break;
     }
-    /* set content_rect */
+    /* set screen_location */
     if (strcmp("frame", widget->wclass->name) == 0)
     {
-        widget->content_rect.top_left.x = widget->screen_location.top_left.x + ((ei_impl_frame_t *)widget)->border_width;
-        widget->content_rect.top_left.y = widget->screen_location.top_left.y + ((ei_impl_frame_t *)widget)->border_width;
-        widget->content_rect.size.width = widget->screen_location.size.width - (((ei_impl_frame_t *)widget)->border_width << 1);
-        widget->content_rect.size.height = widget->screen_location.size.height - (((ei_impl_frame_t *)widget)->border_width << 1);
+        widget->screen_location.top_left.x = widget->content_rect.top_left.x - ((ei_impl_frame_t *)widget)->border_width;
+        widget->screen_location.top_left.y = widget->content_rect.top_left.y - ((ei_impl_frame_t *)widget)->border_width;
+        widget->screen_location.size.width = widget->content_rect.size.width + (((ei_impl_frame_t *)widget)->border_width << 1);
+        widget->screen_location.size.height = widget->content_rect.size.height + (((ei_impl_frame_t *)widget)->border_width << 1);
     }
     else if (strcmp("button", widget->wclass->name) == 0)
     {
-        widget->content_rect.top_left.x = widget->screen_location.top_left.x + ((ei_impl_button_t *)widget)->corner_radius;
-        widget->content_rect.top_left.y = widget->screen_location.top_left.y + ((ei_impl_button_t *)widget)->corner_radius;
-        widget->content_rect.size.width = widget->screen_location.size.width - (((ei_impl_button_t *)widget)->corner_radius << 1);
-        widget->content_rect.size.height = widget->screen_location.size.height - (((ei_impl_button_t *)widget)->corner_radius << 1);
+        widget->screen_location.top_left.x = widget->content_rect.top_left.x - ((ei_impl_button_t *)widget)->corner_radius;
+        widget->screen_location.top_left.y = widget->content_rect.top_left.y - ((ei_impl_button_t *)widget)->corner_radius;
+        widget->screen_location.size.width = widget->content_rect.size.width + (((ei_impl_button_t *)widget)->corner_radius << 1);
+        widget->screen_location.size.height = widget->content_rect.size.height + (((ei_impl_button_t *)widget)->corner_radius << 1);
     }
     else if (strcmp("toplevel", widget->wclass->name) == 0)
     {
         int text_height;
         hw_text_compute_size(((ei_impl_toplevel_t *)widget)->title, ei_default_font, NULL, &text_height);
-        widget->content_rect.top_left.x = widget->screen_location.top_left.x + ((ei_impl_toplevel_t *)widget)->border_width;
-        widget->content_rect.top_left.y = widget->screen_location.top_left.y + (((ei_impl_toplevel_t *)widget)->border_width << 1) + text_height;
-        widget->content_rect.size.width = widget->screen_location.size.width - (((ei_impl_toplevel_t *)widget)->border_width << 1);
-        widget->content_rect.size.height = widget->screen_location.size.height - text_height - 3 * ((ei_impl_toplevel_t *)widget)->border_width;
+        widget->screen_location.top_left.x = widget->content_rect.top_left.x - ((ei_impl_toplevel_t *)widget)->border_width;
+        widget->screen_location.top_left.y = widget->content_rect.top_left.y - (((ei_impl_toplevel_t *)widget)->border_width << 1) - text_height;
+        widget->screen_location.size.width = widget->content_rect.size.width + (((ei_impl_toplevel_t *)widget)->border_width << 1);
+        widget->screen_location.size.height = widget->content_rect.size.height + text_height + 3 * ((ei_impl_toplevel_t *)widget)->border_width;
     }
 }
 

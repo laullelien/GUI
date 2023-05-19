@@ -10,3 +10,4 @@ void insert_widget(ei_widget_t widget, ei_widget_t **plist);
 ei_widget_t **get_widget_list_pointer();
 void ei_id_to_color(uint32_t color_id);
 void ei_color_to_id(ei_color_t *color);
+void ei_widget_destroy_rec(ei_widget_t widget);

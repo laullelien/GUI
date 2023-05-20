@@ -19,6 +19,11 @@ void ei_frame_releasefunc(ei_widget_t frame)
 {
     free(frame->placer_params);
     free(((ei_impl_frame_t *)frame)->text);
+    if(((ei_impl_frame_t *)frame)->img)
+    {
+        hw_surface_free(((ei_impl_frame_t *)frame)->img);
+    }
+    free(((ei_impl_frame_t *)frame)->img_rect);
 }
 void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pick_surface, ei_rect_t *clipper)
 {
@@ -306,6 +311,11 @@ void ei_button_releasefunc(ei_widget_t button)
 {
     free(button->placer_params);
     free(((ei_impl_button_t *)button)->text);
+    if(((ei_impl_button_t *)button)->img)
+    {
+        hw_surface_free(((ei_impl_button_t *)button)->img);
+    }
+    free(((ei_impl_button_t *)button)->img_rect);
 }
 
 void ei_button_setdefaultsfunc(ei_widget_t button)
@@ -335,8 +345,6 @@ void ei_button_drawfunc(ei_widget_t button,
     if (screen_location_intersection != NULL && button->placer_params != NULL)
     {
         ei_rect_t *content_rect_intersection = ei_intersect_clipper(clipper, &button->content_rect);
-
-        ei_impl_placer_run(button); // calculates the position of widget with regards to the root window and update screen_location of widget
 
         ei_rect_t rectangle = button->screen_location;
 
@@ -588,8 +596,8 @@ ei_widget_t ei_toplevel_allocfunc()
 void ei_toplevel_releasefunc(ei_widget_t toplevel)
 {
     free(toplevel->placer_params);
-    free(((ei_impl_toplevel_t *)toplevel)->min_size);
     free(((ei_impl_toplevel_t *)toplevel)->title);
+    free(((ei_impl_toplevel_t *)toplevel)->min_size);
 }
 
 void ei_toplevel_drawfunc(ei_widget_t toplevel,

@@ -1,6 +1,8 @@
 #include "../api/ei_placer.h"
 #include "ei_implementation.h"
 #include "ei_impl_widgetclass.h"
+#include "ei_application.h"
+
 
 void ei_place(ei_widget_t widget,
               ei_anchor_t *anchor,
@@ -141,6 +143,8 @@ void ei_place(ei_widget_t widget,
     {
         widget->placer_params->rel_height = *rel_height;
     }
+    ei_impl_placer_run(widget);
+    ei_app_invalidate_rect(&widget->screen_location);
 }
 
 void ei_impl_placer_run(ei_widget_t widget)

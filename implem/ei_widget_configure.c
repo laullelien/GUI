@@ -55,11 +55,22 @@ void ei_frame_configure(ei_widget_t frame,
     }
     if (img)
     {
-        ((ei_impl_frame_t *)frame)->img = *img;
+        if(((ei_impl_frame_t *)frame)->img)
+        {
+            hw_surface_free(((ei_impl_frame_t *)frame)->img);
+        }
+        ((ei_impl_frame_t *)frame)->img = hw_surface_create(ei_app_root_surface(), hw_surface_get_size(*img), true);
+        hw_surface_lock(*img);
+        hw_surface_lock(((ei_impl_frame_t *)frame)->img);
+        ei_copy_surface(((ei_impl_frame_t *)frame)->img, NULL, *img, NULL, true);
+        hw_surface_unlock(*img);
+        hw_surface_unlock(((ei_impl_frame_t *)frame)->img);
     }
     if (img_rect)
     {
-        ((ei_impl_frame_t *)frame)->img_rect = *img_rect;
+        free(((ei_impl_frame_t *)frame)->img_rect);
+        ((ei_impl_frame_t *)frame)->img_rect = malloc(sizeof(ei_rect_t));
+        *(((ei_impl_frame_t *)frame)->img_rect) = **img_rect;
     }
     if (img_anchor)
     {
@@ -127,11 +138,22 @@ void ei_button_configure(ei_widget_t button,
     }
     if (img)
     {
-        ((ei_impl_button_t *)button)->img = *img;
+        if(((ei_impl_button_t *)button)->img)
+        {
+            hw_surface_free(((ei_impl_button_t *)button)->img);
+        }
+        ((ei_impl_button_t *)button)->img = hw_surface_create(ei_app_root_surface(), hw_surface_get_size(*img), true);
+        hw_surface_lock(*img);
+        hw_surface_lock(((ei_impl_button_t *)button)->img);
+        ei_copy_surface(((ei_impl_button_t *)button)->img, NULL, *img, NULL, true);
+        hw_surface_unlock(*img);
+        hw_surface_unlock(((ei_impl_button_t *)button)->img);
     }
     if (img_rect)
     {
-        ((ei_impl_button_t *)button)->img_rect = *img_rect;
+        free(((ei_impl_button_t *)button)->img_rect);
+        ((ei_impl_button_t *)button)->img_rect = malloc(sizeof(ei_rect_t));
+        *(((ei_impl_button_t *)button)->img_rect) = **img_rect;
     }
     if (img_anchor)
     {
@@ -191,7 +213,8 @@ void ei_toplevel_configure(ei_widget_t toplevel,
     }
     if (min_size)
     {
-        ((ei_impl_toplevel_t *)toplevel)->min_size = *min_size;
+        ((ei_impl_toplevel_t *)toplevel)->min_size = malloc(sizeof(ei_size_t));
+        *(((ei_impl_toplevel_t *)toplevel)->min_size) = **min_size;
     }
     /* to invalide the right rect */
     ei_impl_placer_run(toplevel);

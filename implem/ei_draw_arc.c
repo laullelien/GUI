@@ -463,106 +463,116 @@ void ei_draw_button(ei_surface_t surface,ei_rect_t rectangle, ei_color_t main_co
 {
     
     bool is_horizontal = rectangle.size.width > rectangle.size.height;
-    int radius1 = radius;
-    int radius2 = radius1-border_width;
-
-    //int diag = rectangle.size.width + rectangle.size.height
-
-
-    ei_rect_t middle_rectangle;
-    middle_rectangle.top_left.x = rectangle.top_left.x + border_width;
-    middle_rectangle.top_left.y = rectangle.top_left.y + border_width;
-    middle_rectangle.size.height = rectangle.size.height - (border_width<<1);
-    middle_rectangle.size.width = rectangle.size.width - (border_width<<1);
-
-    ei_color_t color_top;
-    ei_color_t color_bottom;
-    ei_color_t temp;
-
-    int length1;
-    int length2;
-    int length3;
-
-    if(main_color.red > 215)
+    if (relief == ei_relief_raised || relief == ei_relief_sunken)
     {
-        color_top.red = 255;
+        int radius1 = radius;
+        int radius2 = radius1-border_width;
+
+
+
+        ei_rect_t middle_rectangle;
+        middle_rectangle.top_left.x = rectangle.top_left.x + border_width;
+        middle_rectangle.top_left.y = rectangle.top_left.y + border_width;
+        middle_rectangle.size.height = rectangle.size.height - (border_width<<1);
+        middle_rectangle.size.width = rectangle.size.width - (border_width<<1);
+
+        ei_color_t color_top;
+        ei_color_t color_bottom;
+        ei_color_t temp;
+
+        int length1;
+        int length2;
+        int length3;
+
+        if(main_color.red > 215)
+        {
+            color_top.red = 255;
+        }
+        else
+        {
+            color_top.red = main_color.red + 40;
+        }
+
+        if(main_color.blue > 215)
+        {
+            color_top.blue = 255;
+        }
+        else
+        {
+            color_top.blue = main_color.blue + 40;
+        }
+
+        if(main_color.green > 215)
+        {
+            color_top.green = 255;
+        }
+        else
+        {
+            color_top.green = main_color.green + 40;
+        }
+
+        color_top.alpha = main_color.alpha;
+        color_bottom.alpha = main_color.alpha;
+
+        if(main_color.red < 40)
+        {
+            color_bottom.red = 0;
+        }
+        else
+        {
+            color_bottom.red = main_color.red - 40;
+        }
+
+        if(main_color.blue < 40)
+        {
+            color_bottom.blue = 0;
+        }
+        else
+        {
+            color_bottom.blue = main_color.blue - 40;
+        }
+
+        if(main_color.green < 40)
+        {
+            color_bottom.green = 0;
+        }
+        else
+        {
+            color_bottom.green = main_color.green - 40;
+        }
+        if (relief == ei_relief_sunken)
+        {
+            temp = color_top;
+            color_top = color_bottom;
+            color_bottom = temp;
+        }
+
+        int area1 = 0;
+        int area2 = 1;
+        int area3 = 2;
+
+
+        ei_point_t * list = list_of_points_for_a_rounded_frame(rectangle, radius1,&length1, area1, is_horizontal);
+        ei_point_t * list2 = list_of_points_for_a_rounded_frame(rectangle, radius1,&length2, area2, is_horizontal);
+        ei_point_t * list3 = list_of_points_for_a_rounded_frame(middle_rectangle, radius2,&length3, area3, is_horizontal);
+
+        ei_draw_polygon(surface, list, length1, color_top, clipper);
+        ei_draw_polygon(surface, list2, length2, color_bottom, clipper);
+        ei_draw_polygon(surface, list3, length3, main_color, clipper);
+        ei_draw_polygon(pick_surface, list, length1, pick_color, clipper);
+        ei_draw_polygon(pick_surface, list2, length2, pick_color, clipper);
+
+        free(list);
+        free(list2);
+        free(list3);
     }
     else
     {
-        color_top.red = main_color.red + 40;
+        int length = 0;
+        ei_point_t * list = list_of_points_for_a_rounded_frame(rectangle, radius,&length, 2, is_horizontal);
+        ei_draw_polygon(surface, list, length, main_color, clipper);
+        ei_draw_polygon(pick_surface, list, length, main_color, clipper);
+        free(list);
     }
-
-    if(main_color.blue > 215)
-    {
-        color_top.blue = 255;
-    }
-    else
-    {
-        color_top.blue = main_color.blue + 40;
-    }
-
-    if(main_color.green > 215)
-    {
-        color_top.green = 255;
-    }
-    else
-    {
-        color_top.green = main_color.green + 40;
-    }
-
-    color_top.alpha = main_color.alpha;
-    color_bottom.alpha = main_color.alpha;
-
-    if(main_color.red < 40)
-    {
-        color_bottom.red = 0;
-    }
-    else
-    {
-        color_bottom.red = main_color.red - 40;
-    }
-
-    if(main_color.blue < 40)
-    {
-        color_bottom.blue = 0;
-    }
-    else
-    {
-        color_bottom.blue = main_color.blue - 40;
-    }
-
-    if(main_color.green < 40)
-    {
-        color_bottom.green = 0;
-    }
-    else
-    {
-        color_bottom.green = main_color.green - 40;
-    }
-    if (relief == ei_relief_sunken)
-    {
-        temp = color_top;
-        color_top = color_bottom;
-        color_bottom = temp;
-    }
-
-    int area1 = 0;
-    int area2 = 1;
-    int area3 = 2;
-
-
-    ei_point_t * list = list_of_points_for_a_rounded_frame(rectangle, radius1,&length1, area1, is_horizontal);
-    ei_point_t * list2 = list_of_points_for_a_rounded_frame(rectangle, radius1,&length2, area2, is_horizontal);
-    ei_point_t * list3 = list_of_points_for_a_rounded_frame(middle_rectangle, radius2,&length3, area3, is_horizontal);
-
-    ei_draw_polygon(surface, list, length1, color_top, clipper);
-    ei_draw_polygon(surface, list2, length2, color_bottom, clipper);
-    ei_draw_polygon(surface, list3, length3, main_color, clipper);
-    ei_draw_polygon(pick_surface, list, length1, pick_color, clipper);
-    ei_draw_polygon(pick_surface, list2, length2, pick_color, clipper);
-
-    free(list);
-    free(list2);
-    free(list3);
     
 }

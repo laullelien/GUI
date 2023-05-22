@@ -104,6 +104,8 @@ void ei_update(ei_segment *TCA);
  */
 void ei_TCA_free(ei_segment *TCA);
 
+int ei_get_red(ei_surface_t surface, uint32_t * color);
+
 uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color);
 
 /**
@@ -117,10 +119,10 @@ typedef struct ei_impl_placer_params_t
 	int y;
 	int width;
 	int height;
-	int rel_x;
-	int rel_y;
-	int rel_width;
-	int rel_height;
+	float rel_x;
+	float rel_y;
+	float rel_width;
+	float rel_height;
 
 } ei_impl_placer_params_t;
 

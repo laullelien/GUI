@@ -8,7 +8,10 @@ ei_widgetclass_t *ei_widget_get_class(ei_widget_t widget)
 
 const ei_color_t *ei_widget_get_pick_color(ei_widget_t widget)
 {
-    return (ei_color_t *)&(widget->pick_id);
+    ei_color_t *widget_pick_color=malloc(sizeof(ei_color_t));
+    *widget_pick_color=(ei_color_t){widget->pick_id, 0, 0, 0};
+    /* Don't forget to free */
+    return widget_pick_color;
 }
 
 ei_widget_t ei_widget_get_parent(ei_widget_t widget)

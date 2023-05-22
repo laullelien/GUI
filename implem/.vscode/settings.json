@@ -8,6 +8,7 @@
         "ei_widget_configure.h": "c",
         "ei_application.h": "c",
         "typeinfo": "c",
-        "ei_widgetclass.h": "c"
+        "ei_widgetclass.h": "c",
+        "ei_impl_widget.h": "c"
     }
 }

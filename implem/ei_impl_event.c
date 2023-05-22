@@ -1,10 +1,23 @@
 #include "ei_types.h"
+#include "ei_widgetclass.h"
+#include "ei_event.h"
+#include "ei_impl_widget.h"
 #include "ei_impl_widgetclass.h"
 #include "ei_impl_event.h"
+#include "ei_implementation.h"
+
+
+ei_widget_t get_widget_from_mouse_location(ei_event_t *event, ei_surface_t pick_surface)
+{
+    uint32_t *p_first_pixel = (uint32_t *)hw_surface_get_buffer(pick_surface);
+    ei_point_t mouse_location = event->param.mouse.where;
+    p_first_pixel += mouse_location.x + mouse_location.y * hw_surface_get_size(pick_surface).width;
+    return *(*get_widget_list_pointer() + ei_get_red(pick_surface, p_first_pixel));
+}
 
 void merge_rect_clipper(ei_linked_rect_t * rects)
 {
-    int total_area = 0;
+    int rect_sum_area = 0;
     ei_linked_rect_t * current = rects;
 
     int minimal_top = current->rect.top_left.y;;
@@ -15,8 +28,6 @@ void merge_rect_clipper(ei_linked_rect_t * rects)
 
     while (current != NULL)
     {
-
-
         int x_top_left = current->rect.top_left.x;
         int y_top_left = current->rect.top_left.y;
         int x_bottom_right = current->rect.top_left.x + current->rect.size.width;
@@ -44,16 +55,16 @@ void merge_rect_clipper(ei_linked_rect_t * rects)
         }
 
 
-        total_area += (current->rect.size.height * current->rect.size.width);
+        rect_sum_area += (current->rect.size.height * current->rect.size.width);
         current = current->next;
     }
 
     ei_point_t main_top_left = {minimal_left, minimal_top};
     ei_point_t main_bottom_right = {maximal_right, maximal_bottom};
 
-    int total_area2 = (main_bottom_right.x - main_top_left.x)*(main_bottom_right.y - main_top_left.y);
+    int total_area = (main_bottom_right.x - main_top_left.x)*(main_bottom_right.y - main_top_left.y);
 
-    if (total_area2 < total_area)
+    if (total_area < rect_sum_area)
     {
 
         ei_rect_t rect;

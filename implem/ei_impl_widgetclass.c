@@ -753,6 +753,14 @@ bool ei_toplevel_handlefunc(ei_widget_t		widget,
         int delta_x, delta_y;
         delta_x = event->param.mouse.where.x - ancient_mouse_location.x;
         delta_y = event->param.mouse.where.y - ancient_mouse_location.y;
+        
+        // if the mouse button is released
+        if (event->type == ei_ev_mouse_buttonup && event->param.mouse.button == ei_mouse_button_left)
+        {
+            ei_event_set_active_widget(NULL);
+            return true;
+        }
+
 
         // if we have clicked on the top of the toplevel
         if (is_top_toplevel == 1 && is_small_square_toplevel == 0)
@@ -764,10 +772,37 @@ bool ei_toplevel_handlefunc(ei_widget_t		widget,
         // if we have clicked on the small square at the bottom right corner of the toplevel
         else if (is_top_toplevel == 0 && is_small_square_toplevel == 1)
         {
-            widget->placer_params->width += delta_x;
-            widget->placer_params->height += delta_y;
+            int final_width, final_height;
+            final_width = widget->placer_params->width + delta_x;
+            final_height = widget->placer_params->height + delta_y;
+            if (((ei_impl_toplevel_t*) widget)->resizable != ei_axis_both || ((ei_impl_toplevel_t*) widget)->resizable != ei_axis_x )
+            {
+                if (final_width >= ((ei_impl_toplevel_t*) widget)->min_size->width)
+                {
+                    widget->placer_params->width += delta_x;
+                }
+                else 
+                {
+                    widget->placer_params->width = ((ei_impl_toplevel_t*) widget)->min_size->width;
+                }
+            }
+            if (((ei_impl_toplevel_t*) widget)->resizable != ei_axis_both || ((ei_impl_toplevel_t*) widget)->resizable != ei_axis_y )
+            {
+                if (final_height >= ((ei_impl_toplevel_t*) widget)->min_size->height)
+                {
+                    widget->placer_params->height += delta_y;
+
+                }
+                else 
+                {
+                    widget->placer_params->height = ((ei_impl_toplevel_t*) widget)->min_size->height;
+                }
+            }
             ancient_mouse_location = event->param.mouse.where;
         }
+
+
+
         // update the screen by adding the rectangles into invalide rect list
         ////////////////////////////////////////////////////////////////////////////////////
         ei_app_invalidate_rect(&widget->screen_location);
@@ -782,22 +817,37 @@ bool ei_toplevel_handlefunc(ei_widget_t		widget,
 
         if (event->type == ei_ev_mouse_buttondown && event->param.mouse.button == ei_mouse_button_left)
         {
-            // verify that mouse click is on the top of toplevel
             int height_text, width_text;
             hw_text_compute_size (((ei_impl_toplevel_t*) widget)->title, ei_default_font, &width_text, &height_text);
             int height_top_of_the_toplevel = height_text + (((ei_impl_toplevel_t*) widget)->border_width << 1);
-            
+
+            // verify that mouse click is on the top of toplevel            
             if (event->param.mouse.where.y < (widget->screen_location.top_left.y + height_top_of_the_toplevel))
             {
-                ei_event_set_active_widget(widget);
-                is_top_toplevel = 1;
-                is_small_square_toplevel = 0;
-                ancient_mouse_location = event->param.mouse.where;
+                int radius_close_button = height_text / 3; 
+                ei_point_t centre_close_button = {widget->screen_location.top_left.x + (height_top_of_the_toplevel >> 1), widget->screen_location.top_left.y + (height_top_of_the_toplevel >> 1)};
+                
+                // if we have clicked on the close button
+                if (abs(event->param.mouse.where.x - centre_close_button.x) <= radius_close_button && abs(event->param.mouse.where.y - centre_close_button.y) <= radius_close_button)
+                {
+                    ei_widget_destroy(widget);
+                    return true;
+                }
+                // if we have clicked on the other parts of the top level to deplace it
+                else
+                {
+                    ei_event_set_active_widget(widget);
+                    is_top_toplevel = 1;
+                    is_small_square_toplevel = 0;
+                    ancient_mouse_location = event->param.mouse.where;
+                    return true;
+                }
             }
             
             // verify that mouse click is in the small square at the botton right corner
             
-            if ( (  event->param.mouse.where.x <= (widget->screen_location.top_left.x + widget->screen_location.size.width) ) && 
+            else if ( ((ei_impl_toplevel_t*) widget)->resizable != ei_axis_none &&
+                 (  event->param.mouse.where.x <= (widget->screen_location.top_left.x + widget->screen_location.size.width) ) && 
                  (  event->param.mouse.where.x >= (widget->screen_location.top_left.x + widget->screen_location.size.width - (15 + ((ei_impl_toplevel_t*) widget)->border_width)) ) &&
                  (  event->param.mouse.where.y <= (widget->screen_location.top_left.y + widget->screen_location.size.height) ) && 
                  (  event->param.mouse.where.y >= (widget->screen_location.top_left.y + widget->screen_location.size.height - (15 + ((ei_impl_toplevel_t*) widget)->border_width)) )
@@ -807,9 +857,9 @@ bool ei_toplevel_handlefunc(ei_widget_t		widget,
                 is_top_toplevel = 0;
                 is_small_square_toplevel = 1;
                 ancient_mouse_location = event->param.mouse.where;
+                return true;
             }
         }
-        return true;
     }
     return false;
 }

@@ -2,7 +2,7 @@
 
 
 cd cmake
-make button
+make two048
 
 cd ..
-./cmake/button
+./cmake/two048

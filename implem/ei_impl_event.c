@@ -17,6 +17,11 @@ ei_widget_t get_widget_from_mouse_location(ei_event_t *event, ei_surface_t pick_
 
 void merge_rect_clipper(ei_linked_rect_t * rects)
 {
+    if (rects == NULL)
+    {
+        return;
+    }
+
     int rect_sum_area = 0;
     ei_linked_rect_t * current = rects;
 

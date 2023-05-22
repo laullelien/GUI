@@ -56,7 +56,7 @@
 #include "ei_draw.h"
 #include "../implem/ei_implementation.h"
 #include "../implem/ei_draw_arc.h"
-
+#include "../implem/ei_impl_event.h"
 
 int main(int argc, char* argv[])
 {
@@ -105,28 +105,54 @@ int main(int argc, char* argv[])
 	ei_draw_text(main_window, &((ei_point_t){0, 0}), name, ei_default_font, (ei_color_t){0xff, 0x55, 0xf0, 0xff}, &root_rect); 
 	printf("%i\n",ei_copy_surface(main_window, &dst_rect, copy_surface, &src_rect, true));
 
-    // button test
-    ei_rect_t src_rect2;
-    src_rect2.top_left.x=100;
-    src_rect2.top_left.y=100;
-    src_rect2.size.width=300;
-    src_rect2.size.height=200;
 
-    ei_color_t grey;
-    grey.red = 200;
-    grey.green = 200;
-    grey.blue = 200;
-    grey.alpha = 0;
 
-    ei_rect_t clipper;
-    clipper.top_left.y=50;
-    clipper.size.width=150;
-    clipper.top_left.x=50;
-    clipper.size.height=150;
 
-    ei_draw_button(main_window ,src_rect2, grey, ei_relief_sunken, 5, 20, &clipper);
+    ei_linked_rect_t * rects = malloc(sizeof(ei_linked_rect_t));
+    ei_linked_rect_t * rects2 = malloc(sizeof(ei_linked_rect_t));
+    ei_linked_rect_t * rects3 = malloc(sizeof(ei_linked_rect_t));
 
-	// unlock, update screen.
+    ei_rect_t rect;
+    rect.top_left = (ei_point_t){100, 100};
+    rect.size = (ei_size_t){500,500};
+
+    ei_rect_t rect2;
+    rect2.top_left = (ei_point_t){200, 200};
+    rect2.size = (ei_size_t){400,400};
+
+    ei_rect_t rect3;
+    rect3.top_left = (ei_point_t){100, 100};
+    rect3.size = (ei_size_t){400,400};
+
+
+    rects->rect = rect;
+    rects->next = rects2;
+    rects2->rect = rect2;
+    rects2->next = rects3;
+    rects3->rect = rect3;
+    rects3->next = NULL;
+
+    ei_linked_rect_t * current = rects;
+    for (int i=0;i<3;i++)
+    {
+        fprintf(stdout, "x=%i, y=%i, width=%i, height=%i\n", current->rect.top_left.x, current->rect.top_left.y, current->rect.size.width, current->rect.size.height);
+        current = current->next;
+    }
+
+
+    puts("-----------------");
+
+    merge_rect_clipper(rects);
+    current = rects;
+    for (int i=0;i<3;i++)
+    {
+        fprintf(stdout, "x=%i, y=%i, width=%i, height=%i\n", current->rect.top_left.x, current->rect.top_left.y, current->rect.size.width, current->rect.size.height);
+        current = current->next;
+    }
+
+
+
+    // unlock, update screen.
 	hw_surface_unlock(main_window);
 	hw_surface_unlock(copy_surface);
 	hw_surface_update_rects(main_window, NULL);

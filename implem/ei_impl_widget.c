@@ -36,8 +36,6 @@ void insert_widget(ei_widget_t widget, ei_widget_t ** plist)
     current_picking_id+=100;
 }
 
-ei_widget_t * widgets_inside_rect(ei_rect_t )
-
 
 void ei_insert_child(ei_widget_t parent, ei_widget_t child)
 {

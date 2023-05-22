@@ -28,47 +28,50 @@ void ei_draw_pixel(ei_surface_t surface,
     }
 }
 
+
+
 void ei_fill(ei_surface_t surface,
              const ei_color_t *color,
              const ei_rect_t *clipper)
-{
+{   
     int width = hw_surface_get_size(surface).width;
     int height = hw_surface_get_size(surface).height;
 
     uint32_t *p_first_pixel = (uint32_t *)hw_surface_get_buffer(surface);
     uint32_t pixel_color = ei_impl_map_rgba(surface, *color);
-
-    ei_borders borders[1];
-    if (clipper != 0)
+    
+    if (clipper != NULL)
     {
-        ei_initialize_borders(clipper, borders);
-    }
-
-    // if (clipper == NULL)
-    // {
-    //     for (int i = 0; i < width * height; i++)
-    //     {
-    //         *(p_first_pixel + i) = pixel_color;
-    //     }
-    // }
-
-    int i = 0;
-    ei_point_t point = {0, 0};
-
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
+        ei_rect_t surface_rect = hw_surface_get_rect(surface);
+        ei_rect_t clipper_rect = *clipper;
+        ei_rect_t* p_intercept_rect = ei_intersect_clipper(&clipper_rect, &surface_rect);
+        
+        uint32_t* p_first_pixel_in_window = p_first_pixel + p_intercept_rect->top_left.x + p_intercept_rect->top_left.y * width;
+        for (int y = 0; y < p_intercept_rect->size.height; y++)
         {
-            point.x = x;
-            point.y = y;
-            if (ei_inside_clipper(&point, clipper, borders))
+            for (int x = 0; x < p_intercept_rect->size.width; x++)
             {
-                *(p_first_pixel + i) = pixel_color;
+                *p_first_pixel_in_window = pixel_color;
+                p_first_pixel_in_window++;
             }
-            i++;
+            p_first_pixel_in_window = p_first_pixel_in_window + width - p_intercept_rect->size.width;
+        }
+    }
+    else
+    {
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                *p_first_pixel = pixel_color;
+                p_first_pixel++;
+            }
         }
     }
 }
+
+
+
 
 void ei_draw_line(ei_surface_t surface,
                   ei_point_t *first_point,

@@ -7,6 +7,11 @@
 #include "ei_event.h"
 #include <stdio.h>
 
+static ei_point_t ancient_mouse_location;
+static int is_top_toplevel = 0; // 0 == false; 1 == true;
+static int is_small_square_toplevel = 0;
+
+
 /* FRAME */
 
 ei_widget_t ei_frame_allocfunc()
@@ -531,13 +536,15 @@ bool ei_button_handlefunc(ei_widget_t widget, struct ei_event_t *event)
         ei_event_set_active_widget(NULL);
         if (((ei_impl_button_t *)widget)->relief == ei_relief_sunken)
         {
-            ei_app_invalidate_rect(&widget->screen_location);
             ((ei_impl_button_t *)widget)->relief = ei_relief_raised;
+            ei_app_invalidate_rect(&widget->screen_location);
+
         }
         else if (((ei_impl_button_t *)widget)->relief == ei_relief_raised)
         {
-            ei_app_invalidate_rect(&widget->screen_location);
             ((ei_impl_button_t *)widget)->relief = ei_relief_sunken;
+            ei_app_invalidate_rect(&widget->screen_location);
+
         }
         if (((ei_impl_button_t *)widget)->callback != NULL)
         {
@@ -670,13 +677,15 @@ void ei_toplevel_drawfunc(ei_widget_t toplevel,
         ei_draw_polygon(pick_surface, upper_border, 2 * length + 7, (ei_color_t){(uint8_t)(toplevel->pick_id>>16), (uint8_t)(toplevel->pick_id>>8), (uint8_t)(toplevel->pick_id), 0}, screen_location_intersection);
 
         /* close button */
-        ei_rect_t button_square;
-        button_square.top_left.x = close_button_center.x - close_button_radius;
-        button_square.top_left.y = close_button_center.y - close_button_radius;
-        button_square.size.width = close_button_radius << 1;
-        button_square.size.height = close_button_radius << 1;
-        ei_draw_button(surface, button_square, (ei_color_t){200, 0, 0, 255}, ei_relief_raised, 2, close_button_radius, screen_location_intersection, pick_surface, (ei_color_t){(uint8_t)(toplevel->pick_id>>16), (uint8_t)(toplevel->pick_id>>8), (uint8_t)(toplevel->pick_id), 0});
-
+        if (((ei_impl_toplevel_t*)toplevel)->closable)
+        {
+            ei_rect_t button_square;
+            button_square.top_left.x = close_button_center.x - close_button_radius;
+            button_square.top_left.y = close_button_center.y - close_button_radius;
+            button_square.size.width = close_button_radius << 1;
+            button_square.size.height = close_button_radius << 1;
+            ei_draw_button(surface, button_square, (ei_color_t){200, 0, 0, 255}, ei_relief_raised, 2, close_button_radius, screen_location_intersection, pick_surface, (ei_color_t){(uint8_t)(toplevel->pick_id>>16), (uint8_t)(toplevel->pick_id>>8), (uint8_t)(toplevel->pick_id), 0});
+        }
         /* title */
         ei_point_t title_top_left = {toplevel->screen_location.top_left.x + (window_corner_radius << 1), toplevel->screen_location.top_left.y + ((ei_impl_toplevel_t *)toplevel)->border_width};
         ei_draw_text(surface, &title_top_left, ((ei_impl_toplevel_t *)toplevel)->title, ei_default_font, (ei_color_t){255, 255, 255, 255}, screen_location_intersection);
@@ -737,84 +746,136 @@ void ei_toplevel_setdefaultsfunc(ei_widget_t toplevel)
     *(((ei_impl_toplevel_t *)toplevel)->min_size) = (ei_size_t){160, 120};
 }
 
+
+bool ei_toplevel_handlefunc(ei_widget_t		widget,
+						 	 struct ei_event_t*	event)
+{
+
+    // verify if there is an active widget
+    if (ei_event_get_active_widget() != NULL)
+    {
+        int delta_x, delta_y;
+        delta_x = event->param.mouse.where.x - ancient_mouse_location.x;
+        delta_y = event->param.mouse.where.y - ancient_mouse_location.y;
+        
+        // if the mouse button is released
+        if (event->type == ei_ev_mouse_buttonup && event->param.mouse.button == ei_mouse_button_left)
+        {
+            ei_event_set_active_widget(NULL);
+            return true;
+        }
+
+
+        // if we have clicked on the top of the toplevel
+        if (is_top_toplevel == 1 && is_small_square_toplevel == 0)
+        {
+            widget->placer_params->x += delta_x;
+            widget->placer_params->y += delta_y;
+            ancient_mouse_location = event->param.mouse.where;
+        }
+        // if we have clicked on the small square at the bottom right corner of the toplevel
+        else if (is_top_toplevel == 0 && is_small_square_toplevel == 1)
+        {
+            int final_width, final_height;
+            final_width = widget->placer_params->width + delta_x;
+            final_height = widget->placer_params->height + delta_y;
+            if (((ei_impl_toplevel_t*) widget)->resizable != ei_axis_both || ((ei_impl_toplevel_t*) widget)->resizable != ei_axis_x )
+            {
+                if (final_width >= ((ei_impl_toplevel_t*) widget)->min_size->width)
+                {
+                    widget->placer_params->width += delta_x;
+                }
+                else 
+                {
+                    widget->placer_params->width = ((ei_impl_toplevel_t*) widget)->min_size->width;
+                }
+            }
+            if (((ei_impl_toplevel_t*) widget)->resizable != ei_axis_both || ((ei_impl_toplevel_t*) widget)->resizable != ei_axis_y )
+            {
+                if (final_height >= ((ei_impl_toplevel_t*) widget)->min_size->height)
+                {
+                    widget->placer_params->height += delta_y;
+
+                }
+                else 
+                {
+                    widget->placer_params->height = ((ei_impl_toplevel_t*) widget)->min_size->height;
+                }
+            }
+            ancient_mouse_location = event->param.mouse.where;
+        }
+
+
+
+        // update the screen by adding the rectangles into invalide rect list
+        ////////////////////////////////////////////////////////////////////////////////////
+        ei_app_invalidate_rect(&widget->screen_location);
+        // calculate the new rect and put inside the function
+        ei_impl_placer_run(widget);
+        ei_app_invalidate_rect(&widget->screen_location);
+        return true;
+    }
+    else 
+    {
+        /* when there's no active widget */
+
+        if (event->type == ei_ev_mouse_buttondown && event->param.mouse.button == ei_mouse_button_left)
+        {
+            int height_text, width_text;
+            hw_text_compute_size (((ei_impl_toplevel_t*) widget)->title, ei_default_font, &width_text, &height_text);
+            int height_top_of_the_toplevel = height_text + (((ei_impl_toplevel_t*) widget)->border_width << 1);
+
+            // verify that mouse click is on the top of toplevel            
+            if (event->param.mouse.where.y < (widget->screen_location.top_left.y + height_top_of_the_toplevel))
+            {
+                int radius_close_button = height_text / 3; 
+                ei_point_t centre_close_button = {widget->screen_location.top_left.x + (height_top_of_the_toplevel >> 1), widget->screen_location.top_left.y + (height_top_of_the_toplevel >> 1)};
+                
+                // if we have clicked on the close button
+                if (abs(event->param.mouse.where.x - centre_close_button.x) <= radius_close_button && abs(event->param.mouse.where.y - centre_close_button.y) <= radius_close_button && ((ei_impl_toplevel_t*) widget)->closable)
+                {
+                    ei_widget_destroy(widget);
+                    return true;
+                }
+                // if we have clicked on the other parts of the top level to deplace it
+                else
+                {
+                    ei_event_set_active_widget(widget);
+                    is_top_toplevel = 1;
+                    is_small_square_toplevel = 0;
+                    ancient_mouse_location = event->param.mouse.where;
+                    return true;
+                }
+            }
+            
+            // verify that mouse click is in the small square at the botton right corner
+            
+            else if ( ((ei_impl_toplevel_t*) widget)->resizable != ei_axis_none &&
+                 (  event->param.mouse.where.x <= (widget->screen_location.top_left.x + widget->screen_location.size.width) ) && 
+                 (  event->param.mouse.where.x >= (widget->screen_location.top_left.x + widget->screen_location.size.width - (15 + ((ei_impl_toplevel_t*) widget)->border_width)) ) &&
+                 (  event->param.mouse.where.y <= (widget->screen_location.top_left.y + widget->screen_location.size.height) ) && 
+                 (  event->param.mouse.where.y >= (widget->screen_location.top_left.y + widget->screen_location.size.height - (15 + ((ei_impl_toplevel_t*) widget)->border_width)) )
+            )
+            {
+                ei_event_set_active_widget(widget);
+                is_top_toplevel = 0;
+                is_small_square_toplevel = 1;
+                ancient_mouse_location = event->param.mouse.where;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+
 void ei_toplevel_widgetclass_create(ei_widgetclass_t *ei_toplevel_widgetclass)
 {
     ei_toplevel_widgetclass->allocfunc = &ei_toplevel_allocfunc;
     ei_toplevel_widgetclass->releasefunc = &ei_toplevel_releasefunc;
     ei_toplevel_widgetclass->drawfunc = &ei_toplevel_drawfunc;
     ei_toplevel_widgetclass->setdefaultsfunc = &ei_toplevel_setdefaultsfunc;
+    ei_toplevel_widgetclass->handlefunc = &ei_toplevel_handlefunc;
 }
 
-ei_rect_t *ei_intersect_clipper(ei_rect_t *first_clipper, ei_rect_t *second_clipper)
-{
-    ei_rect_t *intersection = malloc(sizeof(ei_rect_t));
 
-    /* defines topleft.x and width */
-    if (first_clipper->top_left.x < second_clipper->top_left.x)
-    {
-        if (first_clipper->top_left.x + first_clipper->size.width <= second_clipper->top_left.x)
-        {
-            free(intersection);
-            return NULL;
-        }
-        else
-        {
-            intersection->top_left.x = second_clipper->top_left.x;
-            intersection->size.width = min(first_clipper->top_left.x + first_clipper->size.width - second_clipper->top_left.x, second_clipper->size.width);
-        }
-    }
-    else
-    {
-        if (second_clipper->top_left.x + second_clipper->size.width <= first_clipper->top_left.x)
-        {
-            free(intersection);
-            return NULL;
-        }
-        else
-        {
-            intersection->top_left.x = first_clipper->top_left.x;
-            intersection->size.width = min(second_clipper->top_left.x + second_clipper->size.width - first_clipper->top_left.x, first_clipper->size.width);
-        }
-    }
-
-    /* defines topleft.y and height */
-    if (first_clipper->top_left.y <= second_clipper->top_left.y)
-    {
-        if (first_clipper->top_left.y + first_clipper->size.height < second_clipper->top_left.y)
-        {
-            free(intersection);
-            return NULL;
-        }
-        else
-        {
-            intersection->top_left.y = second_clipper->top_left.y;
-            intersection->size.height = min(first_clipper->top_left.y + first_clipper->size.height - second_clipper->top_left.y, second_clipper->size.height);
-        }
-    }
-    else
-    {
-        if (second_clipper->top_left.y + second_clipper->size.height <= first_clipper->top_left.y)
-        {
-            free(intersection);
-            return NULL;
-        }
-        else
-        {
-            intersection->top_left.y = first_clipper->top_left.y;
-            intersection->size.height = min(second_clipper->top_left.y + second_clipper->size.height - first_clipper->top_left.y, first_clipper->size.height);
-        }
-    }
-
-    /* intersection is null */
-    if (intersection->size.height == 0 || intersection->size.width == 0)
-    {
-        free(intersection);
-        return NULL;
-    }
-    return intersection;
-}
-
-int min(int a, int b)
-{
-    return (a < b) ? a : b;
-}

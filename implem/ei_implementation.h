@@ -88,4 +88,9 @@ void ei_impl_widget_draw_children(ei_widget_t widget,
 								  ei_rect_t *clipper);
 
 
+
+ei_rect_t *ei_intersect_clipper(ei_rect_t *first_clipper, ei_rect_t *second_clipper);
+
+int min(int a, int b);
+
 #endif

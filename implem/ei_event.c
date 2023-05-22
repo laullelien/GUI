@@ -1,4 +1,7 @@
 #include "../api/ei_event.h"
+#include "ei_types.h"
+#include "ei_event.h"
+
 
 static ei_widget_t active_widget;
 static ei_default_handle_func_t p_default_function = NULL;

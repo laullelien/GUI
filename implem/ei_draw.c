@@ -28,25 +28,23 @@ void ei_draw_pixel(ei_surface_t surface,
     }
 }
 
-
-
 void ei_fill(ei_surface_t surface,
              const ei_color_t *color,
              const ei_rect_t *clipper)
-{   
+{
     int width = hw_surface_get_size(surface).width;
     int height = hw_surface_get_size(surface).height;
 
     uint32_t *p_first_pixel = (uint32_t *)hw_surface_get_buffer(surface);
     uint32_t pixel_color = ei_impl_map_rgba(surface, *color);
-    
+
     if (clipper != NULL)
     {
         ei_rect_t surface_rect = hw_surface_get_rect(surface);
         ei_rect_t clipper_rect = *clipper;
-        ei_rect_t* p_intercept_rect = ei_intersect_clipper(&clipper_rect, &surface_rect);
-        
-        uint32_t* p_first_pixel_in_window = p_first_pixel + p_intercept_rect->top_left.x + p_intercept_rect->top_left.y * width;
+        ei_rect_t *p_intercept_rect = ei_intersect_clipper(&clipper_rect, &surface_rect);
+
+        uint32_t *p_first_pixel_in_window = p_first_pixel + p_intercept_rect->top_left.x + p_intercept_rect->top_left.y * width;
         for (int y = 0; y < p_intercept_rect->size.height; y++)
         {
             for (int x = 0; x < p_intercept_rect->size.width; x++)
@@ -70,9 +68,6 @@ void ei_fill(ei_surface_t surface,
     }
 }
 
-
-
-
 void ei_draw_line(ei_surface_t surface,
                   ei_point_t *first_point,
                   ei_point_t *last_point,
@@ -91,7 +86,7 @@ void ei_draw_line(ei_surface_t surface,
     int dx = last_point->x - first_point->x;
     int dy = last_point->y - first_point->y;
     int e = 0;
-    printf("f %i, %i, %i, %i\n", first_point->x, first_point->y, last_point->x, last_point->y);
+    // printf("f %i, %i, %i, %i\n", first_point->x, first_point->y, last_point->x, last_point->y);
     bool in;
 
     if (clipper)
@@ -103,7 +98,7 @@ void ei_draw_line(ei_surface_t surface,
         ei_rect_t surface_rect = hw_surface_get_rect(surface);
         in = ei_intersect_line_clipper(surface, first_point, last_point, &surface_rect, dx, dy, &e);
     }
-    printf("then %i, %i, %i, %i\n", first_point->x, first_point->y, last_point->x, last_point->y);
+    // printf("then %i, %i, %i, %i\n", first_point->x, first_point->y, last_point->x, last_point->y);
     if (!in)
     {
         /* put back points to their initial values */

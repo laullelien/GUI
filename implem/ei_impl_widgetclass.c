@@ -536,13 +536,15 @@ bool ei_button_handlefunc(ei_widget_t widget, struct ei_event_t *event)
         ei_event_set_active_widget(NULL);
         if (((ei_impl_button_t *)widget)->relief == ei_relief_sunken)
         {
-            ei_app_invalidate_rect(&widget->screen_location);
             ((ei_impl_button_t *)widget)->relief = ei_relief_raised;
+            ei_app_invalidate_rect(&widget->screen_location);
+
         }
         else if (((ei_impl_button_t *)widget)->relief == ei_relief_raised)
         {
-            ei_app_invalidate_rect(&widget->screen_location);
             ((ei_impl_button_t *)widget)->relief = ei_relief_sunken;
+            ei_app_invalidate_rect(&widget->screen_location);
+
         }
         if (((ei_impl_button_t *)widget)->callback != NULL)
         {
@@ -675,13 +677,15 @@ void ei_toplevel_drawfunc(ei_widget_t toplevel,
         ei_draw_polygon(pick_surface, upper_border, 2 * length + 7, (ei_color_t){(uint8_t)(toplevel->pick_id>>16), (uint8_t)(toplevel->pick_id>>8), (uint8_t)(toplevel->pick_id), 0}, screen_location_intersection);
 
         /* close button */
-        ei_rect_t button_square;
-        button_square.top_left.x = close_button_center.x - close_button_radius;
-        button_square.top_left.y = close_button_center.y - close_button_radius;
-        button_square.size.width = close_button_radius << 1;
-        button_square.size.height = close_button_radius << 1;
-        ei_draw_button(surface, button_square, (ei_color_t){200, 0, 0, 255}, ei_relief_raised, 2, close_button_radius, screen_location_intersection, pick_surface, (ei_color_t){(uint8_t)(toplevel->pick_id>>16), (uint8_t)(toplevel->pick_id>>8), (uint8_t)(toplevel->pick_id), 0});
-
+        if (((ei_impl_toplevel_t*)toplevel)->closable)
+        {
+            ei_rect_t button_square;
+            button_square.top_left.x = close_button_center.x - close_button_radius;
+            button_square.top_left.y = close_button_center.y - close_button_radius;
+            button_square.size.width = close_button_radius << 1;
+            button_square.size.height = close_button_radius << 1;
+            ei_draw_button(surface, button_square, (ei_color_t){200, 0, 0, 255}, ei_relief_raised, 2, close_button_radius, screen_location_intersection, pick_surface, (ei_color_t){(uint8_t)(toplevel->pick_id>>16), (uint8_t)(toplevel->pick_id>>8), (uint8_t)(toplevel->pick_id), 0});
+        }
         /* title */
         ei_point_t title_top_left = {toplevel->screen_location.top_left.x + (window_corner_radius << 1), toplevel->screen_location.top_left.y + ((ei_impl_toplevel_t *)toplevel)->border_width};
         ei_draw_text(surface, &title_top_left, ((ei_impl_toplevel_t *)toplevel)->title, ei_default_font, (ei_color_t){255, 255, 255, 255}, screen_location_intersection);
@@ -723,6 +727,7 @@ void ei_toplevel_drawfunc(ei_widget_t toplevel,
             ei_draw_polygon(surface, resize_square, 5, border_color, screen_location_intersection);
             ei_draw_polygon(pick_surface, resize_square, 5, (ei_color_t){(uint8_t)(toplevel->pick_id>>16), (uint8_t)(toplevel->pick_id>>8), (uint8_t)(toplevel->pick_id), 0}, screen_location_intersection);
         }
+        printf("%i %i %i %i\n", content_rect_intersection->top_left.x, content_rect_intersection->top_left.y, content_rect_intersection->size.height, content_rect_intersection->size.width);
 
         free(content_rect_intersection);
     }
@@ -828,7 +833,7 @@ bool ei_toplevel_handlefunc(ei_widget_t		widget,
                 ei_point_t centre_close_button = {widget->screen_location.top_left.x + (height_top_of_the_toplevel >> 1), widget->screen_location.top_left.y + (height_top_of_the_toplevel >> 1)};
                 
                 // if we have clicked on the close button
-                if (abs(event->param.mouse.where.x - centre_close_button.x) <= radius_close_button && abs(event->param.mouse.where.y - centre_close_button.y) <= radius_close_button)
+                if (abs(event->param.mouse.where.x - centre_close_button.x) <= radius_close_button && abs(event->param.mouse.where.y - centre_close_button.y) <= radius_close_button && ((ei_impl_toplevel_t*) widget)->closable)
                 {
                     ei_widget_destroy(widget);
                     return true;
@@ -874,76 +879,4 @@ void ei_toplevel_widgetclass_create(ei_widgetclass_t *ei_toplevel_widgetclass)
     ei_toplevel_widgetclass->handlefunc = &ei_toplevel_handlefunc;
 }
 
-ei_rect_t *ei_intersect_clipper(ei_rect_t *first_clipper, ei_rect_t *second_clipper)
-{
-    ei_rect_t *intersection = malloc(sizeof(ei_rect_t));
 
-    /* defines topleft.x and width */
-    if (first_clipper->top_left.x < second_clipper->top_left.x)
-    {
-        if (first_clipper->top_left.x + first_clipper->size.width <= second_clipper->top_left.x)
-        {
-            free(intersection);
-            return NULL;
-        }
-        else
-        {
-            intersection->top_left.x = second_clipper->top_left.x;
-            intersection->size.width = min(first_clipper->top_left.x + first_clipper->size.width - second_clipper->top_left.x, second_clipper->size.width);
-        }
-    }
-    else
-    {
-        if (second_clipper->top_left.x + second_clipper->size.width <= first_clipper->top_left.x)
-        {
-            free(intersection);
-            return NULL;
-        }
-        else
-        {
-            intersection->top_left.x = first_clipper->top_left.x;
-            intersection->size.width = min(second_clipper->top_left.x + second_clipper->size.width - first_clipper->top_left.x, first_clipper->size.width);
-        }
-    }
-
-    /* defines topleft.y and height */
-    if (first_clipper->top_left.y <= second_clipper->top_left.y)
-    {
-        if (first_clipper->top_left.y + first_clipper->size.height < second_clipper->top_left.y)
-        {
-            free(intersection);
-            return NULL;
-        }
-        else
-        {
-            intersection->top_left.y = second_clipper->top_left.y;
-            intersection->size.height = min(first_clipper->top_left.y + first_clipper->size.height - second_clipper->top_left.y, second_clipper->size.height);
-        }
-    }
-    else
-    {
-        if (second_clipper->top_left.y + second_clipper->size.height <= first_clipper->top_left.y)
-        {
-            free(intersection);
-            return NULL;
-        }
-        else
-        {
-            intersection->top_left.y = first_clipper->top_left.y;
-            intersection->size.height = min(second_clipper->top_left.y + second_clipper->size.height - first_clipper->top_left.y, first_clipper->size.height);
-        }
-    }
-
-    /* intersection is null */
-    if (intersection->size.height == 0 || intersection->size.width == 0)
-    {
-        free(intersection);
-        return NULL;
-    }
-    return intersection;
-}
-
-int min(int a, int b)
-{
-    return (a < b) ? a : b;
-}

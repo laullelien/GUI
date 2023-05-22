@@ -65,7 +65,7 @@ void ei_app_run()
         hw_event_wait_next(&event);
         active_widget = ei_event_get_active_widget();
         handled_event = false;
-        if(event.type == ei_ev_keydown && event.param.key.key_code==SDLK_ESCAPE)
+        if((event.type == ei_ev_close) && (event.type == ei_ev_keydown))
         {
             stop=true;
         }

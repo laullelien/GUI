@@ -2,7 +2,7 @@
 
 
 cd cmake
-make two048
+make minimal
 
 cd ..
-./cmake/two048
+./cmake/minimal

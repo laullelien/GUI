@@ -213,4 +213,9 @@ bool ei_inside_clipper(ei_point_t *point,
 					   const ei_rect_t *clipper,
 					   ei_borders *borders);
 
+
+ei_rect_t *ei_intersect_clipper(ei_rect_t *first_clipper, ei_rect_t *second_clipper);
+
+int min(int a, int b);
+
 #endif

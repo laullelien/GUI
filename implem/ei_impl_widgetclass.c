@@ -727,7 +727,6 @@ void ei_toplevel_drawfunc(ei_widget_t toplevel,
             ei_draw_polygon(surface, resize_square, 5, border_color, screen_location_intersection);
             ei_draw_polygon(pick_surface, resize_square, 5, (ei_color_t){(uint8_t)(toplevel->pick_id>>16), (uint8_t)(toplevel->pick_id>>8), (uint8_t)(toplevel->pick_id), 0}, screen_location_intersection);
         }
-        printf("%i %i %i %i\n", content_rect_intersection->top_left.x, content_rect_intersection->top_left.y, content_rect_intersection->size.height, content_rect_intersection->size.width);
 
         free(content_rect_intersection);
     }

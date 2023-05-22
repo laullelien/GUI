@@ -12,7 +12,7 @@ ei_widget_t get_widget_from_mouse_location(ei_event_t *event, ei_surface_t pick_
     uint32_t *p_first_pixel = (uint32_t *)hw_surface_get_buffer(pick_surface);
     ei_point_t mouse_location = event->param.mouse.where;
     p_first_pixel += mouse_location.x + mouse_location.y * hw_surface_get_size(pick_surface).width;
-    return *(*get_widget_list_pointer() + ei_get_red(pick_surface, p_first_pixel));
+    return *(*get_widget_list_pointer() + ei_get_id(pick_surface, p_first_pixel));
 }
 
 void merge_rect_clipper(ei_linked_rect_t * rects)

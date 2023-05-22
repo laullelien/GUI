@@ -2,7 +2,7 @@
 #include "ei_implementation.h"
 #include "ei_impl_widgetclass.h"
 
-static uint16_t current_picking_id;
+static uint32_t current_picking_id;
 static ei_widget_t *widget_list;
 
 void initialize_widget_list()
@@ -21,7 +21,7 @@ void insert_widget(ei_widget_t widget, ei_widget_t **plist)
     if (current_picking_id % 10 == 9)
     {
         ei_widget_t *temp = calloc(current_picking_id + 11, sizeof(ei_widget_t));
-        for (uint16_t i = 0; i < current_picking_id; i++)
+        for (uint32_t i = 0; i < current_picking_id; i++)
         {
             temp[i] = (*plist)[i];
         }

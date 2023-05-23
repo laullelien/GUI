@@ -8,7 +8,6 @@
 #include "ei_widget_configure.h"
 #include "ei_event.h"
 
-
 static ei_point_t ancient_mouse_location;
 static int is_top_toplevel = 0; // 0 == false; 1 == true;
 static int is_small_square_toplevel = 0;
@@ -514,7 +513,7 @@ void ei_draw_button_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *cli
 
 bool ei_button_handlefunc(ei_widget_t widget, struct ei_event_t *event)
 {
-    if (event->type == ei_ev_mouse_buttondown && event->param.mouse.button == ei_mouse_button_left)
+    if (event->type == ei_ev_mouse_buttondown)
     {
         ei_event_set_active_widget(widget);
         if (((ei_impl_button_t *)widget)->relief == ei_relief_raised)
@@ -529,7 +528,7 @@ bool ei_button_handlefunc(ei_widget_t widget, struct ei_event_t *event)
         }
         return true;
     }
-    else if (event->type == ei_ev_mouse_buttonup && event->param.mouse.button == ei_mouse_button_left && ei_event_get_active_widget() == widget)
+    else if (event->type == ei_ev_mouse_buttonup && ei_event_get_active_widget() == widget)
     {
         /* set widget inactive */
         ei_event_set_active_widget(NULL);

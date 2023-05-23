@@ -27,6 +27,26 @@ uint32_t ei_get_id(ei_surface_t surface, uint32_t *color)
     return (((uint8_t *)color)[ir] << 16) + (((uint8_t *)color)[ig] << 8) + (((uint8_t *)color)[ib]);
 }
 
+/* the following get functions are need to be called after ei_impl_map_rgba */
+int ei_get_ir()
+{
+    return ir;
+}
+
+int ei_get_ig()
+{
+    return ig;
+}
+
+int ei_get_ib()
+{
+    return ib;
+}
+
+int ei_get_ia()
+{
+    return ia;
+}
 
 void ei_impl_placer_run(ei_widget_t widget)
 {

@@ -442,7 +442,7 @@ void ei_draw_polygon(ei_surface_t surface,
             if (TCA != NULL)
             {
                 TCA = ei_TCA_sort(TCA);
-                ei_draw_scanline(surface, TCA, clipper, pixel_color, width, scanline + TC_length[0]);
+                ei_draw_scanline(surface, TCA, clipper, pixel_color, color, width, scanline + TC_length[0]);
                 ei_update(TCA);
             }
         }

@@ -260,28 +260,6 @@ ei_segment *ei_get_middle(ei_segment *first)
     }
     return slow;
 }
-
-ei_segment *ei_TCA_sort(ei_segment *first)
-{
-    if (first->next == NULL)
-    {
-        return first;
-    }
-    ei_segment *middle = ei_get_middle(first);
-    ei_segment *next_to_middle = middle->next;
-    middle->next = NULL;
-
-    /* Apply merge on the left side */
-    ei_segment *first_part = ei_TCA_sort(first);
-
-    /* Apply merge on the right side */
-    ei_segment *second_part = ei_TCA_sort(next_to_middle);
-
-    /* merge both sides */
-    ei_segment *sorted = ei_merge(first_part, second_part);
-    return sorted;
-}
-
 ei_segment *ei_merge(ei_segment *first, ei_segment *second)
 {
     ei_segment *result = NULL;
@@ -306,6 +284,29 @@ ei_segment *ei_merge(ei_segment *first, ei_segment *second)
     }
     return result;
 }
+
+
+ei_segment *ei_TCA_sort(ei_segment *first)
+{
+    if (first->next == NULL)
+    {
+        return first;
+    }
+    ei_segment *middle = ei_get_middle(first);
+    ei_segment *next_to_middle = middle->next;
+    middle->next = NULL;
+
+    /* Apply merge on the left side */
+    ei_segment *first_part = ei_TCA_sort(first);
+
+    /* Apply merge on the right side */
+    ei_segment *second_part = ei_TCA_sort(next_to_middle);
+
+    /* merge both sides */
+    ei_segment *sorted = ei_merge(first_part, second_part);
+    return sorted;
+}
+
 
 void ei_list_print(ei_segment *first)
 {

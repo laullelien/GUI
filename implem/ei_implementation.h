@@ -1,7 +1,7 @@
 /**
  * @file	ei_implementation.h
  *
- * @brief 	Private definitions.
+ * @brief 	Private definitions and implementation of widgets.
  *
  */
 

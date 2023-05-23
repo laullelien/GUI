@@ -88,7 +88,8 @@ int main(int argc, char* argv[])
 
     ei_fill(main_window, &red, &clipper);
 
-    
+
+
 
 	// unlock, update screen.
 	hw_surface_unlock(main_window);

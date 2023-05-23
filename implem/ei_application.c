@@ -149,3 +149,10 @@ void ei_app_invalidate_rect(const ei_rect_t *rect)
         p_rect_cell->next->rect = *rect;
     }
 }
+
+ei_surface_t get_picking_surface()
+{
+    return pick_surface;
+}
+
+

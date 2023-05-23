@@ -2,13 +2,11 @@
 #include "ei_implementation.h"
 #include <stdint.h>
 
-
-static int ir, ig, ib;
+static int ir, ig, ib, ia;
 
 
 uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color)
 {
-    int ia;
     hw_surface_get_channel_indices(surface, &ir, &ig, &ib, &ia);
     uint8_t pixel_color[4];
     pixel_color[ir] = color.red;

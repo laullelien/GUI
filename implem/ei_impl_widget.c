@@ -10,6 +10,7 @@ void initialize_widget_list()
     current_picking_id = 0;
     widget_list = calloc(10, sizeof(ei_widget_t));
 }
+
 ei_widget_t **get_widget_list_pointer()
 {
     return &widget_list;

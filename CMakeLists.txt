@@ -92,7 +92,9 @@ set(LIB_EI_SOURCES
      ${SRC_DIR}/ei_widget_attribute.c
 	 ${SRC_DIR}/ei_impl_widget.c
 	 ${SRC_DIR}/ei_impl_event.c
-	 ${SRC_DIR}/ei_impl_application.c)
+	 ${SRC_DIR}/ei_impl_application.c
+	 ${SRC_DIR}/ei_impl_draw.c)
+
 
 
 add_library(ei STATIC			${LIB_EI_SOURCES})

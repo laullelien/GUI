@@ -73,10 +73,9 @@ void ei_TCA_remove_merge(ei_segment **TC, ei_segment **p_TCA, uint16_t scanline,
  * @param	pixel_color		The color of the polygon, returned by \ref ei_impl_map_rgba
  * @param	width		The width of the window that we are drawing on
  * @param	line_idx		The index of the line that we are drawing on
- * @param	borders     The indices of the clipper extrmums coordinates i.e. x_min (left), x_max (right), y_min (upper), y_max (lower)
  *
  */
-void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *clipper, uint32_t pixel_color, int width, int line_idx, ei_borders *borders);
+void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *clipper, uint32_t pixel_color, int width, int line_idx);
 
 /**
  * \brief	Frees the segments of TCA
@@ -133,4 +132,13 @@ bool ei_inside_clipper(ei_point_t *point,
                        ei_borders *borders);
 
 bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei_point_t *last_point, const ei_rect_t *clipper, int dx, int dy, int *e);
+
+/**
+ * \brief	Frees TC
+ *
+ * @param	TC				Array of segment*, stored based on y_min, the lowest y coordinate of the 2 points
+ *
+ */
+void ei_TC_free(ei_segment **TC, int length, int first_unused_TC_line);
+
 #endif

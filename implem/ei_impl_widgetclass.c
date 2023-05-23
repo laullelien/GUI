@@ -714,11 +714,12 @@ void ei_toplevel_drawfunc(ei_widget_t toplevel,
             ei_point_t resize_square[5];
             resize_square[0].x = bottom_border[2].x - 10;
             resize_square[0].y = bottom_border[2].y - 10;
-            resize_square[1].x = bottom_border[2].x;
+            resize_square[1].x = bottom_border[2].x + 1;
             resize_square[1].y = resize_square[0].y;
-            resize_square[2] = bottom_border[2];
+            resize_square[2].x = bottom_border[2].x + 1;
+            resize_square[2].y = bottom_border[2].y + 1;
             resize_square[3].x = resize_square[0].x;
-            resize_square[3].y = bottom_border[2].y;
+            resize_square[3].y = bottom_border[2].y + 1;
             resize_square[4] = resize_square[0];
             ei_draw_polygon(surface, resize_square, 5, border_color, screen_location_intersection);
             ei_draw_polygon(pick_surface, resize_square, 5, (ei_color_t){(uint8_t)(toplevel->pick_id >> 16), (uint8_t)(toplevel->pick_id >> 8), (uint8_t)(toplevel->pick_id), 0}, screen_location_intersection);

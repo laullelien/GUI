@@ -15,6 +15,7 @@
         "string_view": "c",
         "initializer_list": "c",
         "utility": "c",
-        "ei_types.h": "c"
+        "ei_types.h": "c",
+        "random": "c"
     }
 }

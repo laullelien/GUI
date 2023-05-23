@@ -140,13 +140,11 @@ void ei_TCA_remove_merge(ei_segment **TC, ei_segment **p_TCA, uint16_t scanline,
     }
 }
 
-void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *clipper, uint32_t pixel_color, int width, int line_idx, ei_borders *borders)
+void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *clipper, uint32_t pixel_color, int width, int line_idx)
 {
 
     int offset = width * line_idx;
     uint32_t *p_first_pixel = (uint32_t *)hw_surface_get_buffer(surface) + offset; /* We set p_first_pixel to the first pixel of the scanline */
-    ei_point_t drawing_point[1];
-    drawing_point->y = line_idx;
 
     ei_segment *p_interval_entry = TCA;
     ei_segment *p_interval_ending;
@@ -179,18 +177,13 @@ void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *cl
         {
             interval_entry_idx = clipper->top_left.x;
         }
-        if (interval_entry_idx > clipper->top_left.x + clipper->size.width)
+        if (interval_ending_idx > clipper->top_left.x + clipper->size.width - 1)
         {
-            interval_entry_idx = clipper->top_left.x + clipper->size.width;
+            interval_ending_idx = clipper->top_left.x + clipper->size.width - 1;
         }
         for (int i = interval_entry_idx; i <= interval_ending_idx; i++)
         {
-            drawing_point->x = i;
-            if (ei_inside_clipper(drawing_point, clipper, borders))
-            {
-
-                *(p_first_pixel + i) = pixel_color;
-            }
+            *(p_first_pixel + i) = pixel_color;
         }
         p_interval_entry = p_interval_ending->next;
     }
@@ -603,4 +596,24 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
         return !(last_point->x > clipper->top_left.x + clipper->size.width) && !(last_point->x < clipper->top_left.x);
     }
     return true;
+}
+
+void ei_TC_free(ei_segment **TC, int length, int first_unused_TC_line)
+{
+    for (int line_idx = first_unused_TC_line; line_idx < length; line_idx++)
+    {
+        ei_segment *p_prev_seg = TC[line_idx];
+        if (p_prev_seg == NULL)
+        {
+            continue;
+        }
+        ei_segment *p_curr_seg = p_prev_seg->next;
+        while (p_curr_seg != NULL)
+        {
+            free(p_prev_seg);
+            p_prev_seg = p_curr_seg;
+            p_curr_seg = p_prev_seg->next;
+        }
+        free(p_prev_seg);
+    }
 }

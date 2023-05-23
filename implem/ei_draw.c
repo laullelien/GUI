@@ -398,7 +398,7 @@ void ei_draw_polygon(ei_surface_t surface,
             borders->lower = (clipper->top_left).y + (clipper->size).height;
         }
 
-        uint32_t pixel_color = ei_impl_map_rgba(surface, color);
+//        uint32_t pixel_color = ei_impl_map_rgba(surface, color);
         int width = hw_surface_get_size(surface).width;
 
         /* We determine how long TC must be */
@@ -436,7 +436,7 @@ void ei_draw_polygon(ei_surface_t surface,
             if (TCA != NULL)
             {
                 TCA = ei_TCA_sort(TCA);
-                ei_draw_scanline(surface, TCA, clipper, pixel_color, width, scanline + TC_length[0], borders);
+                ei_draw_scanline(surface, TCA, clipper, color, width, scanline + TC_length[0], borders);
                 // segment *p_curr_seg = TCA;
                 // while (p_curr_seg != NULL)
                 // {

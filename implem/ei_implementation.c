@@ -1,11 +1,11 @@
 #include "ei_implementation.h"
+#include "ei_application.c"
 #include <stdint.h>
 
-static int ir, ig, ib;
+static int ir, ig, ib, ia;
 
 uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color)
 {
-    int ia;
     hw_surface_get_channel_indices(surface, &ir, &ig, &ib, &ia);
     uint8_t pixel_color[4];
     pixel_color[ir] = color.red;
@@ -162,8 +162,11 @@ void ei_TCA_remove_merge(ei_segment **TC, ei_segment **p_TCA, uint16_t scanline,
     }
 }
 
-void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *clipper, uint32_t pixel_color, int width, int line_idx, ei_borders *borders)
+void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *clipper, ei_color_t color, int width, int line_idx, ei_borders *borders)
 {
+
+    hw_surface_get_channel_indices(surface, &ir, &ig, &ib, &ia);
+    uint32_t pixel_color = ei_impl_map_rgba(surface, color);
 
     int offset = width * line_idx;
     uint32_t *p_first_pixel = (uint32_t *)hw_surface_get_buffer(surface) + offset; /* We set p_first_pixel to the first pixel of the scanline */
@@ -196,14 +199,42 @@ void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *cl
         {
             interval_ending_idx = p_interval_ending->x_y_min - (p_interval_ending->e <= 0);
         }
-        // printf("e: %d, s: %d\n", interval_entry_idx, interval_ending_idx);
-        for (uint32_t i = interval_entry_idx; i <= interval_ending_idx; i++)
+
+        if (color.alpha == 255 || surface==get_picking_surface())
         {
-            drawing_point->x = i;
-            if (ei_inside_clipper(drawing_point, clipper, borders))
+
+            // printf("e: %d, s: %d\n", interval_entry_idx, interval_ending_idx);
+            for (uint32_t i = interval_entry_idx; i <= interval_ending_idx; i++)
             {
 
-                *(p_first_pixel + i) = pixel_color;
+
+                drawing_point->x = i;
+                if (ei_inside_clipper(drawing_point, clipper, borders))
+                {
+
+                    *(p_first_pixel + i) = pixel_color;
+
+                }
+            }
+
+
+        }
+        else
+        {
+            p_first_pixel+=interval_entry_idx;
+            // printf("e: %d, s: %d\n", interval_entry_idx, interval_ending_idx);
+            for (uint32_t i = interval_entry_idx; i <= interval_ending_idx; i++)
+            {
+                drawing_point->x = i;
+                if (ei_inside_clipper(drawing_point, clipper, borders))
+                {
+
+                    *((uint8_t *) p_first_pixel + ir) = (uint8_t)(((uint16_t)(*(p_first_pixel + ir)) * (255 - color.alpha) + (uint16_t)((color.red)) * color.alpha) / 255);
+                    *((uint8_t *) p_first_pixel + ig) = (uint8_t)(((uint16_t)(*(p_first_pixel + ig)) * (255 - color.alpha) + (uint16_t)(color.green) * color.alpha) / 255);
+                    *((uint8_t *) p_first_pixel + ib) = (uint8_t)(((uint16_t)(*(p_first_pixel + ib)) * (255 - color.alpha) + (uint16_t)(color.blue) * color.alpha) / 255);
+                    p_first_pixel++;
+
+                }
             }
         }
         p_interval_entry = p_interval_ending->next;

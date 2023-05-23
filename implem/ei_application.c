@@ -98,7 +98,7 @@ void ei_app_run()
         hw_surface_unlock(root_surface);
         hw_surface_unlock(pick_surface);
         // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
-        hw_surface_update_rects(root_surface, p_rect_cell);
+        hw_surface_update_rects(root_surface, get_p_rect_cell());
         free_p_rect_cell();
     }
 }
@@ -145,3 +145,10 @@ void ei_app_invalidate_rect(const ei_rect_t *rect)
         p_rect_cell->next->rect = *rect;
     }
 }
+
+ei_surface_t get_picking_surface()
+{
+    return pick_surface;
+}
+
+

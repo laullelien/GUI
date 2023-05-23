@@ -78,5 +78,3 @@ void ei_toplevel_drawfunc(ei_widget_t toplevel,
                           ei_rect_t *clipper);
 void ei_toplevel_setdefaultsfunc(ei_widget_t toplevel);
 void ei_toplevel_widgetclass_create(ei_widgetclass_t *ei_toplevel_widgetclass);
-ei_rect_t *ei_intersect_clipper(ei_rect_t *first_clipper, ei_rect_t *second_clipper);
-int min(int a, int b);

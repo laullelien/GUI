@@ -1,5 +1,5 @@
+#include "ei_impl_widgetclass.h"
 #include "ei_implementation.h"
-#include "ei_application.c"
 #include <stdint.h>
 
 static int ir, ig, ib, ia;
@@ -18,362 +18,184 @@ uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color)
     return *((uint32_t *)pixel_color);
 }
 
-uint32_t ei_get_id(ei_surface_t surface, uint32_t * color)
+uint32_t ei_get_id(ei_surface_t surface, uint32_t *color)
 {
     /* ir will always be initiated by ei_impl_map_rgba*/
-    return (((uint8_t *)color)[ir]<<16)+(((uint8_t *)color)[ig]<<8)+(((uint8_t *)color)[ib]);
+    return (((uint8_t *)color)[ir] << 16) + (((uint8_t *)color)[ig] << 8) + (((uint8_t *)color)[ib]);
 }
 
-int *ei_TC_length(ei_point_t *point_array, size_t point_array_size)
+void ei_impl_placer_run(ei_widget_t widget)
 {
-    int *TC_length = calloc(2, sizeof(int));
-    TC_length[0] = point_array->y;
-    TC_length[1] = point_array->y;
-    for (size_t i = 1; i < point_array_size; i++)
-    {
-        if (point_array[i].y < TC_length[0])
-        {
-            TC_length[0] = point_array[i].y;
-        }
-        else if (point_array[i].y > TC_length[1])
-        {
-            TC_length[1] = point_array[i].y;
-        }
-    }
-    return TC_length;
-}
-
-void ei_TC_fill(ei_segment **TC, ei_point_t *point_array, size_t point_array_size, int TC_min)
-{
-    /* We store y_min to know in what line of TC we will ad it */
-    int y_min;
-    ei_segment *p_curr_seg;
-    ei_segment *curr_line;
-    for (size_t i = 0; i < point_array_size - 1; i++)
-    {
-        p_curr_seg = malloc(sizeof(ei_segment));
-        /* We check which point is higher */
-        if (point_array[i].y < point_array[i + 1].y)
-        {
-            y_min = point_array[i].y;
-            p_curr_seg->y_max = point_array[i + 1].y;
-            p_curr_seg->x_y_min = point_array[i].x;
-            p_curr_seg->dx = point_array[i + 1].x - point_array[i].x;
-            p_curr_seg->dy = point_array[i + 1].y - point_array[i].y;
-            p_curr_seg->e = 0;
-            p_curr_seg->next = 0;
-        }
-        else
-        {
-            y_min = point_array[i + 1].y;
-            p_curr_seg->y_max = point_array[i].y;
-            p_curr_seg->x_y_min = point_array[i + 1].x;
-            p_curr_seg->dx = point_array[i].x - point_array[i + 1].x;
-            p_curr_seg->dy = point_array[i].y - point_array[i + 1].y;
-            p_curr_seg->e = 0;
-            p_curr_seg->next = 0;
-        }
-        /* We ignore horizontal lines */
-        if (p_curr_seg->dy != 0)
-        {
-            /* We fill TC */
-            curr_line = TC[y_min - TC_min];
-            /* If this line is empty */
-            if (curr_line == NULL)
-            {
-                TC[y_min - TC_min] = p_curr_seg;
-            }
-            else
-            {
-                /* We find where to add the current segment */
-                while (curr_line->next != NULL)
-                {
-                    curr_line = curr_line->next;
-                }
-                curr_line->next = p_curr_seg;
-            }
-        }
-        else
-        {
-            free(p_curr_seg);
-        }
-    }
-}
-
-void ei_TCA_remove_merge(ei_segment **TC, ei_segment **p_TCA, uint16_t scanline, int TC_min)
-{
-    if (*p_TCA == NULL)
-    {
-        *p_TCA = TC[scanline];
-    }
-    else
-    {
-        ei_segment *p_prev_seg = *p_TCA;
-        ei_segment *p_curr_seg = p_prev_seg->next;
-        /* There is only one segment*/
-        if (p_curr_seg == NULL)
-        {
-            if (p_curr_seg->y_max == scanline + TC_min)
-            {
-                *p_TCA = TC[scanline];
-                free(p_curr_seg);
-            }
-            else
-            {
-                p_curr_seg->next = TC[scanline];
-            }
-        }
-        /* There are at least 2 segments */
-        else
-        {
-            while (p_curr_seg->next != 0)
-            {
-                if (p_curr_seg->y_max == scanline + TC_min)
-                {
-                    /* We remove the segment */
-                    p_prev_seg->next = p_curr_seg->next;
-                    free(p_curr_seg);
-                    p_curr_seg = p_prev_seg->next;
-                }
-                else
-                {
-                    p_prev_seg = p_curr_seg;
-                    p_curr_seg = p_curr_seg->next;
-                }
-            }
-            /* Now, there is one last segment to check */
-            if (p_curr_seg->y_max == scanline + TC_min)
-            {
-                p_prev_seg->next = TC[scanline];
-                free(p_curr_seg);
-            }
-            else
-            {
-                p_curr_seg->next = TC[scanline];
-            }
-            /* This was never tested. */
-            if ((*p_TCA)->y_max == scanline + TC_min)
-            {
-                ei_segment *p_to_free_seg = *p_TCA;
-                (*p_TCA) = (*p_TCA)->next;
-                free(p_to_free_seg);
-            }
-        }
-    }
-}
-
-void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *clipper, ei_color_t color, int width, int line_idx, ei_borders *borders)
-{
-
-    hw_surface_get_channel_indices(surface, &ir, &ig, &ib, &ia);
-    uint32_t pixel_color = ei_impl_map_rgba(surface, color);
-
-    int offset = width * line_idx;
-    uint32_t *p_first_pixel = (uint32_t *)hw_surface_get_buffer(surface) + offset; /* We set p_first_pixel to the first pixel of the scanline */
-    ei_point_t drawing_point[1];
-    drawing_point->y = line_idx;
-
-    ei_segment *p_interval_entry = TCA;
-    ei_segment *p_interval_ending;
-    uint16_t interval_entry_idx;
-    uint16_t interval_ending_idx;
-    /* The number of segments in TCA must be even since we removed horizontal and ending segments */
-    while (p_interval_entry != NULL)
-    {
-        p_interval_ending = p_interval_entry->next;
-        /* We round to the next number in entry. So we add 1 to x_y_min if and only if epsilon > 0 */
-        /* We round to the previous number in entry. So we substract 1 from x_y_min if and only if epsilon <= 0 */
-        if (p_interval_entry->dx < 0)
-        {
-            interval_entry_idx = p_interval_entry->x_y_min + (p_interval_entry->e < 0);
-        }
-        else
-        {
-            interval_entry_idx = p_interval_entry->x_y_min + (p_interval_entry->e > 0);
-        }
-        if (p_interval_ending->dx < 0)
-        {
-            interval_ending_idx = p_interval_ending->x_y_min - (p_interval_ending->e >= 0);
-        }
-        else
-        {
-            interval_ending_idx = p_interval_ending->x_y_min - (p_interval_ending->e <= 0);
-        }
-
-        if (color.alpha == 255 || surface==get_picking_surface())
-        {
-
-            // printf("e: %d, s: %d\n", interval_entry_idx, interval_ending_idx);
-            for (uint32_t i = interval_entry_idx; i <= interval_ending_idx; i++)
-            {
-
-
-                drawing_point->x = i;
-                if (ei_inside_clipper(drawing_point, clipper, borders))
-                {
-
-                    *(p_first_pixel + i) = pixel_color;
-
-                }
-            }
-
-
-        }
-        else
-        {
-            p_first_pixel+=interval_entry_idx;
-            // printf("e: %d, s: %d\n", interval_entry_idx, interval_ending_idx);
-            for (uint32_t i = interval_entry_idx; i <= interval_ending_idx; i++)
-            {
-                drawing_point->x = i;
-                if (ei_inside_clipper(drawing_point, clipper, borders))
-                {
-
-                    *((uint8_t *) p_first_pixel + ir) = (uint8_t)(((uint16_t)(*(p_first_pixel + ir)) * (255 - color.alpha) + (uint16_t)((color.red)) * color.alpha) / 255);
-                    *((uint8_t *) p_first_pixel + ig) = (uint8_t)(((uint16_t)(*(p_first_pixel + ig)) * (255 - color.alpha) + (uint16_t)(color.green) * color.alpha) / 255);
-                    *((uint8_t *) p_first_pixel + ib) = (uint8_t)(((uint16_t)(*(p_first_pixel + ib)) * (255 - color.alpha) + (uint16_t)(color.blue) * color.alpha) / 255);
-                    p_first_pixel++;
-
-                }
-            }
-        }
-        p_interval_entry = p_interval_ending->next;
-    }
-}
-
-void ei_update(ei_segment *TCA)
-{
-    ei_segment *p_curr_segment = TCA;
-    while (p_curr_segment != NULL)
-    {
-        if (p_curr_segment->dx > 0)
-        {
-            p_curr_segment->e += p_curr_segment->dx;
-            /* if |dx| > dy there may be several loop needed */
-            while (p_curr_segment->e << 1 > p_curr_segment->dy)
-            {
-                p_curr_segment->x_y_min++;
-                p_curr_segment->e -= p_curr_segment->dy;
-            }
-        }
-        else if (p_curr_segment->dx < 0)
-        {
-            p_curr_segment->e -= p_curr_segment->dx;
-            /* if |dx| > dy there may be several loop needed */
-            while (p_curr_segment->e << 1 > p_curr_segment->dy)
-            {
-                p_curr_segment->x_y_min--;
-                p_curr_segment->e -= p_curr_segment->dy;
-            }
-        }
-        p_curr_segment = p_curr_segment->next;
-    }
-}
-
-void ei_TCA_free(ei_segment *TCA)
-{
-    if (TCA == NULL)
+    if (widget->placer_params == NULL)
     {
         return;
     }
+
+    ei_point_t anchor_coord;
+    int widget_width;
+    int widget_height;
+
+    if (widget->parent)
+    {
+        ei_rect_t parent_rect = widget->parent->content_rect;
+
+        anchor_coord.x = widget->placer_params->rel_x * parent_rect.size.width + widget->placer_params->x + parent_rect.top_left.x;
+        anchor_coord.y = widget->placer_params->rel_y * parent_rect.size.height + widget->placer_params->y + parent_rect.top_left.y;
+        widget_width = widget->placer_params->rel_width * parent_rect.size.width + widget->placer_params->width;
+        widget_height = widget->placer_params->rel_height * parent_rect.size.height + widget->placer_params->height;
+
+        widget->content_rect.size.width = widget_width;
+        widget->content_rect.size.height = widget_height;
+    }
     else
     {
-        ei_segment *p_curr_segment = TCA->next;
-        ei_segment *p_prev_segment = TCA;
-        while (p_curr_segment != NULL)
+        anchor_coord.x = widget->placer_params->x;
+        anchor_coord.y = widget->placer_params->y;
+
+        widget_width = widget->content_rect.size.width;
+        widget_height = widget->content_rect.size.height;
+    }
+    /* set content_rect */
+    switch (widget->placer_params->anchor)
+    {
+
+    case ei_anc_center:
+        widget->content_rect.top_left.x = anchor_coord.x - (widget_width >> 1);
+        widget->content_rect.top_left.y = anchor_coord.y - (widget_height >> 1);
+        break;
+    case ei_anc_north:
+        widget->content_rect.top_left.x = anchor_coord.x - (widget_width >> 1);
+        widget->content_rect.top_left.y = anchor_coord.y;
+        break;
+    case ei_anc_northeast:
+        widget->content_rect.top_left.x = anchor_coord.x - widget_width;
+        widget->content_rect.top_left.y = anchor_coord.y;
+        break;
+    case ei_anc_east:
+        widget->content_rect.top_left.x = anchor_coord.x - widget_width;
+        widget->content_rect.top_left.y = anchor_coord.y - (widget_height >> 1);
+        break;
+    case ei_anc_southeast:
+        widget->content_rect.top_left.x = anchor_coord.x - widget_width;
+        widget->content_rect.top_left.y = anchor_coord.y - widget_height;
+        break;
+    case ei_anc_south:
+        widget->content_rect.top_left.x = anchor_coord.x - (widget_width >> 1);
+        widget->content_rect.top_left.y = anchor_coord.y - widget_height;
+        break;
+    case ei_anc_southwest:
+        widget->content_rect.top_left.x = anchor_coord.x;
+        widget->content_rect.top_left.y = anchor_coord.y - widget_height;
+        break;
+    case ei_anc_west:
+        widget->content_rect.top_left.x = anchor_coord.x;
+        widget->content_rect.top_left.y = anchor_coord.y - (widget_height >> 1);
+        break;
+    case ei_anc_northwest:
+        widget->content_rect.top_left.x = anchor_coord.x;
+        widget->content_rect.top_left.y = anchor_coord.y;
+        break;
+    default:
+        break;
+    }
+    /* set screen_location */
+    if (strcmp("frame", widget->wclass->name) == 0)
+    {
+        widget->screen_location.top_left.x = widget->content_rect.top_left.x - ((ei_impl_frame_t *)widget)->border_width;
+        widget->screen_location.top_left.y = widget->content_rect.top_left.y - ((ei_impl_frame_t *)widget)->border_width;
+        widget->screen_location.size.width = widget->content_rect.size.width + (((ei_impl_frame_t *)widget)->border_width << 1);
+        widget->screen_location.size.height = widget->content_rect.size.height + (((ei_impl_frame_t *)widget)->border_width << 1);
+    }
+    else if (strcmp("button", widget->wclass->name) == 0)
+    {
+        widget->screen_location.top_left.x = widget->content_rect.top_left.x - ((ei_impl_button_t *)widget)->corner_radius;
+        widget->screen_location.top_left.y = widget->content_rect.top_left.y - ((ei_impl_button_t *)widget)->corner_radius;
+        widget->screen_location.size.width = widget->content_rect.size.width + (((ei_impl_button_t *)widget)->corner_radius << 1);
+        widget->screen_location.size.height = widget->content_rect.size.height + (((ei_impl_button_t *)widget)->corner_radius << 1);
+    }
+    else if (strcmp("toplevel", widget->wclass->name) == 0)
+    {
+        int text_height;
+        hw_text_compute_size(((ei_impl_toplevel_t *)widget)->title, ei_default_font, NULL, &text_height);
+        widget->screen_location.top_left.x = widget->content_rect.top_left.x - ((ei_impl_toplevel_t *)widget)->border_width;
+        widget->screen_location.top_left.y = widget->content_rect.top_left.y - (((ei_impl_toplevel_t *)widget)->border_width << 1) - text_height;
+        widget->screen_location.size.width = widget->content_rect.size.width + (((ei_impl_toplevel_t *)widget)->border_width << 1);
+        widget->screen_location.size.height = widget->content_rect.size.height + text_height + 3 * ((ei_impl_toplevel_t *)widget)->border_width;
+    }
+}
+
+
+ei_rect_t *ei_intersect_clipper(ei_rect_t *first_clipper, ei_rect_t *second_clipper)
+{
+    ei_rect_t *intersection = malloc(sizeof(ei_rect_t));
+
+    /* defines topleft.x and width */
+    if (first_clipper->top_left.x < second_clipper->top_left.x)
+    {
+        if (first_clipper->top_left.x + first_clipper->size.width <= second_clipper->top_left.x)
         {
-            free(p_prev_segment);
-            p_prev_segment = p_curr_segment;
-            p_curr_segment = p_curr_segment->next;
+            free(intersection);
+            return NULL;
         }
-        free(p_prev_segment);
-    }
-}
-
-ei_segment *ei_get_middle(ei_segment *first)
-{
-    if (first->next == NULL)
-    {
-        return first;
-    }
-    ei_segment *slow = first;
-    ei_segment *fast = first;
-    while (fast->next != NULL && fast->next->next != NULL)
-    {
-        slow = slow->next;
-        fast = fast->next->next;
-    }
-    return slow;
-}
-
-ei_segment *ei_TCA_sort(ei_segment *first)
-{
-    if (first->next == NULL)
-    {
-        return first;
-    }
-    ei_segment *middle = ei_get_middle(first);
-    ei_segment *next_to_middle = middle->next;
-    middle->next = NULL;
-
-    /* Apply merge on the left side */
-    ei_segment *first_part = ei_TCA_sort(first);
-
-    /* Apply merge on the right side */
-    ei_segment *second_part = ei_TCA_sort(next_to_middle);
-
-    /* merge both sides */
-    ei_segment *sorted = ei_merge(first_part, second_part);
-    return sorted;
-}
-
-ei_segment *ei_merge(ei_segment *first, ei_segment *second)
-{
-    ei_segment *result = NULL;
-    if (first == NULL)
-    {
-        return second;
-    }
-    if (second == NULL)
-    {
-        return first;
-    }
-
-    if (first->x_y_min <= second->x_y_min)
-    {
-        result = first;
-        result->next = ei_merge(first->next, second);
+        else
+        {
+            intersection->top_left.x = second_clipper->top_left.x;
+            intersection->size.width = min(first_clipper->top_left.x + first_clipper->size.width - second_clipper->top_left.x, second_clipper->size.width);
+        }
     }
     else
     {
-        result = second;
-        result->next = ei_merge(first, second->next);
+        if (second_clipper->top_left.x + second_clipper->size.width <= first_clipper->top_left.x)
+        {
+            free(intersection);
+            return NULL;
+        }
+        else
+        {
+            intersection->top_left.x = first_clipper->top_left.x;
+            intersection->size.width = min(second_clipper->top_left.x + second_clipper->size.width - first_clipper->top_left.x, first_clipper->size.width);
+        }
     }
-    return result;
-}
 
-void ei_list_print(ei_segment *first)
-{
-    if (first == NULL)
+    /* defines topleft.y and height */
+    if (first_clipper->top_left.y <= second_clipper->top_left.y)
     {
-        return;
+        if (first_clipper->top_left.y + first_clipper->size.height < second_clipper->top_left.y)
+        {
+            free(intersection);
+            return NULL;
+        }
+        else
+        {
+            intersection->top_left.y = second_clipper->top_left.y;
+            intersection->size.height = min(first_clipper->top_left.y + first_clipper->size.height - second_clipper->top_left.y, second_clipper->size.height);
+        }
     }
-    fprintf(stdout, "%i ", first->x_y_min);
-    ei_list_print(first->next);
+    else
+    {
+        if (second_clipper->top_left.y + second_clipper->size.height <= first_clipper->top_left.y)
+        {
+            free(intersection);
+            return NULL;
+        }
+        else
+        {
+            intersection->top_left.y = first_clipper->top_left.y;
+            intersection->size.height = min(second_clipper->top_left.y + second_clipper->size.height - first_clipper->top_left.y, first_clipper->size.height);
+        }
+    }
+
+    /* intersection is null */
+    if (intersection->size.height == 0 || intersection->size.width == 0)
+    {
+        free(intersection);
+        return NULL;
+    }
+    return intersection;
 }
 
-void ei_initialize_borders(const ei_rect_t *clipper,
-                           ei_borders *borders)
-{
-    borders->left = (clipper->top_left).x;
-    borders->right = (clipper->top_left).x + (clipper->size).width;
-    borders->upper = (clipper->top_left).y;
-    borders->lower = (clipper->top_left).y + (clipper->size).height;
-}
 
-bool ei_inside_clipper(ei_point_t *point,
-                       const ei_rect_t *clipper,
-                       ei_borders *borders)
+int min(int a, int b)
 {
-    return (clipper == 0) || ((point->x >= borders->left) && (point->x < borders->right) && (point->y >= borders->upper) && (point->y < borders->lower));
+    return (a < b) ? a : b;
 }

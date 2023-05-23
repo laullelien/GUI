@@ -2,7 +2,7 @@
 
 
 cd cmake
-make button
+make minimal
 
 cd ..
-./cmake/button
+./cmake/minimal

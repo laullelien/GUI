@@ -65,9 +65,9 @@ void ei_app_run()
         hw_event_wait_next(&event);
         active_widget = ei_event_get_active_widget();
         handled_event = false;
-        if(event.type == ei_ev_keydown && event.param.key.key_code==SDLK_ESCAPE)
+        if ((event.type == ei_ev_close) && (event.type == ei_ev_keydown))
         {
-            stop=true;
+            stop = true;
         }
         if (active_widget != NULL)
         {
@@ -90,6 +90,7 @@ void ei_app_run()
         }
 
         p_rect_cell = get_p_rect_cell();
+        merge_rect_clipper(p_rect_cell);
         while (p_rect_cell != NULL)
         {
             ei_frame_drawfunc(root_widget, root_surface, pick_surface, &(p_rect_cell->rect));
@@ -98,7 +99,10 @@ void ei_app_run()
         hw_surface_unlock(root_surface);
         hw_surface_unlock(pick_surface);
         // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
-        hw_surface_update_rects(root_surface, get_p_rect_cell());
+        if (get_p_rect_cell() != NULL)
+        {
+            hw_surface_update_rects(root_surface, get_p_rect_cell());
+        }
         free_p_rect_cell();
     }
 }

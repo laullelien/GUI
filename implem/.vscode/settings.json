@@ -10,6 +10,11 @@
         "typeinfo": "c",
         "ei_widgetclass.h": "c",
         "ei_impl_widget.h": "c",
-        "ei_impl_widgetclass.h": "c"
+        "ei_impl_widgetclass.h": "c",
+        "array": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "utility": "c",
+        "ei_types.h": "c"
     }
 }

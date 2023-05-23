@@ -10,7 +10,7 @@
 
 
 /**
- * \brief	fill in list_points_arc the points that represent the arc
+ * \brief	fills in list_points_arc the points that represent the arc
  *
  * @param	center the center of the arc to draw
  * @param   radius the radius of the arc
@@ -31,7 +31,7 @@ void list_of_points_for_an_arc( ei_point_t center,
 
 
 /**
- * \brief	return a pointer to a list of points that represent a rounded frame
+ * \brief	returns a pointer to a list of points that represent a rounded frame
  *
  * @param	rectangle the position of the rectangle
  * @param   radius the radius of the corners
@@ -49,7 +49,7 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
 
 
 /**
- * \brief	draw the button by using draw_polygone and list_of_points_for_a_rounded_frame twice
+ * \brief	draws the button by using draw_polygone and list_of_points_for_a_rounded_frame twice
  *
  * @param	surface the surface to draw
  * @param   rectangle the rectangle that represent the button

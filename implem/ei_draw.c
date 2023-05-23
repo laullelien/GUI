@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "ei_implementation.h"
 #include <stdio.h>
+#include "ei_impl_draw.h"
 
 void ei_draw_pixel(ei_surface_t surface,
                    ei_point_t *point,
@@ -37,34 +38,32 @@ void ei_fill(ei_surface_t surface,
     uint32_t *p_first_pixel = (uint32_t *)hw_surface_get_buffer(surface);
     uint32_t pixel_color = ei_impl_map_rgba(surface, *color);
 
-    ei_borders borders[1];
-    if (clipper != 0)
+    if (clipper != NULL)
     {
-        ei_initialize_borders(clipper, borders);
-    }
+        ei_rect_t surface_rect = hw_surface_get_rect(surface);
+        ei_rect_t clipper_rect = *clipper;
+        ei_rect_t *p_intercept_rect = ei_intersect_clipper(&clipper_rect, &surface_rect);
 
-    // if (clipper == NULL)
-    // {
-    //     for (int i = 0; i < width * height; i++)
-    //     {
-    //         *(p_first_pixel + i) = pixel_color;
-    //     }
-    // }
-
-    int i = 0;
-    ei_point_t point = {0, 0};
-
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
+        uint32_t *p_first_pixel_in_window = p_first_pixel + p_intercept_rect->top_left.x + p_intercept_rect->top_left.y * width;
+        for (int y = 0; y < p_intercept_rect->size.height; y++)
         {
-            point.x = x;
-            point.y = y;
-            if (ei_inside_clipper(&point, clipper, borders))
+            for (int x = 0; x < p_intercept_rect->size.width; x++)
             {
-                *(p_first_pixel + i) = pixel_color;
+                *p_first_pixel_in_window = pixel_color;
+                p_first_pixel_in_window++;
             }
-            i++;
+            p_first_pixel_in_window = p_first_pixel_in_window + width - p_intercept_rect->size.width;
+        }
+    }
+    else
+    {
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                *p_first_pixel = pixel_color;
+                p_first_pixel++;
+            }
         }
     }
 }
@@ -79,46 +78,59 @@ void ei_draw_line(ei_surface_t surface,
     uint32_t *p_first_pixel = (uint32_t *)hw_surface_get_buffer(surface);
     uint32_t pixel_color = ei_impl_map_rgba(surface, color);
 
-    int width = hw_surface_get_size(surface).width;
+    /* stores the coordinates to set points to their initial values at the end */
+    ei_point_t first_temp = *first_point;
+    ei_point_t last_temp = *last_point;
 
+    int width = hw_surface_get_size(surface).width;
     int dx = last_point->x - first_point->x;
     int dy = last_point->y - first_point->y;
-
     int e = 0;
-    int offset = width * first_point->y + first_point->x;
+    // printf("f %i, %i, %i, %i\n", first_point->x, first_point->y, last_point->x, last_point->y);
+    bool in;
 
-    ei_borders borders[1];
-    if (clipper != 0)
+    if (clipper)
     {
-        ei_initialize_borders(clipper, borders);
+        in = ei_intersect_line_clipper(surface, first_point, last_point, clipper, dx, dy, &e);
     }
+    else
+    {
+        ei_rect_t surface_rect = hw_surface_get_rect(surface);
+        in = ei_intersect_line_clipper(surface, first_point, last_point, &surface_rect, dx, dy, &e);
+    }
+    // printf("then %i, %i, %i, %i\n", first_point->x, first_point->y, last_point->x, last_point->y);
+    if (!in)
+    {
+        /* put back points to their initial values */
+        *last_point = last_temp;
+        *first_point = first_temp;
+        return;
+    }
+    int offset = width * first_point->y + first_point->x;
 
     /* We first check if the line is horizontal*/
     if (dy == 0)
     {
         /* for the case where the two points are the same*/
-        if (dx == 0 && ei_inside_clipper(first_point, clipper, borders))
+        if (dx == 0)
         {
             *(p_first_pixel + offset) = pixel_color;
         }
         while (first_point->x < last_point->x)
         {
-            if (ei_inside_clipper(first_point, clipper, borders))
-            {
-                *(p_first_pixel + offset) = pixel_color;
-            }
+            *(p_first_pixel + offset) = pixel_color;
             first_point->x++;
             offset++;
         }
         while (first_point->x > last_point->x)
         {
-            if (ei_inside_clipper(first_point, clipper, borders))
-            {
-                *(p_first_pixel + offset) = pixel_color;
-            }
+            *(p_first_pixel + offset) = pixel_color;
             first_point->x--;
             offset--;
         }
+        /* put back points to their initial values */
+        *last_point = last_temp;
+        *first_point = first_temp;
         return;
     }
 
@@ -127,22 +139,21 @@ void ei_draw_line(ei_surface_t surface,
     {
         while (first_point->y > last_point->y)
         {
-            if (ei_inside_clipper(first_point, clipper, borders))
-            {
-                *(p_first_pixel + offset) = pixel_color;
-            }
+
+            *(p_first_pixel + offset) = pixel_color;
             first_point->y--;
             offset -= width;
         }
         while (first_point->y < last_point->y)
         {
-            if (ei_inside_clipper(first_point, clipper, borders))
-            {
-                *(p_first_pixel + offset) = pixel_color;
-            }
+
+            *(p_first_pixel + offset) = pixel_color;
             first_point->y++;
             offset += width;
         }
+        /* put back points to their initial values */
+        *last_point = last_temp;
+        *first_point = first_temp;
         return;
     }
 
@@ -160,10 +171,7 @@ void ei_draw_line(ei_surface_t surface,
             {
                 while (first_point->y > last_point->y)
                 {
-                    if (ei_inside_clipper(first_point, clipper, borders))
-                    {
-                        *(p_first_pixel + offset) = pixel_color;
-                    }
+                    *(p_first_pixel + offset) = pixel_color;
                     first_point->y--;
                     e += dx;
                     offset -= width;
@@ -174,6 +182,9 @@ void ei_draw_line(ei_surface_t surface,
                         offset++;
                     }
                 }
+                /* put back points to their initial values */
+                *last_point = last_temp;
+                *first_point = first_temp;
                 return;
             }
 
@@ -183,10 +194,7 @@ void ei_draw_line(ei_surface_t surface,
             {
                 while (first_point->x < last_point->x)
                 {
-                    if (ei_inside_clipper(first_point, clipper, borders))
-                    {
-                        *(p_first_pixel + offset) = pixel_color;
-                    }
+                    *(p_first_pixel + offset) = pixel_color;
                     first_point->x++;
                     e -= dy;
                     offset++;
@@ -197,6 +205,9 @@ void ei_draw_line(ei_surface_t surface,
                         offset -= width;
                     }
                 }
+                /* put back points to their initial values */
+                *last_point = last_temp;
+                *first_point = first_temp;
                 return;
             }
         }
@@ -210,10 +221,7 @@ void ei_draw_line(ei_surface_t surface,
             {
                 while (first_point->x < last_point->x)
                 {
-                    if (ei_inside_clipper(first_point, clipper, borders))
-                    {
-                        *(p_first_pixel + offset) = pixel_color;
-                    }
+                    *(p_first_pixel + offset) = pixel_color;
                     first_point->x++;
                     e += dy;
                     offset++;
@@ -224,6 +232,9 @@ void ei_draw_line(ei_surface_t surface,
                         offset += width;
                     }
                 }
+                /* put back points to their initial values */
+                *last_point = last_temp;
+                *first_point = first_temp;
                 return;
             }
 
@@ -233,10 +244,7 @@ void ei_draw_line(ei_surface_t surface,
             {
                 while (first_point->y < last_point->y)
                 {
-                    if (ei_inside_clipper(first_point, clipper, borders))
-                    {
-                        *(p_first_pixel + offset) = pixel_color;
-                    }
+                    *(p_first_pixel + offset) = pixel_color;
                     first_point->y++;
                     e += dx;
                     offset += width;
@@ -247,6 +255,9 @@ void ei_draw_line(ei_surface_t surface,
                         offset++;
                     }
                 }
+                /* put back points to their initial values */
+                *last_point = last_temp;
+                *first_point = first_temp;
                 return;
             }
         }
@@ -265,10 +276,7 @@ void ei_draw_line(ei_surface_t surface,
             {
                 while (first_point->y < last_point->y)
                 {
-                    if (ei_inside_clipper(first_point, clipper, borders))
-                    {
-                        *(p_first_pixel + offset) = pixel_color;
-                    }
+                    *(p_first_pixel + offset) = pixel_color;
                     first_point->y++;
                     e -= dx;
                     offset += width;
@@ -279,6 +287,9 @@ void ei_draw_line(ei_surface_t surface,
                         offset--;
                     }
                 }
+                /* put back points to their initial values */
+                *last_point = last_temp;
+                *first_point = first_temp;
                 return;
             }
 
@@ -288,10 +299,7 @@ void ei_draw_line(ei_surface_t surface,
             {
                 while (first_point->x > last_point->x)
                 {
-                    if (ei_inside_clipper(first_point, clipper, borders))
-                    {
-                        *(p_first_pixel + offset) = pixel_color;
-                    }
+                    *(p_first_pixel + offset) = pixel_color;
                     first_point->x--;
                     e += dy;
                     offset--;
@@ -302,6 +310,9 @@ void ei_draw_line(ei_surface_t surface,
                         offset += width;
                     }
                 }
+                /* put back points to their initial values */
+                *last_point = last_temp;
+                *first_point = first_temp;
                 return;
             }
         }
@@ -315,10 +326,7 @@ void ei_draw_line(ei_surface_t surface,
             {
                 while (first_point->x > last_point->x)
                 {
-                    if (ei_inside_clipper(first_point, clipper, borders))
-                    {
-                        *(p_first_pixel + offset) = pixel_color;
-                    }
+                    *(p_first_pixel + offset) = pixel_color;
                     first_point->x--;
                     e -= dy;
                     offset--;
@@ -329,6 +337,9 @@ void ei_draw_line(ei_surface_t surface,
                         offset -= width;
                     }
                 }
+                /* put back points to their initial values */
+                *last_point = last_temp;
+                *first_point = first_temp;
                 return;
             }
 
@@ -338,10 +349,7 @@ void ei_draw_line(ei_surface_t surface,
             {
                 while (first_point->y > last_point->y)
                 {
-                    if (ei_inside_clipper(first_point, clipper, borders))
-                    {
-                        *(p_first_pixel + offset) = pixel_color;
-                    }
+                    *(p_first_pixel + offset) = pixel_color;
                     first_point->y--;
                     e -= dx;
                     offset -= width;
@@ -352,6 +360,9 @@ void ei_draw_line(ei_surface_t surface,
                         offset--;
                     }
                 }
+                /* put back points to their initial values */
+                *last_point = last_temp;
+                *first_point = first_temp;
                 return;
             }
         }
@@ -398,7 +409,7 @@ void ei_draw_polygon(ei_surface_t surface,
             borders->lower = (clipper->top_left).y + (clipper->size).height;
         }
 
-//        uint32_t pixel_color = ei_impl_map_rgba(surface, color);
+        uint32_t pixel_color = ei_impl_map_rgba(surface, color);
         int width = hw_surface_get_size(surface).width;
 
         /* We determine how long TC must be */
@@ -425,6 +436,7 @@ void ei_draw_polygon(ei_surface_t surface,
         ei_segment *TCA = 0;
         ei_segment *p_curr_seg;
         /* We update TCA and draw for each scanline */
+        // uint16_t max_line_idx = TC_length[1] < clipper->top_left.x + clipper->size.height ? TC_length[1] - TC_length[0] : clipper->top_left.x + clipper->size.height;
         for (uint16_t scanline = 0; scanline < TC_length[1] - TC_length[0]; scanline++)
         {
             ei_TCA_remove_merge(TC, &TCA, scanline, TC_length[0]);
@@ -436,7 +448,7 @@ void ei_draw_polygon(ei_surface_t surface,
             if (TCA != NULL)
             {
                 TCA = ei_TCA_sort(TCA);
-                ei_draw_scanline(surface, TCA, clipper, color, width, scanline + TC_length[0], borders);
+                ei_draw_scanline(surface, TCA, clipper, pixel_color, width, scanline + TC_length[0], borders);
                 // segment *p_curr_seg = TCA;
                 // while (p_curr_seg != NULL)
                 // {

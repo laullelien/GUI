@@ -88,17 +88,6 @@ int main(int argc, char* argv[])
 
     ei_fill(main_window, &red, &clipper);
 
-	
-
-
-    // ei_color_t grey;
-    // grey.red = 200;
-    // grey.green = 200;
-    // grey.blue = 200;
-    // grey.alpha = 0;
-
-
-
     
 
 	// unlock, update screen.

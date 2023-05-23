@@ -6,3 +6,18 @@ make minimal
 
 cd ..
 ./cmake/minimal
+
+
+
+cd cmake
+make minesweeper
+
+cd ..
+./cmake/minesweeper
+
+
+cd cmake
+make button
+
+cd ..
+./cmake/button

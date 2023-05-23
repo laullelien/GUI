@@ -79,6 +79,8 @@ include_directories(${HEADER_DIRS})
 
 set(LIB_EI_SOURCES
      ${SRC_DIR}/ei_draw.c
+	 ${SRC_DIR}/ei_impl_draw.c
+	 ${SRC_DIR}/ei_draw_arc.c
      ${SRC_DIR}/ei_implementation.c
      ${SRC_DIR}/ei_placer.c
      ${SRC_DIR}/ei_application.c
@@ -93,7 +95,7 @@ set(LIB_EI_SOURCES
 	 ${SRC_DIR}/ei_impl_application.c)
 
 
-add_library(ei STATIC			${LIB_EI_SOURCES} implem/ei_draw_arc.h implem/ei_draw_arc.c)
+add_library(ei STATIC			${LIB_EI_SOURCES})
 
 # target minimal
 

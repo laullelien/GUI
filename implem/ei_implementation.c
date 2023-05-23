@@ -1,9 +1,10 @@
 #include "ei_impl_widgetclass.h"
 #include "ei_implementation.h"
-
 #include <stdint.h>
 
+
 static int ir, ig, ib;
+
 
 uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color)
 {
@@ -20,11 +21,13 @@ uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color)
     return *((uint32_t *)pixel_color);
 }
 
+
 uint32_t ei_get_id(ei_surface_t surface, uint32_t *color)
 {
-    /* ir will always be initiated by ei_impl_map_rgba*/
+    /* ir will always be initiated by ei_impl_map_rgba */
     return (((uint8_t *)color)[ir] << 16) + (((uint8_t *)color)[ig] << 8) + (((uint8_t *)color)[ib]);
 }
+
 
 void ei_impl_placer_run(ei_widget_t widget)
 {

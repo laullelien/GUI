@@ -1,5 +1,5 @@
-#ifndef PROJETC_IG_EI_IMPL_EVENT_H
-#define PROJETC_IG_EI_IMPL_EVENT_H
+#ifndef EI_IMPL_EVENT_H
+#define EI_IMPL_EVENT_H
 
 #include "ei_types.h"
 
@@ -10,4 +10,4 @@ void merge_rect_clipper(ei_linked_rect_t * rects);
 
 
 
-#endif //PROJETC_IG_EI_IMPL_EVENT_H
+#endif

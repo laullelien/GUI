@@ -400,20 +400,22 @@ void ei_draw_polygon(ei_surface_t surface,
 {
     if (point_array_size != 0)
     {
-        ei_borders borders[1];
-        if (clipper != 0)
-        {
-            borders->left = (clipper->top_left).x;
-            borders->right = (clipper->top_left).x + (clipper->size).width;
-            borders->upper = (clipper->top_left).y;
-            borders->lower = (clipper->top_left).y + (clipper->size).height;
-        }
 
         uint32_t pixel_color = ei_impl_map_rgba(surface, color);
         int width = hw_surface_get_size(surface).width;
 
         /* We determine how long TC must be */
         int *TC_length = ei_TC_length(point_array, point_array_size);
+
+        /* We determine the minimum and maximum index scanlines */
+        int max_line_idx = TC_length[1] < (clipper->top_left.y + clipper->size.height) ? (TC_length[1] - TC_length[0]) : (clipper->top_left.y + clipper->size.height - TC_length[0]);
+        int min_line_idx = TC_length[0] > clipper->top_left.y ? 0 : (clipper->top_left.y - TC_length[0]);
+        if (min_line_idx > max_line_idx)
+        {
+            free(TC_length);
+            return;
+        }
+
         /* We initialize and fill TC */
         ei_segment *TC[TC_length[1] - TC_length[0]];
         for (int i = 0; i <= TC_length[1] - TC_length[0]; i++)
@@ -421,53 +423,32 @@ void ei_draw_polygon(ei_surface_t surface,
             TC[i] = 0;
         }
         ei_TC_fill(TC, point_array, point_array_size, TC_length[0]);
-        // for (int i = 0; i <= TC_length[1] - TC_length[0]; i++)
-        // {
-        //     if (TC[i] != NULL)
-        //     {
-        //         segment *p_curr_seg = TC[i];
-        //         while (p_curr_seg != NULL)
-        //         {
-        //             printf("line: %d, x_y_min : %d,y_max : %d\n", i, p_curr_seg->x_y_min, p_curr_seg->y_max);
-        //             p_curr_seg = p_curr_seg->next;
-        //         }
-        //     }
-        // }
         ei_segment *TCA = 0;
-        ei_segment *p_curr_seg;
-        /* We update TCA and draw for each scanline */
-        // uint16_t max_line_idx = TC_length[1] < clipper->top_left.x + clipper->size.height ? TC_length[1] - TC_length[0] : clipper->top_left.x + clipper->size.height;
-        for (uint16_t scanline = 0; scanline < TC_length[1] - TC_length[0]; scanline++)
+
+        /* We just update TCA until we need to draw */
+        for (uint16_t scanline = 0; scanline < min_line_idx; scanline++)
         {
             ei_TCA_remove_merge(TC, &TCA, scanline, TC_length[0]);
-            p_curr_seg = TCA;
-            while (p_curr_seg != 0)
-            {
-                p_curr_seg = p_curr_seg->next;
-            }
             if (TCA != NULL)
             {
-                TCA = ei_TCA_sort(TCA);
-                ei_draw_scanline(surface, TCA, clipper, pixel_color, width, scanline + TC_length[0], borders);
-                // segment *p_curr_seg = TCA;
-                // while (p_curr_seg != NULL)
-                // {
-                //     if(p_curr_seg->dx>0)
-                //     {
-                //         printf("line: %d, x_y_min : %d,y_max : %d, e : %d, dx : %d, x: %f\n", scanline, p_curr_seg->x_y_min, p_curr_seg->y_max, p_curr_seg->e, p_curr_seg->dx, (float)p_curr_seg->x_y_min+(float)p_curr_seg->e/(float)p_curr_seg->dy);
-                //     }
-                //     else
-                //     {
-                //         printf("line: %d, x_y_min : %d,y_max : %d, e : %d, dx : %d, x: %f\n" , scanline, p_curr_seg->x_y_min, p_curr_seg->y_max, p_curr_seg->e, p_curr_seg->dx, (float)p_curr_seg->x_y_min-(float)p_curr_seg->e/(float)p_curr_seg->dy );
-
-                //     }
-                //     p_curr_seg = p_curr_seg->next;
-                // }
                 ei_update(TCA);
             }
         }
-        free(TC_length);
+
+        /* We update TCA and draw for each scanline */
+        for (uint16_t scanline = min_line_idx; scanline < max_line_idx; scanline++)
+        {
+            ei_TCA_remove_merge(TC, &TCA, scanline, TC_length[0]);
+            if (TCA != NULL)
+            {
+                TCA = ei_TCA_sort(TCA);
+                ei_draw_scanline(surface, TCA, clipper, pixel_color, width, scanline + TC_length[0]);
+                ei_update(TCA);
+            }
+        }
         ei_TCA_free(TCA);
+        ei_TC_free(TC, TC_length[1] - TC_length[0], max_line_idx);
+        free(TC_length);
     }
 }
 

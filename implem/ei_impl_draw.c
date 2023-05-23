@@ -150,8 +150,8 @@ void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *cl
 
     ei_segment *p_interval_entry = TCA;
     ei_segment *p_interval_ending;
-    uint16_t interval_entry_idx;
-    uint16_t interval_ending_idx;
+    int interval_entry_idx;
+    int interval_ending_idx;
     /* The number of segments in TCA must be even since we removed horizontal and ending segments */
     while (p_interval_entry != NULL)
     {
@@ -175,7 +175,15 @@ void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *cl
             interval_ending_idx = p_interval_ending->x_y_min - (p_interval_ending->e <= 0);
         }
         // printf("e: %d, s: %d\n", interval_entry_idx, interval_ending_idx);
-        for (uint32_t i = interval_entry_idx; i <= interval_ending_idx; i++)
+        if (interval_entry_idx < clipper->top_left.x)
+        {
+            interval_entry_idx = clipper->top_left.x;
+        }
+        if (interval_entry_idx > clipper->top_left.x + clipper->size.width)
+        {
+            interval_entry_idx = clipper->top_left.x + clipper->size.width;
+        }
+        for (int i = interval_entry_idx; i <= interval_ending_idx; i++)
         {
             drawing_point->x = i;
             if (ei_inside_clipper(drawing_point, clipper, borders))

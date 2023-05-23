@@ -436,6 +436,7 @@ void ei_draw_polygon(ei_surface_t surface,
         ei_segment *TCA = 0;
         ei_segment *p_curr_seg;
         /* We update TCA and draw for each scanline */
+        // uint16_t max_line_idx = TC_length[1] < clipper->top_left.x + clipper->size.height ? TC_length[1] - TC_length[0] : clipper->top_left.x + clipper->size.height;
         for (uint16_t scanline = 0; scanline < TC_length[1] - TC_length[0]; scanline++)
         {
             ei_TCA_remove_merge(TC, &TCA, scanline, TC_length[0]);

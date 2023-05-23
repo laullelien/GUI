@@ -6,7 +6,6 @@
 #include "ei_impl_widget.h"
 #include "ei_types.h"
 #include "ei_event.h"
-#include "ei_impl_application.h"
 #include "ei_impl_event.h"
 
 static ei_widget_t root_widget;

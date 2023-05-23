@@ -168,4 +168,15 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
  */
 void ei_TC_free(ei_segment **TC, int length, int first_unused_TC_line);
 
+
+/**
+ * \brief	Returns a rectangle corresponding to the intersection of two clippers.
+ *
+ * @param 	first_clipper		The first clipper.
+ * @param 	second_clipper		The second clipper.
+ * 
+ * @return A rectangle corresponding to the intersection of two clippers.
+ */
+ei_rect_t *ei_intersect_clipper(ei_rect_t *first_clipper, ei_rect_t *second_clipper);
+
 #endif

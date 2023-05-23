@@ -1,9 +1,9 @@
+#include <stdio.h>
+#include <stdint.h>
 #include "../api/ei_draw.h"
 #include "../api/hw_interface.h"
 #include "../api/ei_types.h"
-#include <stdint.h>
 #include "ei_implementation.h"
-#include <stdio.h>
 #include "ei_impl_draw.h"
 
 void ei_draw_pixel(ei_surface_t surface,

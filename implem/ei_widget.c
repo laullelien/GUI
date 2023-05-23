@@ -1,14 +1,11 @@
+#include <stdio.h>
 #include "../api/ei_widget.h"
 #include "../api/ei_application.h"
 #include "ei_implementation.h"
 #include "ei_impl_widget.h"
 #include "ei_widget_attributes.h"
-#include <stdio.h>
 #include "ei_impl_widgetclass.h"
 #include "ei_impl_widget.h"
-
-
-
 
 
 ei_widget_t ei_widget_create(ei_const_string_t class_name,

@@ -617,3 +617,79 @@ void ei_TC_free(ei_segment **TC, int length, int first_unused_TC_line)
         free(p_prev_seg);
     }
 }
+
+
+int min(int a, int b)
+{
+    return (a < b) ? a : b;
+}
+
+
+ei_rect_t *ei_intersect_clipper(ei_rect_t *first_clipper, ei_rect_t *second_clipper)
+{
+    ei_rect_t *intersection = malloc(sizeof(ei_rect_t));
+
+    /* defines topleft.x and width */
+    if (first_clipper->top_left.x < second_clipper->top_left.x)
+    {
+        if (first_clipper->top_left.x + first_clipper->size.width <= second_clipper->top_left.x)
+        {
+            free(intersection);
+            return NULL;
+        }
+        else
+        {
+            intersection->top_left.x = second_clipper->top_left.x;
+            intersection->size.width = min(first_clipper->top_left.x + first_clipper->size.width - second_clipper->top_left.x, second_clipper->size.width);
+        }
+    }
+    else
+    {
+        if (second_clipper->top_left.x + second_clipper->size.width <= first_clipper->top_left.x)
+        {
+            free(intersection);
+            return NULL;
+        }
+        else
+        {
+            intersection->top_left.x = first_clipper->top_left.x;
+            intersection->size.width = min(second_clipper->top_left.x + second_clipper->size.width - first_clipper->top_left.x, first_clipper->size.width);
+        }
+    }
+
+    /* defines topleft.y and height */
+    if (first_clipper->top_left.y <= second_clipper->top_left.y)
+    {
+        if (first_clipper->top_left.y + first_clipper->size.height < second_clipper->top_left.y)
+        {
+            free(intersection);
+            return NULL;
+        }
+        else
+        {
+            intersection->top_left.y = second_clipper->top_left.y;
+            intersection->size.height = min(first_clipper->top_left.y + first_clipper->size.height - second_clipper->top_left.y, second_clipper->size.height);
+        }
+    }
+    else
+    {
+        if (second_clipper->top_left.y + second_clipper->size.height <= first_clipper->top_left.y)
+        {
+            free(intersection);
+            return NULL;
+        }
+        else
+        {
+            intersection->top_left.y = first_clipper->top_left.y;
+            intersection->size.height = min(second_clipper->top_left.y + second_clipper->size.height - first_clipper->top_left.y, first_clipper->size.height);
+        }
+    }
+
+    /* intersection is null */
+    if (intersection->size.height == 0 || intersection->size.width == 0)
+    {
+        free(intersection);
+        return NULL;
+    }
+    return intersection;
+}

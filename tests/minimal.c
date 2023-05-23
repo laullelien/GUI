@@ -56,7 +56,6 @@
 #include "ei_draw.h"
 #include "../implem/ei_implementation.h"
 #include "../implem/ei_draw_arc.h"
-#include "../implem/ei_impl_application.h"
 #include "ei_application.h"
 
 

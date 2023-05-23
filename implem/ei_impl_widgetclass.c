@@ -1,11 +1,13 @@
+#include <stdio.h>
 #include "../api/ei_draw.h"
 #include "../api/ei_widgetclass.h"
 #include "ei_impl_widgetclass.h"
+#include "ei_impl_draw.h"
 #include "ei_application.h"
 #include "ei_draw_arc.h"
 #include "ei_widget_configure.h"
 #include "ei_event.h"
-#include <stdio.h>
+
 
 static ei_point_t ancient_mouse_location;
 static int is_top_toplevel = 0; // 0 == false; 1 == true;

@@ -6,6 +6,8 @@
 #include "ei_impl_event.h"
 #include "ei_implementation.h"
 
+static ei_linked_rect_t* p_rect_cell = NULL;
+
 
 ei_widget_t get_widget_from_mouse_location(ei_event_t *event, ei_surface_t pick_surface)
 {
@@ -97,4 +99,27 @@ void merge_rect_clipper(ei_linked_rect_t * rects)
             rects->rect = rect;
         }
     }
+}
+
+
+ei_linked_rect_t** get_pp_rect_cell()
+{
+    return &p_rect_cell;
+}
+
+ei_linked_rect_t* get_p_rect_cell()
+{
+    return p_rect_cell;
+}
+
+void free_p_rect_cell()
+{
+    ei_linked_rect_t* current = p_rect_cell;
+    while (p_rect_cell != NULL)
+    {
+        p_rect_cell = p_rect_cell->next;
+        free(current);
+        current = p_rect_cell;
+    }
+    p_rect_cell = NULL;
 }

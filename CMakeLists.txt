@@ -91,8 +91,7 @@ set(LIB_EI_SOURCES
      ${SRC_DIR}/ei_impl_widgetclass.c
      ${SRC_DIR}/ei_widget_attribute.c
 	 ${SRC_DIR}/ei_impl_widget.c
-	 ${SRC_DIR}/ei_impl_event.c
-	 ${SRC_DIR}/ei_impl_application.c)
+	 ${SRC_DIR}/ei_impl_event.c)
 
 
 
@@ -137,11 +136,6 @@ target_link_libraries(two048		ei ${PLATFORM_LIB_FLAGS})
 
 add_executable(minesweeper		${TEST_DIR}/minesweeper.c)
 target_link_libraries(minesweeper	ei ${PLATFORM_LIB_FLAGS})
-
-# target pong
-
-add_executable(pong		${TEST_DIR}/pong.c)
-target_link_libraries(pong	ei ${PLATFORM_LIB_FLAGS})
 
 # external_class
 

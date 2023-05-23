@@ -56,6 +56,7 @@ typedef struct ei_impl_placer_params_t
 
 } ei_impl_placer_params_t;
 
+
 /**
  * \brief	Tells the placer to recompute the geometry of a widget.
  *		The widget must have been previsouly placed by a call to \ref ei_place.
@@ -65,6 +66,7 @@ typedef struct ei_impl_placer_params_t
  * @param	widget		The widget which geometry must be re-computed.
  */
 void ei_impl_placer_run(ei_widget_t widget);
+
 
 /**
  * \brief	Fields common to all types of widget. Every widget classes specializes this base
@@ -91,6 +93,7 @@ typedef struct ei_impl_widget_t
 	ei_rect_t content_rect;				///< Where to place children, when this widget is used as a container. By defaults, points to the screen_location.
 } ei_impl_widget_t;
 
+
 /**
  * @brief	Draws the children of a widget.
  * 		The children are draw withing the limits of the clipper and
@@ -108,25 +111,5 @@ void ei_impl_widget_draw_children(ei_widget_t widget,
 								  ei_rect_t *clipper);
 
 
-/**
- * \brief	Returns a rectangle corresponding to the intersection of two clippers.
- *
- * @param 	first_clipper		The first clipper.
- * @param 	second_clipper		The second clipper.
- * 
- * @return A rectangle corresponding to the intersection of two clippers.
- */
-ei_rect_t *ei_intersect_clipper(ei_rect_t *first_clipper, ei_rect_t *second_clipper);
-
-
-/**
- * \brief	Returns the minimum of two integer.
- *
- * @param 	a	The first integer.
- * @param 	b	The second integer.
- * 
- * @return An integer corresponding to the minimum of two integers.
- */
-int min(int a, int b);
 
 #endif

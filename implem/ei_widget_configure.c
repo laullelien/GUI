@@ -36,10 +36,17 @@ void ei_frame_configure(ei_widget_t frame,
     {
         ((ei_impl_frame_t *)frame)->relief = *relief;
     }
-    if (text && *text)
+    if (text)
     {
         free(((ei_impl_frame_t *)frame)->text);
-        ((ei_impl_frame_t *)frame)->text = strdup(*text);
+        if (*text)
+        {
+            ((ei_impl_frame_t *)frame)->text = strdup(*text);
+        }
+        else
+        {
+            ((ei_impl_frame_t *)frame)->text = NULL;
+        }
     }
     if (text_font)
     {
@@ -55,7 +62,7 @@ void ei_frame_configure(ei_widget_t frame,
     }
     if (img)
     {
-        if(((ei_impl_frame_t *)frame)->img)
+        if (((ei_impl_frame_t *)frame)->img)
         {
             hw_surface_free(((ei_impl_frame_t *)frame)->img);
         }
@@ -78,7 +85,10 @@ void ei_frame_configure(ei_widget_t frame,
     }
     /* to invalide the right rect */
     ei_impl_placer_run(frame);
-    ei_app_invalidate_rect(&frame->screen_location);
+    ei_rect_t root_rect = hw_surface_get_rect(ei_app_root_surface());
+    ei_rect_t *screen_location_intersection = ei_intersect_clipper(&frame->screen_location, &root_rect);
+    ei_app_invalidate_rect(screen_location_intersection);
+    free(screen_location_intersection);
 }
 
 void ei_button_configure(ei_widget_t button,
@@ -122,7 +132,14 @@ void ei_button_configure(ei_widget_t button,
     if (text)
     {
         free(((ei_impl_button_t *)button)->text);
-        ((ei_impl_button_t *)button)->text = strdup(*text);
+        if (*text)
+        {
+            ((ei_impl_button_t *)button)->text = strdup(*text);
+        }
+        else
+        {
+            ((ei_impl_button_t *)button)->text = NULL;
+        }
     }
     if (text_font)
     {
@@ -138,7 +155,7 @@ void ei_button_configure(ei_widget_t button,
     }
     if (img)
     {
-        if(((ei_impl_button_t *)button)->img)
+        if (((ei_impl_button_t *)button)->img)
         {
             hw_surface_free(((ei_impl_button_t *)button)->img);
         }
@@ -169,7 +186,10 @@ void ei_button_configure(ei_widget_t button,
     }
     /* to invalide the right rect */
     ei_impl_placer_run(button);
-    ei_app_invalidate_rect(&button->screen_location);
+    ei_rect_t root_rect = hw_surface_get_rect(ei_app_root_surface());
+    ei_rect_t *screen_location_intersection = ei_intersect_clipper(&button->screen_location, &root_rect);
+    ei_app_invalidate_rect(screen_location_intersection);
+    free(screen_location_intersection);
 }
 
 void ei_toplevel_configure(ei_widget_t toplevel,
@@ -201,7 +221,14 @@ void ei_toplevel_configure(ei_widget_t toplevel,
         {
             free(((ei_impl_toplevel_t *)toplevel)->title);
         }
-        ((ei_impl_toplevel_t *)toplevel)->title = strdup(*title);
+        if (*title)
+        {
+            ((ei_impl_toplevel_t *)toplevel)->title = strdup(*title);
+        }
+        else
+        {
+            ((ei_impl_toplevel_t *)toplevel)->title = 0;
+        }
     }
     if (closable)
     {
@@ -218,5 +245,8 @@ void ei_toplevel_configure(ei_widget_t toplevel,
     }
     /* to invalide the right rect */
     ei_impl_placer_run(toplevel);
-    ei_app_invalidate_rect(&toplevel->screen_location);
+    ei_rect_t root_rect = hw_surface_get_rect(ei_app_root_surface());
+    ei_rect_t *screen_location_intersection = ei_intersect_clipper(&toplevel->screen_location, &root_rect);
+    ei_app_invalidate_rect(screen_location_intersection);
+    free(screen_location_intersection);
 }

@@ -68,6 +68,11 @@ void ei_frame_configure(ei_widget_t frame,
         {
             hw_surface_free(((ei_impl_frame_t *)frame)->img);
         }
+        if(*img==NULL)
+        {
+            ((ei_impl_frame_t *)frame)->img = NULL;
+            return;
+        }
         ((ei_impl_frame_t *)frame)->img = hw_surface_create(ei_app_root_surface(), hw_surface_get_size(*img), true);
         hw_surface_lock(*img);
         hw_surface_lock(((ei_impl_frame_t *)frame)->img);
@@ -160,6 +165,11 @@ void ei_button_configure(ei_widget_t button,
         if (((ei_impl_button_t *)button)->img)
         {
             hw_surface_free(((ei_impl_button_t *)button)->img);
+        }
+        if(*img==NULL)
+        {
+            ((ei_impl_button_t *)button)->img = NULL;
+            return;
         }
         ((ei_impl_button_t *)button)->img = hw_surface_create(ei_app_root_surface(), hw_surface_get_size(*img), true);
         hw_surface_lock(*img);

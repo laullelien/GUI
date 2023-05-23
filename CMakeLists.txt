@@ -79,6 +79,8 @@ include_directories(${HEADER_DIRS})
 
 set(LIB_EI_SOURCES
      ${SRC_DIR}/ei_draw.c
+	 ${SRC_DIR}/ei_impl_draw.c
+	 ${SRC_DIR}/ei_draw_arc.c
      ${SRC_DIR}/ei_implementation.c
      ${SRC_DIR}/ei_placer.c
      ${SRC_DIR}/ei_application.c

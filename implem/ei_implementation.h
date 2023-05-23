@@ -1,7 +1,7 @@
 /**
  * @file	ei_implementation.h
  *
- * @brief 	Private definitions.
+ * @brief 	Private definitions and implementation of widgets.
  *
  */
 
@@ -14,9 +14,29 @@
 
 
 
+/**
+ * \brief	Gets the id of a widget corresponding to the color given a surface.
+ * 			The id is rearrange following the sequence of red, then green, then blue.
+ *
+ * @param 	surface		The surface which we collect the color from.
+ * @param 	color		The color to be converted to an id.
+ * 
+ * @return The id corresponding to the color given a surface.
+ */
 uint32_t ei_get_id(ei_surface_t surface, uint32_t * color);
 
+
+/**
+ * \brief	Transforms the color into a chain of 32 bits following the correct order 
+ * 			depending on the surface.
+ *
+ * @param 	surface		The surface which we want to color.
+ * @param 	color		The color to be filled into the surface.
+ * 
+ * @return A chain of 32 bit corresponding to the correct order of color based on the surface.
+ */
 uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color);
+
 
 /**
  * \brief	A structure storing the placement parameters of a widget.
@@ -88,9 +108,25 @@ void ei_impl_widget_draw_children(ei_widget_t widget,
 								  ei_rect_t *clipper);
 
 
-
+/**
+ * \brief	Returns a rectangle corresponding to the intersection of two clippers.
+ *
+ * @param 	first_clipper		The first clipper.
+ * @param 	second_clipper		The second clipper.
+ * 
+ * @return A rectangle corresponding to the intersection of two clippers.
+ */
 ei_rect_t *ei_intersect_clipper(ei_rect_t *first_clipper, ei_rect_t *second_clipper);
 
+
+/**
+ * \brief	Returns the minimum of two integer.
+ *
+ * @param 	a	The first integer.
+ * @param 	b	The second integer.
+ * 
+ * @return An integer corresponding to the minimum of two integers.
+ */
 int min(int a, int b);
 
 #endif

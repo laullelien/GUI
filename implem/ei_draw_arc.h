@@ -1,7 +1,13 @@
+/**
+ *  @file	ei_draw_arc.h
+ * 
+ *  @brief	Implement functions that help with the drawing of geometry.
+ *
+ */
 
 
-#ifndef PROJETC_IG_EI_DRAW_ARC_H
-#define PROJETC_IG_EI_DRAW_ARC_H
+#ifndef EI_DRAW_ARC_H
+#define EI_DRAW_ARC_H
 
 #include "hw_interface.h"
 #include "ei_types.h"
@@ -74,4 +80,4 @@ void ei_draw_button(ei_surface_t surface,
                     ei_color_t pick_color);
 
 
-#endif //PROJETC_IG_EI_DRAW_ARC_H
+#endif

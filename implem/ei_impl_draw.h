@@ -1,9 +1,23 @@
-#include "hw_interface.h"
-#include "../api/ei_types.h"
-#include "../api/ei_widget.h"
+/**
+ * @file	ei_impl_draw.h
+ *
+ * @brief 	Implements functions that draw polygons.
+ *
+ */
+
+
 #ifndef EI_IMPL_DRAW
 #define EI_IMPL_DRAW
 
+
+#include "hw_interface.h"
+#include "../api/ei_types.h"
+#include "../api/ei_widget.h"
+
+
+/**
+ * \brief	A structure that stores information about a segment.
+ */
 typedef struct ei_segment
 {
     int y_max;
@@ -14,6 +28,10 @@ typedef struct ei_segment
     struct ei_segment *next;
 } ei_segment;
 
+
+/**
+ * \brief	A structure that stores information about the borders.
+ */
 typedef struct ei_borders
 {
     int left;
@@ -115,9 +133,9 @@ void ei_initialize_borders(const ei_rect_t *clipper,
                            ei_borders *borders);
 
 /**
- * @brief   Indicates whether the point to draw is inside the clipper
+ * @brief   Indicates whether the point to draw is inside the clipper.
  *
- * @param	point       The point to draw
+ * @param	point       The point to draw.
  * @param	clipper		If not NULL, the drawing is restricted within this rectangle.
  * @param	borders     The indices of the clipper extrmums coordinates i.e. x_min (left), x_max (right), y_min (upper), y_max (lower)
  *
@@ -127,5 +145,21 @@ bool ei_inside_clipper(ei_point_t *point,
                        const ei_rect_t *clipper,
                        ei_borders *borders);
 
+
+/**
+ * @brief   Analytical clipping of a line.
+ *
+ * @param	surface     The surface to draw the line.
+ * @param   first_point The first point of the line.
+ * @param   last_point  The second point of the line.
+ * @param	clipper		If not NULL, the drawing is restricted within this rectangle.
+ * @param	dx          Gradient with respect to x.
+ * @param   dy          Gradient with respect to y.
+ * @param   e           Secret to our success.
+ *
+ * @return 			A boolean that is true if and only if the point is inside the clipper
+ */
 bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei_point_t *last_point, const ei_rect_t *clipper, int dx, int dy, int *e);
+
+
 #endif

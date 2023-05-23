@@ -260,6 +260,7 @@ ei_segment *ei_get_middle(ei_segment *first)
     }
     return slow;
 }
+
 ei_segment *ei_merge(ei_segment *first, ei_segment *second)
 {
     ei_segment *result = NULL;
@@ -306,7 +307,6 @@ ei_segment *ei_TCA_sort(ei_segment *first)
     ei_segment *sorted = ei_merge(first_part, second_part);
     return sorted;
 }
-
 
 void ei_list_print(ei_segment *first)
 {

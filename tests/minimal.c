@@ -86,56 +86,8 @@ int main(int argc, char* argv[])
     clipper.size.height=150;
 
 
+    ei_fill(main_window, &red, &clipper);
 
-
-
-    ei_linked_rect_t * rects = malloc(sizeof(ei_linked_rect_t));
-    ei_linked_rect_t * rects2 = malloc(sizeof(ei_linked_rect_t));
-    ei_linked_rect_t * rects3 = malloc(sizeof(ei_linked_rect_t));
-
-    ei_rect_t rect;
-    rect.top_left = (ei_point_t){100, 100};
-    rect.size = (ei_size_t){500,500};
-
-    ei_rect_t rect2;
-    rect2.top_left = (ei_point_t){200, 200};
-    rect2.size = (ei_size_t){400,400};
-
-    ei_rect_t rect3;
-    rect3.top_left = (ei_point_t){100, 100};
-    rect3.size = (ei_size_t){400,400};
-
-
-    rects->rect = rect;
-    rects->next = rects2;
-    rects2->rect = rect2;
-    rects2->next = rects3;
-    rects3->rect = rect3;
-    rects3->next = NULL;
-
-    ei_linked_rect_t * current = rects;
-    for (int i=0;i<3;i++)
-    {
-        fprintf(stdout, "x=%i, y=%i, width=%i, height=%i\n", current->rect.top_left.x, current->rect.top_left.y, current->rect.size.width, current->rect.size.height);
-        current = current->next;
-    }
-
-
-    puts("-----------------");
-
-    merge_rect_clipper(rects);
-    current = rects;
-
-    for (int i=0;i<3;i++)
-    {
-        fprintf(stdout, "x=%i, y=%i, width=%i, height=%i\n", current->rect.top_left.x, current->rect.top_left.y, current->rect.size.width, current->rect.size.height);
-        current = current->next;
-    }
-    
-
-    free(rects);
-    free(rects2);
-    free(rects3);
 
 
 

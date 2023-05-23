@@ -5,6 +5,7 @@
 #include "../api/ei_types.h"
 #include "ei_implementation.h"
 #include "ei_impl_draw.h"
+#include "ei_application.h"
 
 void ei_draw_pixel(ei_surface_t surface,
                    ei_point_t *point,
@@ -400,7 +401,11 @@ void ei_draw_polygon(ei_surface_t surface,
 {
     if (point_array_size != 0)
     {
-
+        if (!clipper)
+        {
+            ei_rect_t root_rect = hw_surface_get_rect(ei_app_root_surface());
+            clipper = &root_rect;
+        }
         uint32_t pixel_color = ei_impl_map_rgba(surface, color);
         int width = hw_surface_get_size(surface).width;
 

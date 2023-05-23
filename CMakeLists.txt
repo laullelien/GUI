@@ -94,7 +94,6 @@ set(LIB_EI_SOURCES
 	 ${SRC_DIR}/ei_impl_event.c)
 
 
-
 add_library(ei STATIC			${LIB_EI_SOURCES})
 
 # target minimal
@@ -137,6 +136,11 @@ target_link_libraries(two048		ei ${PLATFORM_LIB_FLAGS})
 add_executable(minesweeper		${TEST_DIR}/minesweeper.c)
 target_link_libraries(minesweeper	ei ${PLATFORM_LIB_FLAGS})
 
+# target toplevel_inside_toplevel
+
+add_executable(toplevel_inside_toplevel		${TEST_DIR}/toplevel_inside_toplevel.c)
+target_link_libraries(toplevel_inside_toplevel	ei ${PLATFORM_LIB_FLAGS})
+
 # external_class
 
 add_executable(external_class		${TEST_DIR}/external_class.c)
@@ -150,4 +154,4 @@ add_custom_target(doc doxygen		${DOCS_DIR}/doxygen.cfg WORKING_DIRECTORY ${ROOT_
 # all
 
 add_custom_target(ig_all ALL)
-add_dependencies(ig_all minimal frame button hello_world puzzle two048 minesweeper)
+add_dependencies(ig_all minimal frame button hello_world puzzle two048 minesweeper toplevel_inside_toplevel)

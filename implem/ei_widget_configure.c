@@ -36,10 +36,17 @@ void ei_frame_configure(ei_widget_t frame,
     {
         ((ei_impl_frame_t *)frame)->relief = *relief;
     }
-    if (text && *text)
+    if (text)
     {
         free(((ei_impl_frame_t *)frame)->text);
-        ((ei_impl_frame_t *)frame)->text = strdup(*text);
+        if (*text)
+        {
+            ((ei_impl_frame_t *)frame)->text = strdup(*text);
+        }
+        else
+        {
+            ((ei_impl_frame_t *)frame)->text = NULL;
+        }
     }
     if (text_font)
     {
@@ -55,7 +62,7 @@ void ei_frame_configure(ei_widget_t frame,
     }
     if (img)
     {
-        if(((ei_impl_frame_t *)frame)->img)
+        if (((ei_impl_frame_t *)frame)->img)
         {
             hw_surface_free(((ei_impl_frame_t *)frame)->img);
         }
@@ -122,7 +129,14 @@ void ei_button_configure(ei_widget_t button,
     if (text)
     {
         free(((ei_impl_button_t *)button)->text);
-        ((ei_impl_button_t *)button)->text = strdup(*text);
+        if (*text)
+        {
+            ((ei_impl_button_t *)button)->text = strdup(*text);
+        }
+        else
+        {
+            ((ei_impl_button_t *)button)->text = NULL;
+        }
     }
     if (text_font)
     {
@@ -138,7 +152,7 @@ void ei_button_configure(ei_widget_t button,
     }
     if (img)
     {
-        if(((ei_impl_button_t *)button)->img)
+        if (((ei_impl_button_t *)button)->img)
         {
             hw_surface_free(((ei_impl_button_t *)button)->img);
         }
@@ -201,7 +215,14 @@ void ei_toplevel_configure(ei_widget_t toplevel,
         {
             free(((ei_impl_toplevel_t *)toplevel)->title);
         }
-        ((ei_impl_toplevel_t *)toplevel)->title = strdup(*title);
+        if (*title)
+        {
+            ((ei_impl_toplevel_t *)toplevel)->title = strdup(*title);
+        }
+        else
+        {
+            ((ei_impl_toplevel_t *)toplevel)->title = 0;
+        }
     }
     if (closable)
     {

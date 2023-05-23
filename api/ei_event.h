@@ -29,7 +29,6 @@ typedef enum {
 	ei_ev_mouse_buttonup,		///< A mouse button has been released.
 	ei_ev_mouse_move,		///< The mouse has moved.
 
-
 	ei_ev_last			///< Last event type, its value is the number of event types.
 } ei_eventtype_t;
 

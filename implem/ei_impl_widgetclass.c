@@ -227,79 +227,104 @@ void ei_draw_frame_text(ei_surface_t surface, ei_widget_t widget, ei_rect_t *cli
 
 void ei_draw_frame_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clipper)
 {
-    ei_rect_t src_rect;
-    ei_rect_t dst_rect;
+    ei_point_t top_left;
     int img_width, img_height;
-    /* we define src_rect */
+    ei_rect_t src_rect;
+
+    /* we define the image width and height */
     if (((ei_impl_frame_t *)widget)->img_rect != NULL)
     {
-        src_rect = *((ei_impl_frame_t *)widget)->img_rect;
-        img_width = src_rect.size.width;
-        img_height = src_rect.size.height;
+        img_width = ((ei_impl_frame_t *)widget)->img_rect->size.width;
+        img_height = ((ei_impl_frame_t *)widget)->img_rect->size.height;
+        src_rect.top_left = ((ei_impl_frame_t *)widget)->img_rect->top_left;
     }
     else
     {
-        src_rect = hw_surface_get_rect(((ei_impl_frame_t *)widget)->img);
-        img_width = src_rect.size.width;
-        img_height = src_rect.size.height;
+        ei_rect_t img_rect = hw_surface_get_rect(((ei_impl_frame_t *)widget)->img);
+        img_width = img_rect.size.width;
+        img_height = img_rect.size.height;
+        src_rect.top_left = (ei_point_t){0, 0};
     }
 
-    if (img_width > clipper->size.width || img_height > clipper->size.height)
-    {
-        src_rect.size.width = clipper->size.width;
-        src_rect.size.height = clipper->size.height;
-        src_rect.top_left.x += clipper->top_left.x - widget->content_rect.top_left.x;
-        src_rect.top_left.y += clipper->top_left.y - widget->content_rect.top_left.y;
-        img_width = src_rect.size.width;
-        img_height = src_rect.size.height;
-    }
-
-    /*  We define dst_rect*/
+    /* We define the topleft coordinates that the image should have if it fits in the clipper */
     switch (((ei_impl_frame_t *)widget)->img_anchor)
     {
     case ei_anc_center:
-        dst_rect.top_left.x = ((clipper->size.width - img_width) >> 1) + clipper->top_left.x;
-        dst_rect.top_left.y = ((clipper->size.height - img_height) >> 1) + clipper->top_left.y;
+        top_left.x = ((widget->content_rect.size.width - img_width) >> 1) + widget->content_rect.top_left.x;
+        top_left.y = ((widget->content_rect.size.height - img_height) >> 1) + widget->content_rect.top_left.y;
         break;
     case ei_anc_north:
-        dst_rect.top_left.x = ((clipper->size.width - img_width) >> 1) + clipper->top_left.x;
-        dst_rect.top_left.y = clipper->top_left.y;
+        top_left.x = ((widget->content_rect.size.width - img_width) >> 1) + widget->content_rect.top_left.x;
+        top_left.y = widget->content_rect.top_left.y;
         break;
     case ei_anc_northeast:
-        dst_rect.top_left.x = clipper->size.width - img_width + clipper->top_left.x;
-        dst_rect.top_left.y = clipper->top_left.y;
+        top_left.x = widget->content_rect.size.width - img_width + widget->content_rect.top_left.x;
+        top_left.y = widget->content_rect.top_left.y;
         break;
     case ei_anc_east:
-        dst_rect.top_left.x = clipper->size.width - img_width + clipper->top_left.x;
-        dst_rect.top_left.y = ((clipper->size.height - img_height) >> 1) + clipper->top_left.y;
+        top_left.x = widget->content_rect.size.width - img_width + widget->content_rect.top_left.x;
+        top_left.y = ((widget->content_rect.size.height - img_height) >> 1) + widget->content_rect.top_left.y;
         break;
     case ei_anc_southeast:
-        dst_rect.top_left.x = clipper->size.width - img_width + clipper->top_left.x;
-        dst_rect.top_left.y = clipper->size.height - img_height + clipper->top_left.y;
+        top_left.x = widget->content_rect.size.width - img_width + widget->content_rect.top_left.x;
+        top_left.y = widget->content_rect.size.height - img_height + widget->content_rect.top_left.y;
         break;
     case ei_anc_south:
-        dst_rect.top_left.x = ((clipper->size.width - img_width) >> 1) + clipper->top_left.x;
-        dst_rect.top_left.y = clipper->size.height - img_height + clipper->top_left.y;
+        top_left.x = ((widget->content_rect.size.width - img_width) >> 1) + widget->content_rect.top_left.x;
+        top_left.y = widget->content_rect.size.height - img_height + widget->content_rect.top_left.y;
         break;
     case ei_anc_southwest:
-        dst_rect.top_left.x = clipper->top_left.x;
-        dst_rect.top_left.y = clipper->size.height - img_height + clipper->top_left.y;
+        top_left.x = widget->content_rect.top_left.x;
+        top_left.y = widget->content_rect.size.height - img_height + widget->content_rect.top_left.y;
         break;
     case ei_anc_west:
-        dst_rect.top_left.x = clipper->top_left.x;
-        dst_rect.top_left.y = ((clipper->size.height - img_height) >> 1) + clipper->top_left.y;
+        top_left.x = widget->content_rect.top_left.x;
+        top_left.y = ((widget->content_rect.size.height - img_height) >> 1) + widget->content_rect.top_left.y;
         break;
-
     case ei_anc_northwest:
-        dst_rect.top_left.x = clipper->top_left.x;
-        dst_rect.top_left.y = clipper->top_left.y;
+        top_left.x = widget->content_rect.top_left.x;
+        top_left.y = widget->content_rect.top_left.y;
         break;
     default:
         break;
     }
-    dst_rect.size = src_rect.size;
+
+    ei_rect_t dst_rect;
+    dst_rect.top_left = top_left;
+    dst_rect.size.width = img_width;
+    dst_rect.size.width = img_height;
+
+    if (clipper != NULL)
+    {
+        /* intersect clipper and dst_rect and apply same modifications on src_rect */
+        if (dst_rect.size.width + dst_rect.top_left.x > clipper->size.width + clipper->top_left.x)
+        {
+            dst_rect.size.width = - dst_rect.top_left.x + clipper->size.width + clipper->top_left.x;
+        }
+        if (dst_rect.size.height + dst_rect.top_left.y > clipper->size.height + clipper->top_left.y)
+        {
+            dst_rect.size.height = - dst_rect.top_left.y + clipper->size.height + clipper->top_left.y;
+        }
+        if (dst_rect.top_left.x < clipper->top_left.x)
+        {
+            dst_rect.size.width -= clipper->top_left.x - dst_rect.top_left.x;
+            src_rect.top_left.x += clipper->top_left.x - dst_rect.top_left.x;
+            dst_rect.top_left.x = clipper->top_left.x;
+        }
+        if (dst_rect.top_left.y < clipper->top_left.y)
+        {
+            dst_rect.size.height -= clipper->top_left.y - dst_rect.top_left.y;
+            src_rect.top_left.y += clipper->top_left.y - dst_rect.top_left.y;
+            dst_rect.top_left.y = clipper->top_left.y;
+        }
+    }
+    src_rect.size = dst_rect.size;
+
     hw_surface_lock(((ei_impl_frame_t *)widget)->img);
-    ei_copy_surface(surface, &dst_rect, ((ei_impl_frame_t *)widget)->img, &src_rect, true);
+    if (dst_rect.size.width > 0 && dst_rect.size.height > 0)
+    {
+        ei_copy_surface(surface, &dst_rect, ((ei_impl_frame_t *)widget)->img, &src_rect, true);
+    }
     hw_surface_unlock(((ei_impl_frame_t *)widget)->img);
 }
 
@@ -436,79 +461,104 @@ void ei_draw_button_text(ei_surface_t surface, ei_widget_t widget, ei_rect_t *cl
 
 void ei_draw_button_img(ei_surface_t surface, ei_widget_t widget, ei_rect_t *clipper)
 {
-    ei_rect_t src_rect;
-    ei_rect_t dst_rect;
+    ei_point_t top_left;
     int img_width, img_height;
-    /* we define src_rect */
-    if (((ei_impl_button_t *)widget)->img_rect != NULL)
+    ei_rect_t src_rect;
+    
+    /* we define the image width and height */
+    if (((ei_impl_frame_t *)widget)->img_rect != NULL)
     {
-        src_rect = *((ei_impl_button_t *)widget)->img_rect;
-        img_width = src_rect.size.width;
-        img_height = src_rect.size.height;
+        img_width = ((ei_impl_frame_t *)widget)->img_rect->size.width;
+        img_height = ((ei_impl_frame_t *)widget)->img_rect->size.height;
+        src_rect.top_left = ((ei_impl_frame_t *)widget)->img_rect->top_left;
     }
     else
     {
-        src_rect = hw_surface_get_rect(((ei_impl_button_t *)widget)->img);
-        img_width = src_rect.size.width;
-        img_height = src_rect.size.height;
+        ei_rect_t img_rect = hw_surface_get_rect(((ei_impl_frame_t *)widget)->img);
+        img_width = img_rect.size.width;
+        img_height = img_rect.size.height;
+        src_rect.top_left = (ei_point_t){0, 0};
     }
 
-    if (img_width > clipper->size.width || img_height > clipper->size.height)
-    {
-        src_rect.size.width = clipper->size.width;
-        src_rect.size.height = clipper->size.height;
-        src_rect.top_left.x += clipper->top_left.x - widget->content_rect.top_left.x;
-        src_rect.top_left.y += clipper->top_left.y - widget->content_rect.top_left.y;
-        img_width = src_rect.size.width;
-        img_height = src_rect.size.height;
-    }
-
-    /*  We define dst_rect*/
-    switch (((ei_impl_frame_t *)widget)->img_anchor)
+    /* We define the topleft coordinates that the image should have if it fits in the clipper */
+    switch (((ei_impl_button_t *)widget)->img_anchor)
     {
     case ei_anc_center:
-        dst_rect.top_left.x = ((clipper->size.width - img_width) >> 1) + clipper->top_left.x;
-        dst_rect.top_left.y = ((clipper->size.height - img_height) >> 1) + clipper->top_left.y;
+        top_left.x = ((widget->content_rect.size.width - img_width) >> 1) + widget->content_rect.top_left.x;
+        top_left.y = ((widget->content_rect.size.height - img_height) >> 1) + widget->content_rect.top_left.y;
         break;
     case ei_anc_north:
-        dst_rect.top_left.x = ((clipper->size.width - img_width) >> 1) + clipper->top_left.x;
-        dst_rect.top_left.y = clipper->top_left.y;
+        top_left.x = ((widget->content_rect.size.width - img_width) >> 1) + widget->content_rect.top_left.x;
+        top_left.y = widget->content_rect.top_left.y;
         break;
     case ei_anc_northeast:
-        dst_rect.top_left.x = clipper->size.width - img_width + clipper->top_left.x;
-        dst_rect.top_left.y = clipper->top_left.y;
+        top_left.x = widget->content_rect.size.width - img_width + widget->content_rect.top_left.x;
+        top_left.y = widget->content_rect.top_left.y;
         break;
     case ei_anc_east:
-        dst_rect.top_left.x = clipper->size.width - img_width + clipper->top_left.x;
-        dst_rect.top_left.y = ((clipper->size.height - img_height) >> 1) + clipper->top_left.y;
+        top_left.x = widget->content_rect.size.width - img_width + widget->content_rect.top_left.x;
+        top_left.y = ((widget->content_rect.size.height - img_height) >> 1) + widget->content_rect.top_left.y;
         break;
     case ei_anc_southeast:
-        dst_rect.top_left.x = clipper->size.width - img_width + clipper->top_left.x;
-        dst_rect.top_left.y = clipper->size.height - img_height + clipper->top_left.y;
+        top_left.x = widget->content_rect.size.width - img_width + widget->content_rect.top_left.x;
+        top_left.y = widget->content_rect.size.height - img_height + widget->content_rect.top_left.y;
         break;
     case ei_anc_south:
-        dst_rect.top_left.x = ((clipper->size.width - img_width) >> 1) + clipper->top_left.x;
-        dst_rect.top_left.y = clipper->size.height - img_height + clipper->top_left.y;
+        top_left.x = ((widget->content_rect.size.width - img_width) >> 1) + widget->content_rect.top_left.x;
+        top_left.y = widget->content_rect.size.height - img_height + widget->content_rect.top_left.y;
         break;
     case ei_anc_southwest:
-        dst_rect.top_left.x = clipper->top_left.x;
-        dst_rect.top_left.y = clipper->size.height - img_height + clipper->top_left.y;
+        top_left.x = widget->content_rect.top_left.x;
+        top_left.y = widget->content_rect.size.height - img_height + widget->content_rect.top_left.y;
         break;
     case ei_anc_west:
-        dst_rect.top_left.x = clipper->top_left.x;
-        dst_rect.top_left.y = ((clipper->size.height - img_height) >> 1) + clipper->top_left.y;
+        top_left.x = widget->content_rect.top_left.x;
+        top_left.y = ((widget->content_rect.size.height - img_height) >> 1) + widget->content_rect.top_left.y;
         break;
-
     case ei_anc_northwest:
-        dst_rect.top_left.x = clipper->top_left.x;
-        dst_rect.top_left.y = clipper->top_left.y;
+        top_left.x = widget->content_rect.top_left.x;
+        top_left.y = widget->content_rect.top_left.y;
         break;
     default:
         break;
     }
-    dst_rect.size = src_rect.size;
+
+    ei_rect_t dst_rect;
+    dst_rect.top_left = top_left;
+    dst_rect.size.width = img_width;
+    dst_rect.size.width = img_height;
+
+    if (clipper != NULL)
+    {
+        /* intersect clipper and dst_rect and apply same modifications on src_rect */
+        if (dst_rect.size.width + dst_rect.top_left.x > clipper->size.width + clipper->top_left.x)
+        {
+            dst_rect.size.width = - dst_rect.top_left.x + clipper->size.width + clipper->top_left.x;
+        }
+        if (dst_rect.size.height + dst_rect.top_left.y > clipper->size.height + clipper->top_left.y)
+        {
+            dst_rect.size.height = - dst_rect.top_left.y + clipper->size.height + clipper->top_left.y;
+        }
+        if (dst_rect.top_left.x < clipper->top_left.x)
+        {
+            dst_rect.size.width -= clipper->top_left.x - dst_rect.top_left.x;
+            src_rect.top_left.x += clipper->top_left.x - dst_rect.top_left.x;
+            dst_rect.top_left.x = clipper->top_left.x;
+        }
+        if (dst_rect.top_left.y < clipper->top_left.y)
+        {
+            dst_rect.size.height -= clipper->top_left.y - dst_rect.top_left.y;
+            src_rect.top_left.y += clipper->top_left.y - dst_rect.top_left.y;
+            dst_rect.top_left.y = clipper->top_left.y;
+        }
+    }
+    src_rect.size = dst_rect.size;
+
     hw_surface_lock(((ei_impl_button_t *)widget)->img);
-    ei_copy_surface(surface, &dst_rect, ((ei_impl_button_t *)widget)->img, &src_rect, true);
+    if (dst_rect.size.width > 0 && dst_rect.size.height > 0)
+    {
+        ei_copy_surface(surface, &dst_rect, ((ei_impl_button_t *)widget)->img, &src_rect, true);
+    }
     hw_surface_unlock(((ei_impl_button_t *)widget)->img);
 }
 

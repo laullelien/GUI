@@ -561,11 +561,11 @@ void ei_draw_text(ei_surface_t surface,
         /* intersect clipper and dst_rect and apply same modifications on src_rect */
         if (dst_rect.size.width + dst_rect.top_left.x > clipper->size.width + clipper->top_left.x)
         {
-            dst_rect.size.width -= dst_rect.size.width + dst_rect.top_left.x - clipper->size.width - clipper->top_left.x;
+            dst_rect.size.width = -dst_rect.top_left.x + clipper->size.width + clipper->top_left.x;
         }
         if (dst_rect.size.height + dst_rect.top_left.y > clipper->size.height + clipper->top_left.y)
         {
-            dst_rect.size.height -= dst_rect.size.height + dst_rect.top_left.y - clipper->size.height - clipper->top_left.y;
+            dst_rect.size.height = -dst_rect.top_left.y + clipper->size.height + clipper->top_left.y;
         }
         if (dst_rect.top_left.x < clipper->top_left.x)
         {

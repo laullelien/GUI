@@ -1,6 +1,8 @@
 #include "ei_impl_draw.h"
 #include "../api/ei_types.h"
 #include "ei_implementation.h"
+#include "ei_application.c"
+
 
 int *ei_TC_length(ei_point_t *point_array, size_t point_array_size)
 {
@@ -140,7 +142,7 @@ void ei_TCA_remove_merge(ei_segment **TC, ei_segment **p_TCA, uint16_t scanline,
     }
 }
 
-void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *clipper, uint32_t pixel_color, int width, int line_idx)
+void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *clipper, uint32_t pixel_color, ei_color_t color, int width, int line_idx)
 {
 
     int offset = width * line_idx;
@@ -180,9 +182,31 @@ void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *cl
         {
             interval_ending_idx = clipper->top_left.x + clipper->size.width - 1;
         }
-        for (int i = interval_entry_idx; i <= interval_ending_idx; i++)
+        if (color.alpha == 255 || surface == ei_get_picking_surface())
         {
-            *(p_first_pixel + i) = pixel_color;
+            for (int i = interval_entry_idx; i <= interval_ending_idx; i++)
+            {
+                *(p_first_pixel + i) = pixel_color;
+            }
+        }
+        else
+        {
+            int ir = ei_get_ir();
+            int ig = ei_get_ig();
+            int ib = ei_get_ib();
+            int ia = ei_get_ia();
+            int src_alpha = color.alpha;
+            int src_alpha_comp = 255 - src_alpha;
+
+            p_first_pixel += interval_entry_idx;
+            for (int i = 0; i <= interval_ending_idx - interval_entry_idx; i++)
+            {
+                *((uint8_t *)p_first_pixel + ia) = 255;
+                *((uint8_t *)p_first_pixel + ir) = (uint8_t)(((uint16_t)(*((uint8_t *)p_first_pixel + ir)) * (src_alpha_comp) + (uint16_t)(color.red) * src_alpha) / 255);
+                *((uint8_t *)p_first_pixel + ig) = (uint8_t)(((uint16_t)(*((uint8_t *)p_first_pixel + ig)) * (src_alpha_comp) + (uint16_t)(color.green) * src_alpha) / 255);
+                *((uint8_t *)p_first_pixel + ib) = (uint8_t)(((uint16_t)(*((uint8_t *)p_first_pixel + ib)) * (src_alpha_comp) + (uint16_t)(color.blue) * src_alpha) / 255);
+                p_first_pixel++;
+            }
         }
         p_interval_entry = p_interval_ending->next;
     }

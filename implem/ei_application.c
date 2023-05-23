@@ -151,7 +151,7 @@ void ei_app_invalidate_rect(const ei_rect_t *rect)
     }
 }
 
-ei_surface_t get_picking_surface()
+ei_surface_t ei_get_picking_surface()
 {
     return pick_surface;
 }

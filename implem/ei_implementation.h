@@ -37,6 +37,25 @@ uint32_t ei_get_id(ei_surface_t surface, uint32_t * color);
  */
 uint32_t ei_impl_map_rgba(ei_surface_t surface, ei_color_t color);
 
+/**
+ * @return the idex of the red color
+ */
+int ei_get_ir();
+
+/**
+ * @return the idex of the green color
+ */
+int ei_get_ig();
+
+/**
+ * @return the idex of the blue color
+ */
+int ei_get_ib();
+
+/**
+ * @return the idex of the alpha value
+ */
+int ei_get_ia();
 
 /**
  * \brief	A structure storing the placement parameters of a widget.

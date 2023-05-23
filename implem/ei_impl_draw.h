@@ -5,15 +5,12 @@
  *
  */
 
-
 #ifndef EI_IMPL_DRAW
 #define EI_IMPL_DRAW
-
 
 #include "hw_interface.h"
 #include "../api/ei_types.h"
 #include "../api/ei_widget.h"
-
 
 /**
  * \brief	A structure that stores information about a segment.
@@ -27,7 +24,6 @@ typedef struct ei_segment
     uint16_t dy;
     struct ei_segment *next;
 } ei_segment;
-
 
 /**
  * \brief	A structure that stores information about the borders.
@@ -89,11 +85,12 @@ void ei_TCA_remove_merge(ei_segment **TC, ei_segment **p_TCA, uint16_t scanline,
  * It corresponds to every line that intersect the scanline apart from horizontal lines which are useless for the algorithm
  * @param	clipper		If not NULL, the drawing is restricted within this rectangle.
  * @param	pixel_color		The color of the polygon, returned by \ref ei_impl_map_rgba
+ * @param	color		The color of the polygon
  * @param	width		The width of the window that we are drawing on
  * @param	line_idx		The index of the line that we are drawing on
  *
  */
-void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *clipper, uint32_t pixel_color, int width, int line_idx);
+void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *clipper, uint32_t pixel_color, ei_color_t color, int width, int line_idx);
 
 /**
  * \brief	Frees the segments of TCA
@@ -121,7 +118,6 @@ void ei_TCA_free(ei_segment *TCA);
  */
 ei_segment *ei_TCA_sort(ei_segment *first);
 
-
 /**
  * @brief   Initialize the borders to the clipper's borders
  *
@@ -143,7 +139,6 @@ void ei_initialize_borders(const ei_rect_t *clipper,
 bool ei_inside_clipper(ei_point_t *point,
                        const ei_rect_t *clipper,
                        ei_borders *borders);
-
 
 /**
  * @brief   Analytical clipping of a line.
@@ -168,13 +163,12 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
  */
 void ei_TC_free(ei_segment **TC, int length, int first_unused_TC_line);
 
-
 /**
  * \brief	Returns a rectangle corresponding to the intersection of two clippers.
  *
  * @param 	first_clipper		The first clipper.
  * @param 	second_clipper		The second clipper.
- * 
+ *
  * @return A rectangle corresponding to the intersection of two clippers.
  */
 ei_rect_t *ei_intersect_clipper(ei_rect_t *first_clipper, ei_rect_t *second_clipper);

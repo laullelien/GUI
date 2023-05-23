@@ -1,29 +1,38 @@
 #!/bin/bash
 
 
-cd cmake
-make minimal
 
-cd ..
-./cmake/minimal
+# cd cmake
+# make puzzle
 
-
-
-cd cmake
-make minesweeper
-
-cd ..
-./cmake/minesweeper
+# cd ..
+# ./cmake/puzzle
 
 
-cd cmake
-make button
 
-cd ..
-./cmake/button
+# cd cmake
+# make minimal
+
+# cd ..
+# ./cmake/minimal
+
+
 
 cd cmake
-make two048
+make poly
 
 cd ..
-./cmake/two048
+./cmake/poly
+
+
+# cd cmake
+# make button
+
+# cd ..
+# ./cmake/button
+
+# cd cmake
+# make two048
+
+# cd ..
+# ./cmake/two048

@@ -10,7 +10,7 @@
 #define EI_IMPL_EVENT_H
 
 #include "ei_types.h"
-
+#include "ei_event.h"
 
 /**
  * \brief	return the widget pointed by the mouse on the screen

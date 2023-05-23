@@ -175,9 +175,11 @@ int main(int argc, char *argv[])
 	fish[6].x = 200;
 	fish[6].y = 50;
 
+
 	ei_fill(main_window, black, NULL);
 
 	ei_draw_polygon(main_window, red_poly, 5, *red, NULL);
+
 	ei_draw_polygon(main_window, green_poly, 9, *green, NULL);
 	ei_draw_polygon(main_window, blue_poly, 4, *blue, NULL);
 	ei_draw_polygon(main_window, red_poly_b, 5, *red, NULL);

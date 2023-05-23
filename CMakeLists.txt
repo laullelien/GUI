@@ -136,10 +136,20 @@ target_link_libraries(two048		ei ${PLATFORM_LIB_FLAGS})
 add_executable(minesweeper		${TEST_DIR}/minesweeper.c)
 target_link_libraries(minesweeper	ei ${PLATFORM_LIB_FLAGS})
 
-# target toplevel_inside_toplevel
+# target toplevel
 
-add_executable(toplevel_inside_toplevel		${TEST_DIR}/toplevel_inside_toplevel.c)
-target_link_libraries(toplevel_inside_toplevel	ei ${PLATFORM_LIB_FLAGS})
+add_executable(toplevel		${TEST_DIR}/toplevel.c)
+target_link_libraries(toplevel	ei ${PLATFORM_LIB_FLAGS})
+
+# target poly
+
+add_executable(poly		${TEST_DIR}/poly.c)
+target_link_libraries(poly	ei ${PLATFORM_LIB_FLAGS})
+
+# target rectangle
+
+add_executable(rectangle		${TEST_DIR}/rectangle.c)
+target_link_libraries(rectangle	ei ${PLATFORM_LIB_FLAGS})
 
 # external_class
 
@@ -154,4 +164,4 @@ add_custom_target(doc doxygen		${DOCS_DIR}/doxygen.cfg WORKING_DIRECTORY ${ROOT_
 # all
 
 add_custom_target(ig_all ALL)
-add_dependencies(ig_all minimal frame button hello_world puzzle two048 minesweeper toplevel_inside_toplevel)
+add_dependencies(ig_all minimal frame button hello_world puzzle two048 minesweeper toplevel rectangle poly)

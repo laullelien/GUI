@@ -33,31 +33,31 @@ int main(int argc, char *argv[])
 	black->red = 0;
 	black->green = 0;
 	black->blue = 0;
-	black->alpha = 0;
+	black->alpha = 255;
 
 	ei_color_t *white = malloc(sizeof(ei_color_t));
 	white->red = 255;
 	white->green = 255;
 	white->blue = 255;
-	white->alpha = 0;
+	white->alpha = 255;
 
 	ei_color_t *red = malloc(sizeof(ei_color_t));
 	red->red = 255;
 	red->green = 0;
 	red->blue = 0;
-	red->alpha = 0;
+	red->alpha = 255;
 
 	ei_color_t *green = malloc(sizeof(ei_color_t));
 	green->red = 0;
 	green->green = 255;
 	green->blue = 0;
-	green->alpha = 0;
+	green->alpha = 255;
 
 	ei_color_t *blue = malloc(sizeof(ei_color_t));
 	blue->red = 0;
 	blue->green = 0;
 	blue->blue = 255;
-	blue->alpha = 0;
+	blue->alpha = 255;
 
 	ei_point_t red_poly[5];
 	red_poly[0].x = 6;
@@ -178,17 +178,20 @@ int main(int argc, char *argv[])
 
 	ei_fill(main_window, black, NULL);
 
-	ei_draw_polygon(main_window, red_poly, 5, *red, NULL);
+	ei_rect_t rect = hw_surface_get_rect(main_window);
 
-	ei_draw_polygon(main_window, green_poly, 9, *green, NULL);
-	ei_draw_polygon(main_window, blue_poly, 4, *blue, NULL);
-	ei_draw_polygon(main_window, red_poly_b, 5, *red, NULL);
-	ei_draw_polygon(main_window, green_poly_b, 9, *green, NULL);
-	ei_draw_polygon(main_window, blue_poly_b, 4, *blue, NULL);
-	ei_draw_polygon(main_window, fish, 7, *green, NULL);
-	ei_draw_polyline(main_window, fish, 7, *white, NULL);
-	ei_draw_polygon(main_window, blue_poly_d, 7, *blue, NULL);
-	ei_draw_polyline(main_window, blue_poly_d, 7, *white, NULL);
+
+	ei_draw_polygon(main_window, red_poly, 5, *red, &rect);
+
+	ei_draw_polygon(main_window, green_poly, 9, *green, &rect);
+	ei_draw_polygon(main_window, blue_poly, 4, *blue, &rect);
+	ei_draw_polygon(main_window, red_poly_b, 5, *red, &rect);
+	ei_draw_polygon(main_window, green_poly_b, 9, *green, &rect);
+	ei_draw_polygon(main_window, blue_poly_b, 4, *blue, &rect);
+	ei_draw_polygon(main_window, fish, 7, *green, &rect);
+	ei_draw_polyline(main_window, fish, 7, *white, &rect);
+	ei_draw_polygon(main_window, blue_poly_d, 7, *blue, &rect);
+	ei_draw_polyline(main_window, blue_poly_d, 7, *white, &rect);
 
 
 

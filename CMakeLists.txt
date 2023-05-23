@@ -146,10 +146,32 @@ target_link_libraries(toplevel	ei ${PLATFORM_LIB_FLAGS})
 add_executable(poly		${TEST_DIR}/poly.c)
 target_link_libraries(poly	ei ${PLATFORM_LIB_FLAGS})
 
+
+# target fill
+
+add_executable(fill		${TEST_DIR}/fill.c)
+target_link_libraries(fill	ei ${PLATFORM_LIB_FLAGS})
+
+
+# target oct_lines
+
+add_executable(oct_lines		${TEST_DIR}/oct_lines.c)
+target_link_libraries(oct_lines	ei ${PLATFORM_LIB_FLAGS})
+
 # target rectangle
 
 add_executable(rectangle		${TEST_DIR}/rectangle.c)
 target_link_libraries(rectangle	ei ${PLATFORM_LIB_FLAGS})
+
+# target copy_surface
+
+add_executable(copy_surface		${TEST_DIR}/copy_surface.c)
+target_link_libraries(copy_surface	ei ${PLATFORM_LIB_FLAGS})
+
+# target intersection
+
+add_executable(intersection		${TEST_DIR}/intersection.c)
+target_link_libraries(intersection	ei ${PLATFORM_LIB_FLAGS})
 
 # external_class
 
@@ -164,4 +186,4 @@ add_custom_target(doc doxygen		${DOCS_DIR}/doxygen.cfg WORKING_DIRECTORY ${ROOT_
 # all
 
 add_custom_target(ig_all ALL)
-add_dependencies(ig_all minimal frame button hello_world puzzle two048 minesweeper toplevel rectangle poly)
+add_dependencies(ig_all minimal frame button hello_world puzzle two048 minesweeper toplevel rectangle poly lines oct_lines copy_surface external_class fill intersection)

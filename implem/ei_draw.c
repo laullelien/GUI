@@ -399,7 +399,7 @@ void ei_draw_polygon(ei_surface_t surface,
 {
     if (point_array_size != 0)
     {
-        if (!clipper)
+        if (clipper==NULL)
         {
             ei_rect_t root_rect = hw_surface_get_rect(ei_app_root_surface());
             clipper = &root_rect;

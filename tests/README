@@ -3,20 +3,19 @@ Ce répertoire contient un ensemble de programmes destinés à tester votre bibl
 "freq_counter.c,.h" ne sont pas des programmes de test. Ce sont deux fichiers que vous pouvez utiliser dans vos tests pour mesurer la fréquence de fonctionnement de vos programmes (c.f. 5.6 "Évaluation de performances" dans le sujet).
 
 
-button.c
-copy_surface.c
+button.c            test ei_draw_polygon, ei_draw_button, and all the functions to hande the button widget (configure, handlefunc, ...)
+copy_surface.c      test ei_copy_surface
 external_class.c
-fill.c
-frame.c
-hello_world.c
-intersection.c
-line.c
-lines.c
-minesweeper.c
-minimal.c
-oct_lines.c
-poly.c
-puzzle.c
-rectangle.c
-toplevel.c
-two048.c
+fill.c              test ei_fill
+frame.c             test frame widget with image in it
+hello_world.c       test toplevel and button widget, ei_widget_configure, ei_app_create, ei_app_run
+intersection.c      test ei_intersect_clipper
+lines.c             test ei_draw_polyline with clipper
+minesweeper.c       
+minimal.c           test analytical clipping with ei_fill
+oct_lines.c         test ei_draw_polyline
+poly.c              test ei_draw_polygon
+puzzle.c            
+rectangle.c         valgrind test with ei_app_invalidate_rect and free_p_rect_cell
+toplevel.c          test toplevel in toplevel and ei_button_handlefunc
+two048.c            

@@ -550,34 +550,6 @@ bool ei_button_handlefunc(ei_widget_t widget, struct ei_event_t *event)
         }
         return true;
     }
-    // if (((ei_impl_button_t *)widget)->relief == ei_relief_none)
-    // {
-    //     return true;
-    // }
-    // if (event->type == ei_ev_mouse_buttondown && event->param.mouse.button == ei_mouse_button_left) /*define a global var active*/
-    // {
-    //     if (((ei_impl_button_t *)widget)->relief == ei_relief_raised)
-    //     {
-    //         ((ei_impl_button_t *)widget)->relief = ei_relief_sunken;
-    //         ei_app_invalidate_rect(&widget->screen_location);
-    //         ei_event_set_active_widget(widget);
-    //     }
-    //     return true;
-    // }
-    // if (event->type == ei_ev_mouse_buttonup && event->param.mouse.button == ei_mouse_button_left)
-    // {
-    //     if (((ei_impl_button_t *)widget)->relief == ei_relief_sunken)
-    //     {
-    //         ((ei_impl_button_t *)widget)->relief = ei_relief_raised;
-    //         ei_app_invalidate_rect(&widget->screen_location);
-    //         if (strcmp("button", widget->wclass->name) == 0 && ((ei_impl_button_t *)widget)->callback != 0)
-    //         {
-    //             *(((ei_impl_button_t *)widget)->callback)(widget, &event, ((ei_impl_button_t *)active_widget)->user_param);
-    //         }
-    //         ei_event_set_active_widget(NULL);
-    //     }
-    //     return true;
-    // }
     return false;
 }
 

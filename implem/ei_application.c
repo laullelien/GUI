@@ -101,7 +101,7 @@ void ei_app_run()
         // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
         if (get_p_rect_cell() != NULL)
         {
-            hw_surface_update_rects(root_surface, get_p_rect_cell());
+            hw_surface_update_rects(root_surface, NULL);
         }
         free_p_rect_cell();
     }
@@ -132,6 +132,10 @@ void ei_app_quit_request()
 
 void ei_app_invalidate_rect(const ei_rect_t *rect)
 {
+    if(rect==NULL)
+    {
+        return;
+    }
     ei_linked_rect_t **pp_rect_cell = get_pp_rect_cell();
     if ((*pp_rect_cell) == NULL)
     {

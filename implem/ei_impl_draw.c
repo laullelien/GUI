@@ -172,7 +172,6 @@ void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *cl
         {
             interval_ending_idx = p_interval_ending->x_y_min - (p_interval_ending->e <= 0);
         }
-        // printf("e: %d, s: %d\n", interval_entry_idx, interval_ending_idx);
         if (interval_entry_idx < clipper->top_left.x)
         {
             interval_entry_idx = clipper->top_left.x;
@@ -445,9 +444,7 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
     {
         if (abs(dy) > dx)
         {
-            // printf("a\n");
             double y = (double)dy / (double)dx * (double)(clipper->top_left.x - first_point->x);
-            // printf("marche pas %i, %i, %f, %i\n", dx, dy, y, clipper->top_left.x - first_point->x);
             if (y > 0)
             {
                 *e = (int)ceil(y) * dx;
@@ -458,7 +455,6 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
                 *e = -(int)floor(y) * dx;
                 first_point->y += floor(y);
             }
-            // printf("py %i\n", first_point->y);
             *e %= abs(dy);
             if (*e << 1 > abs(dy))
             {
@@ -467,7 +463,6 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
         }
         else
         {
-            // printf("a'\n");
             first_point->y += (clipper->top_left.x - first_point->x) * dy / dx;
             *e = ((clipper->top_left.x - first_point->x) * abs(dy)) % dx;
             if (*e << 1 > dx)
@@ -477,7 +472,6 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
             }
         }
         first_point->x = clipper->top_left.x;
-        // printf("%i, %i\n", first_point->y, clipper->top_left.y + clipper->size.height);
         return !(first_point->y > clipper->top_left.y + clipper->size.height) && !(first_point->y < clipper->top_left.y);
     }
 
@@ -486,7 +480,6 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
     {
         if (abs(dy) > -dx)
         {
-            // printf("b\n");
             double y = (double)dy / (double)-dx * (double)(first_point->x - clipper->top_left.x - clipper->size.width);
             if (y > 0)
             {
@@ -506,7 +499,6 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
         }
         else
         {
-            // printf("b'\n");
             first_point->y += ((first_point->x - clipper->top_left.x - clipper->size.width) * dy) / -dx;
             *e = ((first_point->x - clipper->top_left.x - clipper->size.width) * abs(dy)) % -dx;
             if (*e << 1 > -dx)
@@ -524,7 +516,6 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
     {
         if (dy > abs(dx))
         {
-            // printf("c'\n");
             first_point->x += (clipper->top_left.y - first_point->y) * dx / dy;
             *e = ((clipper->top_left.y - first_point->y) * abs(dx)) % dy;
             if (*e << 1 > dy)
@@ -535,7 +526,6 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
         }
         else
         {
-            // printf("c\n");
             double x = (double)dx / (double)dy * (double)(clipper->top_left.y - first_point->y);
             if (x > 0)
             {
@@ -562,7 +552,6 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
     {
         if (-dy > abs(dx))
         {
-            // printf("d'\n");
             first_point->x += (first_point->y - clipper->top_left.y - clipper->size.height) * dx / -dy;
             *e = ((first_point->y - clipper->top_left.y - clipper->size.height) * abs(dx)) % -dy;
             if (*e << 1 > -dy)
@@ -573,9 +562,7 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
         }
         else
         {
-            // printf("d\n");
             double x = (double)dx / (double)-dy * (double)(first_point->y - clipper->top_left.y - clipper->size.height);
-            // printf("%f, %f, %f, %f\n", (double)dx, (double)dy, (double)(first_point->y - clipper->top_left.y - clipper->size.width), x);
             if (x > 0)
             {
                 *e = (int)ceil(x) * -dy;

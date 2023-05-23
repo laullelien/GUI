@@ -148,12 +148,6 @@ void list_of_points_for_an_arc( ei_point_t center,
 
 
 
-
-
-
-
-
-
 ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
                                                int radius,
                                                int* array_size,
@@ -197,16 +191,11 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
         total_length += 1;
 
 
-
-
-
         /* top left */
         point.x = rectangle.top_left.x + radius;
         point.y = rectangle.top_left.y;
         *(list_points_arc+total_length) = point;
         total_length += 1;
-
-
 
 
         center.x = rectangle.top_left.x + radius;
@@ -222,11 +211,7 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
         total_length += 1;
 
 
-
-
         /* We begin the form right here */
-
-
 
 
         /* bottom left */
@@ -273,8 +258,10 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
 
 
         *array_size = total_length;
-        return list_points_arc; /* remember to free list points at the end */
+        return list_points_arc;
     }
+
+
     /* BOTTOM PART */
     else if (area == 1)
     {
@@ -314,8 +301,6 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
         total_length += 1;
 
 
-
-
         center.x = rectangle.top_left.x + radius;
         center.y = rectangle.top_left.y + rectangle.size.height - radius;
 
@@ -332,8 +317,6 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
         point.y = rectangle.top_left.y + rectangle.size.height ;
         *(list_points_arc+total_length) = point;
         total_length += 1;
-
-
 
 
         center.x = rectangle.top_left.x +  rectangle.size.width - radius;
@@ -369,8 +352,9 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
 
 
         *array_size = total_length;
-        return list_points_arc; /* remember to free list points at the end */
+        return list_points_arc; 
     }
+
     /* MIDDLE PART */
     else
     {
@@ -393,7 +377,6 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
         point.y = rectangle.top_left.y + radius;
         *(list_points_arc+total_length) = point;
         total_length += 1;
-
 
 
         /* BOTTOM LEFT */
@@ -452,7 +435,7 @@ ei_point_t* list_of_points_for_a_rounded_frame(ei_rect_t rectangle,
         total_length += 1;
 
         *array_size = total_length;
-        return list_points_arc; /* remember to free list points at the end */
+        return list_points_arc;
     }
 
 

@@ -156,7 +156,6 @@ void ei_frame_drawfunc(ei_widget_t frame, ei_surface_t surface, ei_surface_t pic
 
 void ei_frame_setdefaultsfunc(ei_widget_t frame)
 {
-    // (*(ei_widget_t *)frame)->requested_size = *requested_size;
     ((ei_impl_frame_t *)frame)->color = ei_default_background_color;
     ((ei_impl_frame_t *)frame)->border_width = 0;
     ((ei_impl_frame_t *)frame)->relief = ei_relief_none;
@@ -767,7 +766,6 @@ bool ei_toplevel_handlefunc(ei_widget_t widget,
         }
 
         // update the screen by adding the rectangles into invalide rect list
-        ////////////////////////////////////////////////////////////////////////////////////
         ei_rect_t root_rect = hw_surface_get_rect(ei_app_root_surface());
         ei_rect_t *prev_screen_location_intersection = ei_intersect_clipper(&widget->screen_location, &root_rect);
         ei_app_invalidate_rect(prev_screen_location_intersection);

@@ -10,7 +10,6 @@ const ei_color_t *ei_widget_get_pick_color(ei_widget_t widget)
 {
     ei_color_t *widget_pick_color=malloc(sizeof(ei_color_t));
     *widget_pick_color=(ei_color_t){(uint8_t)(widget->pick_id>>16), (uint8_t)(widget->pick_id>>8), (uint8_t)(widget->pick_id), 0};
-    /* Don't forget to free */
     return widget_pick_color;
 }
 

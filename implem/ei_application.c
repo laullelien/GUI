@@ -76,7 +76,6 @@ void ei_app_run()
         else if (event.type == ei_ev_mouse_move || event.type == ei_ev_mouse_buttondown || event.type == ei_ev_mouse_buttonup)
         {
             ei_widget_t clicked_widget = get_widget_from_mouse_location(&event, pick_surface);
-            // printf("%s, id = %i\n", clicked_widget->wclass->name, clicked_widget->pick_id);
             if (clicked_widget->wclass->handlefunc != NULL)
             {
                 handled_event = (*(clicked_widget->wclass->handlefunc))(clicked_widget, &event);
@@ -97,7 +96,6 @@ void ei_app_run()
         }
         hw_surface_unlock(root_surface);
         hw_surface_unlock(pick_surface);
-        // ei_copy_surface(root_surface, NULL, pick_surface, NULL, false);
         if (get_p_rect_cell() != NULL)
         {
             hw_surface_update_rects(root_surface, NULL);

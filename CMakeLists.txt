@@ -137,10 +137,10 @@ target_link_libraries(two048		ei ${PLATFORM_LIB_FLAGS})
 add_executable(minesweeper		${TEST_DIR}/minesweeper.c)
 target_link_libraries(minesweeper	ei ${PLATFORM_LIB_FLAGS})
 
-# target pong
+# target toplevel_inside_toplevel
 
-add_executable(pong		${TEST_DIR}/pong.c)
-target_link_libraries(pong	ei ${PLATFORM_LIB_FLAGS})
+add_executable(toplevel_inside_toplevel		${TEST_DIR}/toplevel_inside_toplevel.c)
+target_link_libraries(toplevel_inside_toplevel	ei ${PLATFORM_LIB_FLAGS})
 
 # external_class
 
@@ -155,4 +155,4 @@ add_custom_target(doc doxygen		${DOCS_DIR}/doxygen.cfg WORKING_DIRECTORY ${ROOT_
 # all
 
 add_custom_target(ig_all ALL)
-add_dependencies(ig_all minimal frame button hello_world puzzle two048 minesweeper)
+add_dependencies(ig_all minimal frame button hello_world puzzle two048 minesweeper toplevel_inside_toplevel)

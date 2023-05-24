@@ -6,26 +6,26 @@
 # cd ..
 # ./cmake/minimal
 
+# cd cmake
+# make lines
+
+# cd ..
+# ./cmake/lines
+
 cd cmake
-make puzzle
+make minesweeper
 
 cd ..
-./cmake/puzzle
+./cmake/minesweeper
 
-# cd cmake
-# make minesweeper
+cd cmake
+make button
 
-# cd ..
-# ./cmake/minesweeper
+cd ..
+./cmake/button
 
-# cd cmake
-# make button
+cd cmake
+make two048
 
-# cd ..
-# ./cmake/button
-
-# cd cmake
-# make two048
-
-# cd ..
-# ./cmake/two048
+cd ..
+./cmake/two048

@@ -173,7 +173,6 @@ void ei_draw_scanline(ei_surface_t surface, ei_segment *TCA, const ei_rect_t *cl
         {
             interval_ending_idx = p_interval_ending->x_y_min - (p_interval_ending->e <= 0);
         }
-        // printf("e: %d, s: %d\n", interval_entry_idx, interval_ending_idx);
         if (interval_entry_idx < clipper->top_left.x)
         {
             interval_entry_idx = clipper->top_left.x;
@@ -276,6 +275,7 @@ ei_segment *ei_get_middle(ei_segment *first)
     }
     return slow;
 }
+
 ei_segment *ei_merge(ei_segment *first, ei_segment *second)
 {
     ei_segment *result = NULL;

@@ -87,7 +87,6 @@ void ei_draw_line(ei_surface_t surface,
     int dx = last_point->x - first_point->x;
     int dy = last_point->y - first_point->y;
     int e = 0;
-    // printf("f %i, %i, %i, %i\n", first_point->x, first_point->y, last_point->x, last_point->y);
     bool in;
 
     if (clipper)
@@ -99,7 +98,6 @@ void ei_draw_line(ei_surface_t surface,
         ei_rect_t surface_rect = hw_surface_get_rect(surface);
         in = ei_intersect_line_clipper(first_point, last_point, &surface_rect, dx, dy, &e);
     }
-    // printf("then %i, %i, %i, %i\n", first_point->x, first_point->y, last_point->x, last_point->y);
     if (!in)
     {
         /* put back points to their initial values */
@@ -401,7 +399,7 @@ void ei_draw_polygon(ei_surface_t surface,
 {
     if (point_array_size != 0)
     {
-        if (!clipper)
+        if (clipper==NULL)
         {
             ei_rect_t root_rect = hw_surface_get_rect(ei_app_root_surface());
             clipper = &root_rect;

@@ -7,6 +7,7 @@
 #include "../implem/ei_implementation.h"
 #include "../implem/ei_draw_arc.h"
 #include "../implem/ei_impl_widgetclass.h"
+#include "../implem/ei_impl_draw.h"
 
 int main(int argc, char *argv[])
 {
@@ -21,7 +22,7 @@ int main(int argc, char *argv[])
     ei_rect_t *inter = ei_intersect_clipper(&f_rec, &s_rec);
     if (inter != NULL)
     {
-        printf("%i, %i, %i, %i", inter->top_left.x, inter->top_left.y, inter->size.width, inter->size.height);
+        printf("%i, %i, %i, %i\n", inter->top_left.x, inter->top_left.y, inter->size.width, inter->size.height);
     }
     else
     {

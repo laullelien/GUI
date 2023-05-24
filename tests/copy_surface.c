@@ -29,13 +29,20 @@ int main(int argc, char* argv[])
 	white.green = 255;
 	white.blue = 255;
 	white.alpha = 0;
+
+	// fill white color on main window
     ei_fill(main_window, &white, NULL );
+	
+	
 	ei_color_t copy_color;
 	copy_color.red = 255;
 	copy_color.green = 0;
 	copy_color.blue = 0;
 	copy_color.alpha = 60;
+	
+	// fill red color on second surface (copy_surface)
 	ei_fill(copy_surface, &copy_color, NULL);
+
 
 	ei_rect_t dst_rect;
 	dst_rect.top_left.x=300;
@@ -48,7 +55,8 @@ int main(int argc, char* argv[])
 	src_rect.top_left.y=200;
 	src_rect.size.width=100;
 	src_rect.size.height=100;
-	printf("%i\n",ei_copy_surface(main_window, &dst_rect, copy_surface, &src_rect, true));
+	
+	ei_copy_surface(main_window, &dst_rect, copy_surface, &src_rect, true);
 
 	// unlock, update screen.
 	hw_surface_unlock(main_window);

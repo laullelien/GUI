@@ -64,11 +64,6 @@ int main(int argc, char** argv)
 	ei_anchor_t anchor = ei_anc_west;
 	ei_place(button, &anchor, & (int){150}, & (int){300}, NULL, NULL, NULL, NULL, NULL, NULL);
 
-	ei_widget_t toplevel= ei_widget_create("toplevel", ei_app_root_widget(), NULL, NULL);
-	bool closable = true;
-	ei_toplevel_configure(toplevel, NULL, NULL, NULL, NULL, &closable, NULL, NULL);
-    ei_place_xy(toplevel, 100, 100);
-
 	/* Run the application's main loop. */
 	ei_app_run();
 

@@ -98,12 +98,12 @@
 # ./cmake/poly
 
 
-# # puzzle (OK)
-# cd cmake
-# make puzzle
+# puzzle (OK)
+cd cmake
+make puzzle
 
-# cd ..
-# ./cmake/puzzle
+cd ..
+./cmake/puzzle
 
 
 # # rectangle (OK)

@@ -63,8 +63,8 @@ int main(int argc, char **argv)
 	ei_rect_t *src_rect=malloc(sizeof(ei_rect_t));
 	src_rect->top_left.x=0;
 	src_rect->top_left.y=0;
-	src_rect->size.width=300;
-	src_rect->size.height=200;
+	src_rect->size.width=600;
+	src_rect->size.height=400;
 	
 	/* Create the application and change the color of the background. */
 	ei_app_create((ei_size_t){600, 600}, false);
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 
 	ei_frame_configure(frame, &(ei_size_t){300, 200},
 					   &(ei_color_t){0x88, 0x88, 0x88, 0xff},
-					   NULL,
+					   &(int){2},
 					   &(ei_relief_t){ei_relief_raised}, NULL, NULL, NULL, NULL, &image, &src_rect, &img_anchor);
 	ei_place_xy(frame, 300, 300);
 	ei_place(frame, &anchor, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);

@@ -143,7 +143,6 @@ bool ei_inside_clipper(ei_point_t *point,
 /**
  * @brief   Analytical clipping of a line.
  *
- * @param	surface     The surface to draw the line.
  * @param   first_point The first point of the line.
  * @param   last_point  The second point of the line.
  * @param	clipper		If not NULL, the drawing is restricted within this rectangle.
@@ -153,7 +152,7 @@ bool ei_inside_clipper(ei_point_t *point,
  *
  * @return 			A boolean that is true if and only if the point is inside the clipper
  */
-bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei_point_t *last_point, const ei_rect_t *clipper, int dx, int dy, int *e);
+bool ei_intersect_line_clipper(ei_point_t *first_point, ei_point_t *last_point, const ei_rect_t *clipper, int dx, int dy, int *e);
 
 /**
  * \brief	Frees TC

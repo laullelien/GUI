@@ -123,34 +123,47 @@ int main(int argc, char **argv)
 	hw_init();
 
 	main_window = hw_create_window(win_size, false);
-	char a = 's';
+	char a = 'p';
+	int i=200;
+	int j=200;
 	while (a != 'e')
 	{
-		for (int i = 200; i < 700; i += 50)
+		if(a=='z')
 		{
-			for (int j = 0; j < 200; j += 50)
-			{
-				ei_rect_t *clipper_ptr = NULL;
-				ei_rect_t clipper = ei_rect(ei_point(i, j), ei_size(100, 400));
-				clipper_ptr = &clipper;
-				/* Lock the drawing surface, paint it white. */
-				hw_surface_lock(main_window);
-				ei_fill(main_window, &(ei_color_t){0, 0, 0, 0}, NULL);
-				ei_fill(main_window, &white, clipper_ptr);
-
-				/* Draw polylines. */
-				test_line(main_window, clipper_ptr);
-				test_octogone(main_window, clipper_ptr);
-				test_square(main_window, clipper_ptr);
-				test_dot(main_window, clipper_ptr);
-
-				/* Unlock and update the surface. */
-				hw_surface_unlock(main_window);
-				hw_surface_update_rects(main_window, NULL);
-				sleep(1);
-			}
+			j-=50;
 		}
+		else if(a=='s')
+		{
+			j+=50;
+		}
+		else if(a=='q')
+		{
+			i-=50;
+		}
+		else if(a=='d')
+		{
+			i+=50;
+		}
+		ei_rect_t *clipper_ptr = NULL;
+		ei_rect_t clipper = ei_rect(ei_point(i, j), ei_size(100, 400));
+		clipper_ptr = &clipper;
+		/* Lock the drawing surface, paint it white. */
+		hw_surface_lock(main_window);
+		ei_fill(main_window, &(ei_color_t){0, 0, 0, 0}, NULL);
+		ei_fill(main_window, &white, clipper_ptr);
+
+		/* Draw polylines. */
+		test_line(main_window, clipper_ptr);
+		test_octogone(main_window, clipper_ptr);
+		test_square(main_window, clipper_ptr);
+		test_dot(main_window, clipper_ptr);
+
+		/* Unlock and update the surface. */
+		hw_surface_unlock(main_window);
+		hw_surface_update_rects(main_window, NULL);
+
 		a = getchar();
+
 	}
 
 	/* Wait for a character on command line. */

@@ -3,7 +3,6 @@
 #include "ei_implementation.h"
 #include "ei_application.c"
 
-
 int *ei_TC_length(ei_point_t *point_array, size_t point_array_size)
 {
     int *TC_length = calloc(2, sizeof(int));
@@ -302,7 +301,6 @@ ei_segment *ei_merge(ei_segment *first, ei_segment *second)
     return result;
 }
 
-
 ei_segment *ei_TCA_sort(ei_segment *first)
 {
     if (first->next == NULL)
@@ -323,7 +321,6 @@ ei_segment *ei_TCA_sort(ei_segment *first)
     ei_segment *sorted = ei_merge(first_part, second_part);
     return sorted;
 }
-
 
 void ei_list_print(ei_segment *first)
 {
@@ -351,12 +348,12 @@ bool ei_inside_clipper(ei_point_t *point,
     return (clipper == 0) || ((point->x >= borders->left) && (point->x <= borders->right) && (point->y >= borders->upper) && (point->y <= borders->lower));
 }
 
-bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei_point_t *last_point, const ei_rect_t *clipper, int dx, int dy, int *e)
+bool ei_intersect_line_clipper(ei_point_t *first_point, ei_point_t *last_point, const ei_rect_t *clipper, int dx, int dy, int *e)
 {
-    uint8_t first_code = ((first_point->y > clipper->top_left.y + clipper->size.height) << 3) + ((first_point->y < clipper->top_left.y) << 2) + ((first_point->x > clipper->top_left.x + clipper->size.width) << 1) + ((first_point->x < clipper->top_left.x));
-    uint8_t second_code = ((last_point->y > clipper->top_left.y + clipper->size.height) << 3) + ((last_point->y < clipper->top_left.y) << 2) + ((last_point->x > clipper->top_left.x + clipper->size.width) << 1) + ((last_point->x < clipper->top_left.x));
-    bool in = (first_code | second_code) == 0;
-    bool out = (first_code & second_code) != 0;
+    uint8_t first_code = ((first_point->y > clipper->top_left.y + clipper->size.height - 1) << 3) + ((first_point->y < clipper->top_left.y) << 2) + ((first_point->x > clipper->top_left.x + clipper->size.width - 1) << 1) + ((first_point->x < clipper->top_left.x));
+    uint8_t last_code = ((last_point->y > clipper->top_left.y + clipper->size.height - 1) << 3) + ((last_point->y < clipper->top_left.y) << 2) + ((last_point->x > clipper->top_left.x + clipper->size.width - 1) << 1) + ((last_point->x < clipper->top_left.x));
+    bool in = (first_code | last_code) == 0;
+    bool out = (first_code & last_code) != 0;
     if (in)
     {
         return true;
@@ -365,261 +362,146 @@ bool ei_intersect_line_clipper(ei_surface_t surface, ei_point_t *first_point, ei
     {
         return false;
     }
-    /* we first intersect the last point with x */
-    /* x_2 < x_min */
-    if (second_code & 1)
+    if (first_code != 0)
     {
-        double y = (double)dy / (double)dx * (double)(clipper->top_left.x - last_point->x);
-        if (fabs(y) - floor(fabs(y)) > 1 / 2)
+        /* x_1 < x_min*/
+        if (first_code & 1)
         {
-            if (y > 0)
+            double y = (double)(dy * (clipper->top_left.x - first_point->x)) / (double)dx;
+            if (dx > abs(dy))
             {
-                y++;
+                *e = (clipper->top_left.x - first_point->x) * abs(dy) % dx;
+                if (*e << 1 > dx)
+                {
+                    *e -= dx;
+                }
             }
             else
             {
-                y--;
+                *e = abs(first_point->y - (int)round(y)) * dx % abs(dy);
+                if ((*e << 1) > abs(dy))
+                {
+                    *e -= abs(dy);
+                }
             }
+            first_point->y += (int)round(y);
+            first_point->x = clipper->top_left.x;
+            return ei_intersect_line_clipper(first_point, last_point, clipper, dx, dy, e);
         }
-        last_point->y += y;
-        last_point->x = clipper->top_left.x;
-    }
 
-    /* x_2 > x_max */
-    else if (second_code & 2)
-    {
-        double y = (double)dy / (double)dx * (double)(last_point->x - clipper->top_left.x - clipper->size.width);
-        if (fabs(y) - floor(fabs(y)) > 1 / 2)
+        /* x_1 > x_max*/
+        else if (first_code & 2)
         {
-            if (y > 0)
+            double y = (double)(dy * (first_point->x - clipper->top_left.x - clipper->size.width + 1)) / (double)(-dx);
+            if ((-dx) > abs(dy))
             {
-                y++;
+                *e = (first_point->x - clipper->top_left.x - clipper->size.width + 1) * abs(dy) % (-dx);
+                if (*e << 1 > (-dx))
+                {
+                    *e += dx;
+                }
             }
             else
             {
-                y--;
-            }
-        }
-        last_point->y -= y;
-        last_point->x = clipper->top_left.x + clipper->size.width;
-    }
-
-    second_code = ((last_point->y > clipper->top_left.y + clipper->size.height) << 3) + ((last_point->y < clipper->top_left.y) << 2) + ((last_point->x > clipper->top_left.x + clipper->size.width) << 1) + ((last_point->x < clipper->top_left.x));
-
-    /* if the intersection is still not in the clipper */
-    if (second_code != 0)
-    {
-        /* y_2 < y_min */
-        if (second_code & 4)
-        {
-            double x = (double)dx / (double)dy * (double)(clipper->top_left.y - last_point->y);
-            if (fabs(x) - floor(fabs(x)) > 1 / 2)
-            {
-                if (x > 0)
+                *e = abs(first_point->y - (int)round(y)) * (-dx) % abs(dy);
+                if (*e << 1 > abs(dy))
                 {
-                    x++;
-                }
-                else
-                {
-                    x--;
+                    *e -= abs(dy);
                 }
             }
-            last_point->x += x;
-            last_point->y = clipper->top_left.y;
+            first_point->y += (int)round(y);
+            first_point->x = clipper->top_left.x + clipper->size.width - 1;
+            return ei_intersect_line_clipper(first_point, last_point, clipper, dx, dy, e);
         }
 
-        /* y_2 > y_max */
-        else if (second_code & 8)
+        /* y_1 < y_min*/
+        else if (first_code & 4)
         {
-            double x = (double)dx / (double)dy * (double)(last_point->y - clipper->top_left.y - clipper->size.height);
-            if (fabs(x) - floor(fabs(x)) > 1 / 2)
+            double x = (double)(dx * (clipper->top_left.y - first_point->y)) / (double)dy;
+            if (dy > abs(dx))
             {
-                if (x > 0)
+                *e = (clipper->top_left.y - first_point->y) * abs(dx) % dy;
+                if (*e << 1 > dy)
                 {
-                    x++;
+                    *e -= dy;
                 }
-                else
-                {
-                    x--;
-                }
-            }
-            last_point->x -= x;
-            last_point->y = clipper->top_left.y + clipper->size.height;
-        }
-    }
-
-    second_code = ((last_point->y > clipper->top_left.y + clipper->size.height) << 3) + ((last_point->y < clipper->top_left.y) << 2) + ((last_point->x > clipper->top_left.x + clipper->size.width) << 1) + ((last_point->x < clipper->top_left.x));
-
-    if (second_code != 0)
-    {
-        printf("%i\n", second_code);
-        return false;
-    }
-
-    /* the first point is inside */
-    /* in this case, we just need to change the second point to stop at the right time since there is no need to increment e */
-
-    if (!first_code)
-    {
-        return true;
-    }
-
-    /* x < x_min*/
-    if (first_code & 1)
-    {
-        if (abs(dy) > dx)
-        {
-            // printf("a\n");
-            double y = (double)dy / (double)dx * (double)(clipper->top_left.x - first_point->x);
-            // printf("marche pas %i, %i, %f, %i\n", dx, dy, y, clipper->top_left.x - first_point->x);
-            if (y > 0)
-            {
-                *e = (int)ceil(y) * dx;
-                first_point->y += ceil(y);
             }
             else
             {
-                *e = -(int)floor(y) * dx;
-                first_point->y += floor(y);
+                *e = abs(first_point->x - (int)round(x)) * dy % abs(dx);
+                if (*e << 1 > abs(dx))
+                {
+                    *e -= abs(dx);
+                }
             }
-            // printf("py %i\n", first_point->y);
-            *e %= abs(dy);
-            if (*e << 1 > abs(dy))
-            {
-                *e -= abs(dy);
-            }
+            first_point->x += (int)round(x);
+            first_point->y = clipper->top_left.y;
+            return ei_intersect_line_clipper(first_point, last_point, clipper, dx, dy, e);
         }
+
+        /* y_1 > y_max*/
         else
         {
-            // printf("a'\n");
-            first_point->y += (clipper->top_left.x - first_point->x) * dy / dx;
-            *e = ((clipper->top_left.x - first_point->x) * abs(dy)) % dx;
-            if (*e << 1 > dx)
+            double x = (double)(dx * (first_point->y - clipper->top_left.y - clipper->size.height + 1)) / (double)(-dy);
+            if ((-dy) > abs(dx))
             {
-                *e -= dx;
-                first_point->y += (1 - ((dy < 0) << 1));
-            }
-        }
-        first_point->x = clipper->top_left.x;
-        // printf("%i, %i\n", first_point->y, clipper->top_left.y + clipper->size.height);
-        return !(first_point->y > clipper->top_left.y + clipper->size.height) && !(first_point->y < clipper->top_left.y);
-    }
-
-    /* x > x_max */
-    else if (first_code & 2)
-    {
-        if (abs(dy) > -dx)
-        {
-            // printf("b\n");
-            double y = (double)dy / (double)-dx * (double)(first_point->x - clipper->top_left.x - clipper->size.width);
-            if (y > 0)
-            {
-                *e = (int)ceil(y) * -dx;
-                first_point->y += ceil(y);
+                *e = (first_point->y - clipper->top_left.y - clipper->size.width + 1) * abs(dx) % (-dy);
+                if (*e << 1 > (-dy))
+                {
+                    *e += dy;
+                }
             }
             else
             {
-                *e = (int)floor(y) * dx;
-                first_point->y += floor(y);
+                *e = abs(first_point->x - (int)round(x)) * (-dy) % abs(dx);
+                if (*e << 1 > abs(dx))
+                {
+                    *e -= abs(dx);
+                }
             }
-            *e %= abs(dy);
-            if (*e << 1 > abs(dy))
-            {
-                *e -= abs(dy);
-            }
+            first_point->x += (int)round(x);
+            first_point->y = clipper->top_left.y + clipper->size.height - 1;
+            return ei_intersect_line_clipper(first_point, last_point, clipper, dx, dy, e);
         }
-        else
-        {
-            // printf("b'\n");
-            first_point->y += ((first_point->x - clipper->top_left.x - clipper->size.width) * dy) / -dx;
-            *e = ((first_point->x - clipper->top_left.x - clipper->size.width) * abs(dy)) % -dx;
-            if (*e << 1 > -dx)
-            {
-                *e += dx;
-                first_point->y += (1 - ((dy < 0) << 1));
-            }
-        }
-        first_point->x = clipper->top_left.x + clipper->size.width;
-        return !(first_point->y > clipper->top_left.y + clipper->size.height) && !(first_point->y < clipper->top_left.y);
     }
-
-    /* y < y_min*/
-    else if (first_code & 4)
-    {
-        if (dy > abs(dx))
-        {
-            // printf("c'\n");
-            first_point->x += (clipper->top_left.y - first_point->y) * dx / dy;
-            *e = ((clipper->top_left.y - first_point->y) * abs(dx)) % dy;
-            if (*e << 1 > dy)
-            {
-                first_point->x += (1 - ((dx < 0) << 1));
-                *e -= dy;
-            }
-        }
-        else
-        {
-            // printf("c\n");
-            double x = (double)dx / (double)dy * (double)(clipper->top_left.y - first_point->y);
-            if (x > 0)
-            {
-                *e = (int)ceil(x) * dy;
-                first_point->x += ceil(x);
-            }
-            else
-            {
-                *e = -(int)floor(x) * dy;
-                first_point->x += floor(x);
-            }
-            *e %= abs(dx);
-            if (*e << 1 > abs(dx))
-            {
-                *e -= abs(dx);
-            }
-        }
-        first_point->y = clipper->top_left.y;
-        return !(last_point->x > clipper->top_left.x + clipper->size.width) && !(last_point->x < clipper->top_left.x);
-    }
-
-    /* y > y_max */
     else
     {
-        if (-dy > abs(dx))
+        /* x_2 < x_min*/
+        if (last_code & 1)
         {
-            // printf("d'\n");
-            first_point->x += (first_point->y - clipper->top_left.y - clipper->size.height) * dx / -dy;
-            *e = ((first_point->y - clipper->top_left.y - clipper->size.height) * abs(dx)) % -dy;
-            if (*e << 1 > -dy)
-            {
-                first_point->x += (1 - ((dx < 0) << 1));
-                *e += dy;
-            }
+            double y = (double)(dy * (clipper->top_left.x - last_point->x)) / (double)dx;
+            last_point->y += (int)round(y);
+            last_point->x = clipper->top_left.x;
+            return ei_intersect_line_clipper(first_point, last_point, clipper, dx, dy, e);
         }
+
+        /* x_2 > x_max*/
+        else if (last_code & 2)
+        {
+            double y = (double)(dy * (last_point->x - clipper->top_left.x - clipper->size.width + 1)) / (double)(-dx);
+            last_point->y += (int)round(y);
+            last_point->x = clipper->top_left.x + clipper->size.width - 1;
+            return ei_intersect_line_clipper(first_point, last_point, clipper, dx, dy, e);
+        }
+
+        /* y_2 < y_min*/
+        else if (last_code & 4)
+        {
+            double x = (double)(dx * (clipper->top_left.y - last_point->y)) / (double)dy;
+            last_point->x += (int)round(x);
+            last_point->y = clipper->top_left.y;
+            return ei_intersect_line_clipper(first_point, last_point, clipper, dx, dy, e);
+        }
+
+        /* y_2 > y_max*/
         else
         {
-            // printf("d\n");
-            double x = (double)dx / (double)-dy * (double)(first_point->y - clipper->top_left.y - clipper->size.height);
-            // printf("%f, %f, %f, %f\n", (double)dx, (double)dy, (double)(first_point->y - clipper->top_left.y - clipper->size.width), x);
-            if (x > 0)
-            {
-                *e = (int)ceil(x) * -dy;
-                first_point->x += ceil(x);
-            }
-            else
-            {
-                *e = (int)floor(x) * dy;
-                first_point->x += floor(x);
-            }
-            *e %= abs(dx);
-            if (*e << 1 > abs(dx))
-            {
-                *e -= abs(dx);
-            }
+            double x = (double)(dx * (last_point->y - clipper->top_left.y - clipper->size.height + 1)) / (double)(-dy);
+            last_point->x += (int)round(x);
+            last_point->y = clipper->top_left.y + clipper->size.height - 1;
+            return ei_intersect_line_clipper(first_point, last_point, clipper, dx, dy, e);
         }
-        first_point->y = clipper->top_left.y + clipper->size.height;
-        return !(last_point->x > clipper->top_left.x + clipper->size.width) && !(last_point->x < clipper->top_left.x);
     }
-    return true;
 }
 
 void ei_TC_free(ei_segment **TC, int length, int first_unused_TC_line)
@@ -642,12 +524,10 @@ void ei_TC_free(ei_segment **TC, int length, int first_unused_TC_line)
     }
 }
 
-
 int min(int a, int b)
 {
     return (a < b) ? a : b;
 }
-
 
 ei_rect_t *ei_intersect_clipper(ei_rect_t *first_clipper, ei_rect_t *second_clipper)
 {

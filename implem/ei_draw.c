@@ -92,12 +92,12 @@ void ei_draw_line(ei_surface_t surface,
 
     if (clipper)
     {
-        in = ei_intersect_line_clipper(surface, first_point, last_point, clipper, dx, dy, &e);
+        in = ei_intersect_line_clipper(first_point, last_point, clipper, dx, dy, &e);
     }
     else
     {
         ei_rect_t surface_rect = hw_surface_get_rect(surface);
-        in = ei_intersect_line_clipper(surface, first_point, last_point, &surface_rect, dx, dy, &e);
+        in = ei_intersect_line_clipper(first_point, last_point, &surface_rect, dx, dy, &e);
     }
     // printf("then %i, %i, %i, %i\n", first_point->x, first_point->y, last_point->x, last_point->y);
     if (!in)

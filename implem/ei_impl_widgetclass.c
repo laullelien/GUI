@@ -12,6 +12,21 @@ static ei_point_t ancient_mouse_location;
 static int is_top_toplevel = 0; // 0 == false; 1 == true;
 static int is_small_square_toplevel = 0;
 
+
+
+void external_class_register(ei_widgetclass_t* widgetclass)
+{
+    ei_widgetclass_register(widgetclass);
+}
+
+
+
+
+
+
+
+
+
 /* FRAME */
 
 ei_widget_t ei_frame_allocfunc()

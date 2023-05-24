@@ -14,9 +14,10 @@ void ei_widgetclass_register(ei_widgetclass_t *p_widgetclass_list)
         ei_button_widgetclass_create(p_widgetclass_list);
     }
     else if (strcmp("toplevel", p_widgetclass_list->name) == 0)
-    {
+    {                                 
         ei_toplevel_widgetclass_create(p_widgetclass_list);
     }
+    else
     return;
 }
 
@@ -36,4 +37,10 @@ ei_widgetclass_t *ei_widgetclass_from_name(ei_const_string_t name)
         return p_widgetclass_list + 2;
     }
     return NULL;
+}
+
+
+size_t		ei_widget_struct_size()
+{
+    return sizeof(ei_impl_widget_t);
 }

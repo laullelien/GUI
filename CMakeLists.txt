@@ -79,18 +79,23 @@ include_directories(${HEADER_DIRS})
 
 set(LIB_EI_SOURCES
      ${SRC_DIR}/ei_draw.c
+	 ${SRC_DIR}/ei_impl_draw.c
+	 ${SRC_DIR}/ei_draw_arc.c
      ${SRC_DIR}/ei_implementation.c
      ${SRC_DIR}/ei_placer.c
      ${SRC_DIR}/ei_application.c
+	 ${SRC_DIR}/ei_event.c
      ${SRC_DIR}/ei_widget_configure.c
      ${SRC_DIR}/ei_widget.c
      ${SRC_DIR}/ei_widgetclass.c
      ${SRC_DIR}/ei_impl_widgetclass.c
      ${SRC_DIR}/ei_widget_attribute.c
+	 ${SRC_DIR}/ei_impl_widget.c
+	 ${SRC_DIR}/ei_impl_event.c)
 
-        implem/ei_impl_widget.c)
 
-add_library(ei STATIC			${LIB_EI_SOURCES} implem/ei_draw_arc.h implem/ei_draw_arc.c)
+
+add_library(ei STATIC			${LIB_EI_SOURCES})
 
 # target minimal
 
@@ -109,7 +114,7 @@ target_link_libraries(frame		ei ${PLATFORM_LIB_FLAGS})
 
 # target button
 
-add_executable(button			${TEST_DIR}/button.c implem/ei_draw_arc.h implem/ei_draw_arc.c)
+add_executable(button			${TEST_DIR}/button.c)
 target_link_libraries(button		ei ${PLATFORM_LIB_FLAGS})
 
 # target hello_world

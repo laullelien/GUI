@@ -42,7 +42,7 @@ typedef void*				ei_user_param_t;
  * @brief	A 2-D point with integer coordinates.
  */
 typedef struct {
-	int				x; ///< The abscisse of the point. The origin is on the left side of the image.
+	int				x; ///< The abscissa of the point. The origin is on the left side of the image.
 	int				y; ///< The ordinate of the point, the origin is at the top of the image, ordinates increase towards the bottom.
 } ei_point_t;
 

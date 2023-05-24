@@ -56,6 +56,7 @@
 #include "ei_draw.h"
 #include "../implem/ei_implementation.h"
 #include "../implem/ei_draw_arc.h"
+#include "ei_application.h"
 
 
 int main(int argc, char* argv[])
@@ -75,56 +76,19 @@ int main(int argc, char* argv[])
 	hw_surface_lock(main_window);
 	hw_surface_lock(copy_surface);
 
-	ei_color_t white;
-	white.red = 255;
-	white.green = 255;
-	white.blue = 255;
-	white.alpha = 0;
-    ei_fill(main_window, &white, NULL );
-	ei_color_t copy_color;
-	copy_color.red = 255;
-	copy_color.green = 0;
-	copy_color.blue = 0;
-	copy_color.alpha = 60;
-	ei_fill(copy_surface, &copy_color, NULL);
+	ei_color_t red = {255,0,0,0};
 
-	ei_rect_t dst_rect;
-	dst_rect.top_left.x=300;
-	dst_rect.top_left.y=150;
-	dst_rect.size.width=100;
-	dst_rect.size.height=100;
-
-	ei_rect_t src_rect;
-	src_rect.top_left.x=200;
-	src_rect.top_left.y=200;
-	src_rect.size.width=100;
-	src_rect.size.height=100;
-
-	char *name="ICI";
-	ei_rect_t root_rect=hw_surface_get_rect(main_window);
-	ei_draw_text(main_window, &((ei_point_t){0, 0}), name, ei_default_font, (ei_color_t){0xff, 0x55, 0xf0, 0xff}, &root_rect); 
-	printf("%i\n",ei_copy_surface(main_window, &dst_rect, copy_surface, &src_rect, true));
-
-    // button test
-    ei_rect_t src_rect2;
-    src_rect2.top_left.x=100;
-    src_rect2.top_left.y=100;
-    src_rect2.size.width=300;
-    src_rect2.size.height=200;
-
-    ei_color_t grey;
-    grey.red = 200;
-    grey.green = 200;
-    grey.blue = 200;
-    grey.alpha = 0;
-
-    ei_rect_t clipper;
+	ei_rect_t clipper;
     clipper.top_left.y=50;
     clipper.size.width=150;
     clipper.top_left.x=50;
     clipper.size.height=150;
 
-    ei_draw_button(main_window ,src_rect2, grey, ei_relief_sunken, 5, 20, &clipper);
+
+    ei_fill(main_window, &red, &clipper);
+
+
+
 
 	// unlock, update screen.
 	hw_surface_unlock(main_window);

@@ -19,11 +19,11 @@
 
 
 # external_class (KOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO)
-# cd cmake
-# make external_class
+cd cmake
+make external_class
 
-# cd ..
-# ./cmake/external_class
+cd ..
+./cmake/external_class
 
 
 # fill  (OK)
@@ -98,12 +98,12 @@
 # ./cmake/poly
 
 
-# puzzle (OK)
-cd cmake
-make puzzle
+# # puzzle (OK)
+# cd cmake
+# make puzzle
 
-cd ..
-./cmake/puzzle
+# cd ..
+# ./cmake/puzzle
 
 
 # # rectangle (OK)

@@ -5,9 +5,7 @@
 #include "ei_impl_widget.h"
 #include "ei_widget_attributes.h"
 #include "ei_impl_widgetclass.h"
-#include "ei_impl_widget.h"
 #include "ei_impl_event.h"
-#include "ei_application.c"
 
 
 ei_widget_t ei_widget_create(ei_const_string_t class_name,

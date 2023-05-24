@@ -15,6 +15,10 @@ static ei_surface_t pick_surface;
 static ei_event_t event;
 static bool stop = false;
 
+ei_surface_t ei_get_picking_surface() {
+    return pick_surface;
+}
+
 void ei_app_create(ei_size_t main_window_size, bool fullscreen)
 {
     initialize_widget_list();
@@ -151,9 +155,5 @@ void ei_app_invalidate_rect(const ei_rect_t *rect)
     }
 }
 
-ei_surface_t ei_get_picking_surface()
-{
-    return pick_surface;
-}
 
 

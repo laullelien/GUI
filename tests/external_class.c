@@ -9,14 +9,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../api/ei_widget.h"
 #include "ei_utils.h"
 #include "ei_application.h"
 #include "ei_event.h"
 #include "hw_interface.h"
 #include "ei_widget_configure.h"
-#include "ei_widget_attributes.h"
-#include "../api/ei_placer.h"
+
 
 void external_class_register();
 void external_class_configure(ei_widget_t widget, int margin);
@@ -111,5 +109,4 @@ int main(int argc, char** argv)
 
 	return (EXIT_SUCCESS);
 }
-
 

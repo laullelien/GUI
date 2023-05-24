@@ -21,11 +21,11 @@
 
 
 # external_class (KOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO)
-# cd cmake
-# make external_class
+cd cmake
+make external_class
 
-# cd ..
-# ./cmake/external_class
+cd ..
+./cmake/external_class
 
 # cd cmake
 # make lines
@@ -63,11 +63,11 @@
 
 
 # # lines (OK but could not close manually until crashhhhh)
-cd cmake 
-make lines
+# cd cmake 
+# make lines
 
-cd ..
-./cmake/lines
+# cd ..
+# ./cmake/lines
 
 
 # # minesweeper (OK)

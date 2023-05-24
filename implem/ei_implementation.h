@@ -13,7 +13,7 @@
 #include "ei_widget.h"
 
 
-
+ei_surface_t ei_get_picking_surface();
 /**
  * \brief	Gets the id of a widget corresponding to the color given a surface.
  * 			The id is rearrange following the sequence of red, then green, then blue.

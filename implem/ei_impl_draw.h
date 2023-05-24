@@ -9,8 +9,8 @@
 #define EI_IMPL_DRAW
 
 #include "hw_interface.h"
-#include "../api/ei_types.h"
-#include "../api/ei_widget.h"
+#include "ei_types.h"
+#include "ei_widget.h"
 
 /**
  * \brief	A structure that stores information about a segment.

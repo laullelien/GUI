@@ -33,7 +33,6 @@ if(${APPLE})
 					"/opt/local/include")
 	set(PLATFORM_DIR		"${ROOT_DIR}/_macos")
 	set(EIBASE			${PLATFORM_DIR}/libeibase.a)
-	set(EXTCLASS			${PLATFORM_DIR}/libexternalclass.a)
 	set(PLATFORM_LIB_FLAGS		${EIBASE} -L/opt/local/lib ${LIB_FLAGS})
 
 
@@ -45,7 +44,6 @@ elseif(${UNIX})
 					"/usr/include/SDL2")
 	set(PLATFORM_DIR		"${ROOT_DIR}/_x11")
 	set(EIBASE			${PLATFORM_DIR}/libeibase.a)
-	set(EXTCLASS			${PLATFORM_DIR}/libexternalclass.a)
 	set(PLATFORM_LIB_FLAGS		${EIBASE} -L${PLATFORM_DIR} ${LIB_FLAGS} -lm)
 
 	message(STATUS "Building for Linux with eibase: ${EIBASE}")
@@ -60,7 +58,6 @@ else()
 
 	set(PLATFORM_DIR		"${ROOT_DIR}/_win")
 	set(EIBASE			${PLATFORM_DIR}/eibase.lib)
-	set(EXTCLASS			${PLATFORM_DIR}/externalclass.lib)
 	set(PLATFORM_LIB_FLAGS		${EIBASE}
 					${SDL}/lib/SDL2.lib
 					${SDL}/lib/SDL2_ttf.lib
@@ -173,12 +170,6 @@ target_link_libraries(copy_surface	ei ${PLATFORM_LIB_FLAGS})
 add_executable(intersection		${TEST_DIR}/intersection.c)
 target_link_libraries(intersection	ei ${PLATFORM_LIB_FLAGS})
 
-# external_class
-
-add_executable(external_class		${TEST_DIR}/external_class.c)
-target_link_libraries(external_class	ei ${PLATFORM_LIB_FLAGS} ${EXTCLASS})
-
-
 # target to build the documentation
 
 add_custom_target(doc doxygen		${DOCS_DIR}/doxygen.cfg WORKING_DIRECTORY ${ROOT_DIR})
@@ -186,4 +177,4 @@ add_custom_target(doc doxygen		${DOCS_DIR}/doxygen.cfg WORKING_DIRECTORY ${ROOT_
 # all
 
 add_custom_target(ig_all ALL)
-add_dependencies(ig_all minimal frame button hello_world puzzle two048 minesweeper toplevel rectangle poly lines oct_lines copy_surface external_class fill intersection)
+add_dependencies(ig_all minimal frame button hello_world puzzle two048 minesweeper toplevel rectangle poly lines oct_lines copy_surface fill intersection)
